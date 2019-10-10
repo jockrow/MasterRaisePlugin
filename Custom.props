@@ -1,0 +1,15 @@
+# Plugin properties
+plugin.masterraise.MasterRaisePlugin.name=Master Raise
+plugin.masterraise.MasterRaisePlugin.author=Richard Martinez
+plugin.masterraise.MasterRaisePlugin.version=1.5
+plugin.masterraise.MasterRaisePlugin.docs=MasterRaise.html
+
+#menu
+plugin.masterraise.MasterRaisePlugin.menu=masterraise.toggle-favorites
+
+#labels
+masterraise.toggle-favorites.label=Menu Favorites
+inspect-file.label=Inspect File
+inspect-pixel.label=Inspect Pixel
+inspect-alarm.label=Inspect Alarm
+open-its-folder.label=Open Its Folder

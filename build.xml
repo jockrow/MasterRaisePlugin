@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<project name="MasterRaise" default="dist" basedir=".">
+	<property file="build.properties" />
+	<property name="jar.name" value="${ant.project.name}.jar"/>
+	<property name="src.dir" value="."/>
+	<property name="build.dir" value="build"/>
+	<property name="install.dir" value="${jedit.install.dir}/jars"/>
+
+	<path id="project.class.path">
+		<pathelement location="${install.dir}/TextObjects.jar"/>
+		<pathelement location="${install.dir}/commons-io-2.4.jar"/>
+		<pathelement location="${jedit.install.dir}/jedit.jar"/>
+	</path>
+
+	<target name="init">
+		<mkdir dir="${build.dir}"/>
+	</target>
+
+	<target name="compile" depends="init">
+		<javac
+			srcdir="${src.dir}"
+			destdir="${build.dir}"
+			deprecation="off"
+			includeJavaRuntime="yes"
+			includeantruntime="false">
+			<classpath refid="project.class.path"/>
+		</javac>
+	</target>
+
+	<target name="dist" depends="compile">
+		<mkdir dir="${install.dir}"/>
+		<copy todir="${build.dir}">
+		    <fileset dir="${src.dir}">
+		    	<include name="**/*.props"/>
+				<include name="**/actions.xml"/>
+				<include name="**/services.xml"/>
+				<include name="icons/**"/>
+		    </fileset>
+		</copy>
+		<jar jarfile="${install.dir}/${jar.name}">
+			<fileset dir="${build.dir}">   
+				<exclude name="build*"/>
+				<exclude name="build/"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+		<delete file="${install.dir}/${jar.name}" />
+	</target>
+</project>

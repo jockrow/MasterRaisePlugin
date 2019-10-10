@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE SERVICES SYSTEM "services.dtd">
+
+<SERVICES>
+	<SERVICE CLASS="org.gjt.sp.jedit.gui.DynamicContextMenuService" NAME="Text Objects">
+		new masterraise.context.ContextMenuService();
+	</SERVICE>
+	<SERVICE CLASS="org.gjt.sp.jedit.gui.statusbar.StatusWidgetFactory" NAME="process">
+		import masterraise.notify.NotifyWidgetFactory;
+		new NotifyWidgetFactory();
+	</SERVICE>
+</SERVICES>
