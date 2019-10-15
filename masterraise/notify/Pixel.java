@@ -31,7 +31,7 @@ public abstract class Pixel{
 	static Color c = null;
 	static String currentDetail = "";
 	
-	public static void startInspect(View view){
+	public static void start(View view){
 		try {
 			new InspectionDialog(view);
 		} catch (AWTException e) {

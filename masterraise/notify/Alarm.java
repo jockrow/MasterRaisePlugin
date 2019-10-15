@@ -52,7 +52,7 @@ public class Alarm{
 		}
 	});
 
-	public void startInspect(View view){
+	public void start(View view){
 		KeyListener ka = new KeyListener(){
 			public void keyReleased(KeyEvent ke){
 				if (ke.getKeyCode() == KeyEvent.VK_ESCAPE){

@@ -1,7 +1,6 @@
 <!DOCTYPE ACTIONS SYSTEM "actions.dtd">
 
 <ACTIONS>
-	<!-- <ACTION NAME="customplugin.toggle-favorites"> -->
 	<ACTION NAME="masterraise.toggle-favorites">
 		<CODE>
 			masterraise.MasterRaisePlugin.toggleFavorites(view);
@@ -9,21 +8,6 @@
 		<IS_SELECTED>
 			return masterraise.MasterRaisePlugin.checkFavorites();
 		</IS_SELECTED>
-	</ACTION>
-	<ACTION NAME="inspect-file">
-		<CODE>
-			masterraise.notify.File.startInspect(view);
-		</CODE>
-	</ACTION>
-	<ACTION NAME="inspect-pixel">
-		<CODE>
-			masterraise.notify.Pixel.startInspect(view);
-		</CODE>
-	</ACTION>
-	<ACTION NAME="inspect-alarm">
-		<CODE>
-			new masterraise.notify.Alarm().startInspect(view);
-		</CODE>
 	</ACTION>
 	<ACTION NAME="open-its-folder">
 		<CODE>
@@ -34,4 +18,27 @@
 			new masterraise.files.jEditFile().openFolder(openPath);
 		</CODE>
 	</ACTION>
+	
+	<ACTION NAME="notify-file">
+		<CODE>
+			masterraise.notify.File.start(view);
+		</CODE>
+	</ACTION>
+	<ACTION NAME="notify-pixel">
+		<CODE>
+			masterraise.notify.Pixel.start(view);
+		</CODE>
+	</ACTION>
+	<ACTION NAME="notify-alarm">
+		<CODE>
+			new masterraise.notify.Alarm().start(view);
+		</CODE>
+	</ACTION>
+	
+	<ACTION NAME="spreadsheet-transpose-matrix">
+		<CODE>
+			new masterraise.tools.SpreadSheet().transposeMatrix();
+		</CODE>
+	</ACTION>
+	
 </ACTIONS>

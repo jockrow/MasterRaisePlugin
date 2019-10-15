@@ -1,0 +1,31 @@
+# Plugin properties
+plugin.masterraise.MasterRaisePlugin.name=Master Raise
+plugin.masterraise.MasterRaisePlugin.author=Richard Martinez
+plugin.masterraise.MasterRaisePlugin.version=1.5
+plugin.masterraise.MasterRaisePlugin.docs=MasterRaise.html
+
+#menu
+plugin.masterraise.MasterRaisePlugin.menu=masterraise.toggle-favorites \
+	open-its-folder \
+	- \
+	%notify-parent
+		notify-file \
+		notify-pixel \
+		notify-alarm \
+		
+plugin.masterraise.MasterRaisePlugin.menu.code=new masterraise.MasterRaiseMenuProvider();
+
+notify-parent=notify-file notify-pixel notify-alarm
+
+#labels
+masterraise.toggle-favorites.label=Menu Favorites
+open-its-folder.label=Open Its Folder
+
+notify-parent.label=Notify
+notify-file.label=File Changed
+notify-pixel.label=Pixel Changed
+notify-alarm.label=Alarm
+
+spreadsheet-increase-column.label=Increase Column
+spreadsheet-transpose-matrix.label=Transpose Matrix
+spreadsheet-value-from-column.label=Value From Column

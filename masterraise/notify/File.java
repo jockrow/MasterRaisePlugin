@@ -20,7 +20,7 @@ import org.gjt.sp.jedit.gui.FilesChangedDialog;
 public abstract class File{
 	static Timer timer = null;
 
-	public static void startInspect(View view){
+	public static void start(View view){
 		Buffer buffer = view.getBuffer();
 
 		//TODO:VERIFICAR SI SE PUEDE MOVER ESTO A InspectionWidgetFactory
