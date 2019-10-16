@@ -21,6 +21,8 @@ notify-parent=notify-file notify-pixel notify-alarm
 masterraise.toggle-favorites.label=Menu Favorites
 open-its-folder.label=Open Its Folder
 
+edit-first-upper-case.label=First Upper Case
+
 notify-parent.label=Notify
 notify-file.label=File Changed
 notify-pixel.label=Pixel Changed
