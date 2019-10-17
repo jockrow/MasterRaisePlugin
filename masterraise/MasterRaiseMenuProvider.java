@@ -7,32 +7,58 @@ import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.menu.DynamicMenuProvider;
 
 public class MasterRaiseMenuProvider implements DynamicMenuProvider{
+	private JMenu menu = null; 
+	
+	private void createSubMenu(String title){
+		menu.add(GUIUtilities.loadMenuItem(jEdit.getAction(title), false));
+	}
 
 	@Override
 	public void update(JMenu superMenu) {
-		JMenu menu = new JMenu("SpreadSheet");
-		menu.add(GUIUtilities.loadMenuItem(jEdit.getAction("spreadsheet-transpose-matrix"), false));
-//		menu.add(GUIUtilities.loadMenuItem(jEdit.getAction("project-compile"), false));
-//		menu.add(GUIUtilities.loadMenuItem(jEdit.getAction("project-run"), false));
-////		menu.addSeparator();
-//		menu.add(GUIUtilities.loadMenuItem(jEdit.getAction("chdir-pv-root"), false));
-//		menu.add(GUIUtilities.loadMenuItem(jEdit.getAction("chdir-pv-selected"), false));
+		menu = new JMenu("HTML");
+		createSubMenu("html-fields-list");
+		createSubMenu("html-entities-name");
+		createSubMenu("html-entities-table");
+		createSubMenu("html-options2csv");
 		superMenu.add(menu);
-////		superMenu.addSeparator();
-//		
-		menu = new JMenu("SQL");
-//		EditAction[] commands = MasterRaisePlugin.getCommandoCommands();
-//		for(int i = 0; i < commands.length; i++)
-//		{
-//			menu.add(GUIUtilities.loadMenuItem(commands[i], false));
-//		}
+		
+		menu = new JMenu("Java");
+		createSubMenu("java-default-icons");
+		createSubMenu("java-fields-to-java-properties");
+		createSubMenu("java-gen-get-set");
 		superMenu.add(menu);
-//		menu = new JMenu("Shells");
-//		commands = MasterRaisePlugin.getSwitchActions();
-//		for(int i = 0; i < commands.length; i++)
-//		{
-//			menu.add(GUIUtilities.loadMenuItem(commands[i], false));
-//		}
+		
+		menu = new JMenu("Language");
+		createSubMenu("language-code-to-string");
+		createSubMenu("language-generate-url-string");
+		createSubMenu("language-print-debug-variables");
+		superMenu.add(menu);
+		
+		menu = new JMenu("Notify");
+		createSubMenu("notify-file");
+		createSubMenu("notify-pixel");
+		createSubMenu("notify-alarm");
+		superMenu.add(menu);
+		
+		menu = new JMenu("PHP");
+		createSubMenu("php-get-vars-from-html");
+		superMenu.add(menu);
+		
+		menu = new JMenu("Query");
+		createSubMenu("query-beauty-query");
+		createSubMenu("query-convert-query");
+		createSubMenu("query-convert-sql-to-language");
+		createSubMenu("query-convert-to-sqllite");
+		createSubMenu("query-format-in");
+		createSubMenu("query-oracle-ldr-to-bat-rename-images");
+		createSubMenu("query-sqlserver-get-temp-tables");
+		createSubMenu("query-sqlserver-set-variables-sp");
+		superMenu.add(menu);
+		
+		menu = new JMenu("SpreadSheet");
+		createSubMenu("spreadsheet-increase-column");
+		createSubMenu("spreadsheet-transpose-matrix");
+		createSubMenu("spreadsheet-value-column");
 		superMenu.add(menu);
 	}
 

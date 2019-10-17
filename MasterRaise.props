@@ -1,33 +1,53 @@
 # Plugin properties
+plugin.masterraise.MasterRaisePlugin.activate=defer
 plugin.masterraise.MasterRaisePlugin.name=Master Raise
 plugin.masterraise.MasterRaisePlugin.author=Richard Martinez
 plugin.masterraise.MasterRaisePlugin.version=1.5
 plugin.masterraise.MasterRaisePlugin.docs=MasterRaise.html
+plugin.masterraise.MasterRaisePlugin.jars=Console.jar
 
 #menu
 plugin.masterraise.MasterRaisePlugin.menu=masterraise.toggle-favorites \
 	open-its-folder \
 	- \
-	%notify-parent
-		notify-file \
-		notify-pixel \
-		notify-alarm \
-
+		
 plugin.masterraise.MasterRaisePlugin.menu.code=new masterraise.MasterRaiseMenuProvider();
- 
-notify-parent=notify-file notify-pixel notify-alarm
 
 #labels
 masterraise.toggle-favorites.label=Menu Favorites
 open-its-folder.label=Open Its Folder
- 
+
 edit-first-upper-case.label=First Upper Case
 
-notify-parent.label=Notify
+html-fields-list.label=Html Fields List
+html-entities-name.label=Html Entities Name
+html-entities-table.label=Html Entities Table
+html-options2csv.label=Html Options to csv
+
+java-default-icons.label=Default Java Icons
+java-fields-to-java-properties.label=Java Fields To Java Properties
+java-gen-get-set.label=Generate Getters and Setters
+
+language-code-to-string.label=Code To String
+language-generate-url-string.label=Generate Url String
+language-print-debug-variables.label=Print Debug Variables
+
 notify-file.label=File Changed
 notify-pixel.label=Pixel Changed
 notify-alarm.label=Alarm
 
+php-get-vars-from-html.label=Get Variables from Html
+
+query-beauty-query.label=Beauty Query
+query-convert-query.label=Convert Query
+query-convert-sql-to-language.label=Convert Query to Language
+query-convert-to-sqllite.label=Convert to SqlLite
+query-format-in.label=Format In
+query-oracle-ldr-to-bat-rename-images.label=Oracle Ldr to Bat Rename
+query-sqlserver-get-temp-tables.label=Sql Server Get Temp Tables
+query-sqlserver-set-variables-sp.label=Sql Server Set Variables Sp
+
 spreadsheet-increase-column.label=Increase Column
 spreadsheet-transpose-matrix.label=Transpose Matrix
-spreadsheet-value-from-column.label=Value From Column
+spreadsheet-value-column.label=Value From Column
+

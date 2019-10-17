@@ -12,6 +12,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.UIManager;
 
+import org.gjt.sp.jedit.BeanShell;
 import org.gjt.sp.jedit.EBMessage;
 import org.gjt.sp.jedit.EBPlugin;
 import org.gjt.sp.jedit.EditBus.EBHandler;
@@ -23,12 +24,16 @@ import org.gjt.sp.jedit.msg.BufferUpdate;
 import org.gjt.sp.jedit.msg.EditPaneUpdate;
 import org.gjt.sp.jedit.msg.ViewUpdate;
 
-//import sessions.SessionSwitcher;
-
 public class MasterRaisePlugin extends EBPlugin{
 	private static final String MENU_FAVORITES_ACTIVATE = "masterraise-plugin.menu.favorites.activate";
 	private static final int M_PLUGIN = 8;
 	boolean waitFor1stBuff = true;
+	private static final String MACRO_PATH = "/bsh";
+	
+	public void start()
+	{
+		BeanShell.getNameSpace().addCommandPath(MACRO_PATH, getClass());
+	}
 
 	@EBHandler
 	public void handleViewUpdate(ViewUpdate vu){
@@ -43,6 +48,7 @@ public class MasterRaisePlugin extends EBPlugin{
 			if (epu.getWhat().equals(EditPaneUpdate.CREATED)){
 				GUIUtilities.setIconPath("jeditresource:/MasterRaise.jar!/icons/masterRise/");
 				setIcons();
+//				setDarkTheme();
 //				final SessionSwitcher switcher = new CustomSession(view, true);
 //				new CustomSession(jEdit.getActiveView(), true);
 			}
@@ -88,6 +94,63 @@ public class MasterRaisePlugin extends EBPlugin{
 		
 //		UIManager.put("FileView.floppyDriveIcon", GUIUtilities.loadIcon("22x22/actions/document-save.png"));
 	}
+	
+//	private void setMasterProperty(String property){
+//		jEdit.setProperty(property, jEdit.getProperty("masterraise." + property));		
+//	}
+	
+//	private void setDarkTheme(){
+//		setMasterProperty("error-list.errorColor");
+//		setMasterProperty("error-list.warningColor");
+//		setMasterProperty("hypersearch.results.highlight");
+//		setMasterProperty("metalcolor.backgroundcolor");
+//		setMasterProperty("metalcolor.basecolor");
+//		setMasterProperty("metalcolor.scrollbarcolor");
+//		setMasterProperty("metalcolor.textcolor");
+//		setMasterProperty("view.bgColor");
+//		setMasterProperty("view.caretColor");
+//		setMasterProperty("view.eolMarkerColor");
+//		setMasterProperty("view.fgColor");
+//		setMasterProperty("view.gutter.bgColor");
+//		setMasterProperty("view.gutter.currentLineColor");
+//		setMasterProperty("view.gutter.fgColor");
+//		setMasterProperty("view.gutter.focusBorderColor");
+//		setMasterProperty("view.gutter.markerColor");
+//		setMasterProperty("view.gutter.noFocusBorderColor");
+//		setMasterProperty("view.gutter.selectionAreaBgColor");
+//		setMasterProperty("view.gutter.structureHighlightColor");
+//		setMasterProperty("view.lineHighlightColor");
+//		setMasterProperty("view.multipleSelectionColor");
+//		setMasterProperty("view.selectionColor");
+//		setMasterProperty("view.selectionFgColor");
+//		setMasterProperty("view.status.background");
+//		setMasterProperty("view.status.foreground");
+//		setMasterProperty("view.status.memory.background");
+//		setMasterProperty("view.status.memory.foreground");
+//		setMasterProperty("view.structureHighlightColor");
+//		setMasterProperty("view.style.comment1");
+//		setMasterProperty("view.style.comment3");
+//		setMasterProperty("view.style.digit");
+//		setMasterProperty("view.style.keyword1");
+//		setMasterProperty("view.style.keyword2");
+//		setMasterProperty("view.style.keyword3");
+//		setMasterProperty("view.style.literal1");
+//		setMasterProperty("view.style.function");
+//		setMasterProperty("view.style.operator");
+//		setMasterProperty("view.wrapGuideColor");
+//		setMasterProperty("vfs.browser.colors.8.color");
+//		setMasterProperty("white-space.block-color");
+//		setMasterProperty("white-space.fold-color");
+//		setMasterProperty("white-space.space-color");
+//		setMasterProperty("white-space.tab-color");
+//		setMasterProperty("white-space.whitespace-color");
+//		setMasterProperty("console.bgColor");
+//		setMasterProperty("console.caretColor");
+//		setMasterProperty("console.errorColor");
+//		setMasterProperty("console.infoColor");
+//		setMasterProperty("console.plainColor");
+//		setMasterProperty("console.warningColor");
+//	}
 
 	@SuppressWarnings("deprecation")
 	private static void hideMenus(View view){

@@ -39,9 +39,8 @@ import org.gjt.sp.jedit.jEdit;
 /**
  * Subversion context menu to add to the jEdit text area context menu.
  */
-@SuppressWarnings("serial")
 public class TextObjectsContextMenu extends JMenu {
-
+	private static final long serialVersionUID = -3821708576540377679L;
 	private View view = null;
 
 	public TextObjectsContextMenu( View view ) {

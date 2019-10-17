@@ -1,0 +1,3 @@
+public void endSelectedText(String t){
+	new masterraise.Edit().endSelectedText(t);
+}

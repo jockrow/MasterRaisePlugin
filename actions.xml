@@ -11,11 +11,66 @@
 	</ACTION>
 	<ACTION NAME="open-its-folder">
 		<CODE>
-			String openPath = buffer.getPath();
-			if(buffer.isNewFile()){
-				openPath = buffer.getDirectory();
-			}
-			new masterraise.files.jEditFile().openFolder(openPath);
+			new masterraise.files.jEditFile().openFolder(buffer.getDirectory());
+		</CODE>
+	</ACTION>
+	
+	<ACTION NAME="edit-first-upper-case">
+		<CODE>
+			new masterraise.Edit().firsUpperCase();
+		</CODE>
+	</ACTION>
+
+	<ACTION NAME="html-fields-list">
+		<CODE>
+			new masterraise.tools.Html().getFieldsList();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="html-entities-name">
+		<CODE>
+			new masterraise.tools.Html().getEntities().showNamedEntities();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="html-entities-table">
+		<CODE>
+			new masterraise.tools.Html().showEntitiesTable();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="html-options2csv">
+		<CODE>
+			new masterraise.tools.Html().options2Csv();
+		</CODE>
+	</ACTION>
+	
+	<ACTION NAME="java-default-icons">
+		<CODE>
+			new masterraise.tools.Java().javaDefaultIcons();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="java-fields-to-java-properties">
+		<CODE>
+			new masterraise.tools.Java().fields2javaProperties();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="java-gen-get-set">
+		<CODE>
+			new masterraise.tools.Java().genGetSet();
+		</CODE>
+	</ACTION>
+	
+	<ACTION NAME="language-code-to-string">
+		<CODE>
+			new masterraise.tools.Language().showGui("codeToString");
+		</CODE>
+	</ACTION>
+	<ACTION NAME="language-generate-url-string">
+		<CODE>
+			new masterraise.tools.Language().showGui("generateUrlString");
+		</CODE>
+	</ACTION>
+	<ACTION NAME="language-print-debug-variables">
+		<CODE>
+			new masterraise.tools.Language().showGui("printDebugVariables");
 		</CODE>
 	</ACTION>
 	
@@ -34,11 +89,68 @@
 			new masterraise.notify.Alarm().start(view);
 		</CODE>
 	</ACTION>
-	
+
+	<ACTION NAME="spreadsheet-increase-column">
+		<CODE>
+			new masterraise.tools.SpreadSheet().increaseColumn();
+		</CODE>
+	</ACTION>
 	<ACTION NAME="spreadsheet-transpose-matrix">
 		<CODE>
 			new masterraise.tools.SpreadSheet().transposeMatrix();
 		</CODE>
 	</ACTION>
+	<ACTION NAME="spreadsheet-value-column">
+		<CODE>
+			new masterraise.tools.SpreadSheet().valueFromColumn();
+		</CODE>
+	</ACTION>
 	
+	<ACTION NAME="php-get-vars-from-html">
+		<CODE>
+			new masterraise.tools.Php().getVarsFromHtml();
+		</CODE>
+	</ACTION>
+	
+	<ACTION NAME="query-beauty-query">
+		<CODE>
+			new masterraise.tools.Query().getBeautyQuery().showGui();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="query-convert-query">
+		<CODE>
+			new masterraise.tools.Query().getConvertQuery().showGui();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="query-convert-sql-to-language">
+		<CODE>
+			new masterraise.tools.Query().convertSqlToLanguage();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="query-convert-to-sqllite">
+		<CODE>
+			new masterraise.tools.Query().convertToSqlLite();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="query-format-in">
+		<CODE>
+			new masterraise.tools.Query().formatIn();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="query-oracle-ldr-to-bat-rename-images">
+		<CODE>
+			new masterraise.tools.Query().oracleLdrToBatRenameImages();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="query-sqlserver-get-temp-tables">
+		<CODE>
+			new masterraise.tools.Query().sqlServerIdentifyTmpTables();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="query-sqlserver-set-variables-sp">
+		<CODE>
+			new masterraise.tools.Query().sqlServerSetVariablesSp();
+		</CODE>
+	</ACTION>
+		
 </ACTIONS>

@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-class jEditFile{
-	boolean moveFile(String oldPathFile, String newPathFile){
+public class jEditFile{
+	public boolean moveFile(String oldPathFile, String newPathFile){
 		File oldFile = new File(oldPathFile);
 		File newFile = new File(newPathFile);
 
@@ -36,7 +36,7 @@ class jEditFile{
 		return true;
 	}
 
-	boolean createFile(String pathFile, String body) throws IOException{
+	public boolean createFile(String pathFile, String body) throws IOException{
 		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(new FileWriter(pathFile));
@@ -55,7 +55,7 @@ class jEditFile{
 		new File(directory, fileName).delete();
 	}
 
-	File[] dir(String path, String filter){
+	public File[] dir(String path, String filter){
 		List<File> listDir = new ArrayList<File>();
 		FileVisitor<Path> simpleFileVisitor = new SimpleFileVisitor<Path>() {
 			@Override
@@ -92,7 +92,7 @@ class jEditFile{
 		return (File[])listDir.toArray(new File[listDir.size()]);
 	}
 	
-	String readFile(String pathFile){
+	public String readFile(String pathFile){
 		String body = "";
 		try (BufferedReader br = new BufferedReader(new FileReader(pathFile))) {
 			String sCurrentLine;
@@ -109,14 +109,14 @@ class jEditFile{
 	
 	public void openFolder(String openPath){
 		boolean isWindows = System.getProperty("os.name").indexOf("Linux") < 0;
-		String fileExplorer = "explorer.exe /select,";
+		String fileExplorer = "cmd /c start \"\"";
 		
 		if(!isWindows){
 			fileExplorer = "nemo";
 		}
 
 		try {
-			Runtime.getRuntime().exec(fileExplorer + "\"" + openPath + "\"");
+			Runtime.getRuntime().exec(fileExplorer + " \"" + openPath + "\"");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

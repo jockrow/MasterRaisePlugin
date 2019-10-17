@@ -1,17 +1,34 @@
 package masterraise;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.gjt.sp.jedit.BeanShell;
 import org.gjt.sp.jedit.Buffer;
+import org.gjt.sp.jedit.EditPane;
+import org.gjt.sp.jedit.Registers;
 import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
+import org.gjt.sp.jedit.buffer.JEditBuffer;
+import org.gjt.sp.jedit.bufferset.BufferSetManager;
 import org.gjt.sp.jedit.search.CurrentBufferSet;
 import org.gjt.sp.jedit.search.DirectoryListSet;
 import org.gjt.sp.jedit.search.SearchAndReplace;
+import org.gjt.sp.jedit.textarea.JEditTextArea;
+import org.gjt.sp.jedit.textarea.Selection;
+import org.gjt.sp.jedit.textarea.TextArea;
+
+import console.Console;
+import console.Shell;
 
 
-public class Edit {
+public class Edit extends Constants{
+	private View view = jEdit.getActiveView();
+	private TextArea textArea = view.getTextArea();
+	private String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
+	Console console = (Console) view.getDockableWindowManager().getDockable("console");
+	
 	/**
 	 * Get number of occurrences when replace
 	 * @param identify if is a directory
@@ -36,7 +53,6 @@ public class Edit {
 	 * @return numReplaces
 	 */
 	public String replaceDirectory(String search, String replace, String flags, String directory, String filter, boolean openFiles){
-		View view = jEdit.getActiveView();
 		boolean ic =  SearchAndReplace.getIgnoreCase();
 		boolean re =  SearchAndReplace.getRegexp();
 		boolean ww = SearchAndReplace.getWholeWord();
@@ -81,11 +97,10 @@ public class Edit {
 	 * @return numReplaces
 	 */
 	public int replaceBuffer(String search, String replace, String flags){
-		View view = jEdit.getActiveView();
-		boolean isRunning = BeanShell.isScriptRunning();
-		if(isRunning){
-			BeanShell.runScript(view, jEdit.getSettingsDirectory() + File.separator + "startup" + File.separator + "startBeanShell.bsh",null,false);
-		}
+//		boolean isRunning = BeanShell.isScriptRunning();
+//		if(isRunning){
+//			BeanShell.runScript(view, jEdit.getSettingsDirectory() + File.separator + "startup" + File.separator + "startBeanShell.bsh",null,false);
+//		}
 
 		boolean ic =  SearchAndReplace.getIgnoreCase();
 		boolean re =  SearchAndReplace.getRegexp();
@@ -124,19 +139,23 @@ public class Edit {
 	 * @return numReplaces
 	 */
 	public int replaceSelection(String search, String replace, String flags){
-		View view = jEdit.getActiveView();
+		//TODO:corregir la selección para una sóla línea
+//		boolean isRunning = BeanShell.isScriptRunning();
+//		if(isRunning){
+//			BeanShell.runScript(view, jEdit.getSettingsDirectory() + File.separator + "startup" + File.separator + "startBeanShell.bsh",null,false);
+//		}
 
-		boolean isRunning = BeanShell.isScriptRunning();
-		if(isRunning){
-			BeanShell.runScript(view, jEdit.getSettingsDirectory() + File.separator + "startup" + File.separator + "startBeanShell.bsh",null,false);
-		}
-
-		BeanShell.runScript(view, jEdit.getSettingsDirectory() + File.separator + "startup" + File.separator + "startBeanShell.bsh",null,false);
+//		BeanShell.runScript(view, jEdit.getSettingsDirectory() + File.separator + "startup" + File.separator + "startBeanShell.bsh",null,false);
+//		BeanShell.runScript(view, "bsh" + File.separator + "replaceSelection.bsh",null,false);
 		boolean ic =  SearchAndReplace.getIgnoreCase();
 		boolean re =  SearchAndReplace.getRegexp();
 		boolean ww = SearchAndReplace.getWholeWord();
 		boolean bs = SearchAndReplace.getBeanShellReplace();
 		String oldSearch = SearchAndReplace.getSearchString();
+//		System.out.println("...oldSearch:" + oldSearch);
+		
+//		textArea.goToNextLine(true);
+//		textArea.goToStartOfWhiteSpace(true);
 
 		SearchAndReplace.setSearchString(search);
 		SearchAndReplace.setReplaceString(replace);
@@ -153,9 +172,20 @@ public class Edit {
 		SearchAndReplace.setSearchString(oldSearch);
 
 		try{
+			String retorno = _getNumReplaces(view.getStatus().getMessage(), false);
+			
+//			SearchAndReplace.setIgnoreCase(ic);
+//			SearchAndReplace.setRegexp(re);
+//			SearchAndReplace.setWholeWord(ww);
+//			SearchAndReplace.setBeanShellReplace(bs);
+//			SearchAndReplace.setSearchString(oldSearch);
+			
+			System.out.println("...retorno:" + retorno);
 			return Integer.parseInt(_getNumReplaces(view.getStatus().getMessage(), false));
 		}
 		catch(Exception ex){
+//			System.out.println("...ex:" + ex.getMessage());
+			ex.printStackTrace();
 			return 0;
 		}
 	}
@@ -195,4 +225,138 @@ public class Edit {
 		SearchAndReplace.setBeanShellReplace(bs);
 		return result;
 	}
+	
+	public JEditBuffer openTempBuffer(){
+		final EditPane editPane = view.getEditPane();
+
+		//En el caso que no haya seleccionado nada tomará todo el buffer
+		if(selectedText.trim().equals("")){
+			textArea.selectAll();
+			selectedText = textArea.getSelectedText();
+		}
+		Buffer bfTmp = BufferSetManager.createUntitledBuffer();
+		bfTmp.insert(0, selectedText);
+		editPane.setBuffer(bfTmp);
+
+		return bfTmp;
+	}
+	
+	public void closeTempBuffer(JEditBuffer bfTmp){
+		textArea.selectAll();
+		selectedText = textArea.getSelectedText();
+		jEdit._closeBuffer(view,(Buffer) bfTmp);
+		Registers.setRegister('$', selectedText);
+		textArea.setSelectedText(selectedText);
+	}
+	
+	public String iniSelectedText(){
+		String t = textArea.getSelectedText();
+
+		if(t=="" || t==null){
+			textArea.selectAll();
+			t=textArea.getSelectedText();
+		}
+
+		return t;
+	}
+	
+	public void endSelectedText(String t){
+		Selection tmpSelection = (Selection) textArea.getSelection(0).clone();
+
+		textArea.setSelectedText(t);
+		Registers.setRegister('$', t);
+
+		if(textArea.getCaretPosition() < tmpSelection.getEnd()){
+			textArea.extendSelection(tmpSelection.getStart(), textArea.getCaretPosition());
+		}
+		else{
+			textArea.addToSelection(tmpSelection);
+		}
+	}
+
+	protected void deleteDuplicates(TextArea textArea){
+		invokeDefaultClass("TextToolsSorting", "deleteDuplicates", textArea);
+	}
+	
+	protected void transposeLines(TextArea textArea){
+		invokeDefaultClass("TextToolsPlugin", "transposeLines", textArea);
+	}
+	
+	protected void sortLines(TextArea textArea){
+		invokeDefaultClass("TextToolsSorting", "sortLines", textArea);
+	}
+	
+	private void invokeDefaultClass(String className, String methodName, TextArea textArea){
+		try{
+			Class<?> mainClass = Class.forName(className);
+			Method method = null;
+			
+			if(methodName.equals("sortLines")){
+				method = mainClass.getMethod(methodName, JEditTextArea.class, boolean.class);
+				method.invoke(mainClass, textArea, false);
+			}
+			else{
+				method = mainClass.getMethod(methodName, View.class, JEditTextArea.class);
+				method.invoke(mainClass, view, textArea);
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected void runCommand(String command)
+	{
+		view.getDockableWindowManager().addDockableWindow("console");
+		Shell _shell = Shell.getShell("System");
+		console.run(_shell, command);
+	}
+	
+	protected void waitForConsole()
+	{
+		view.getDockableWindowManager().addDockableWindow("console");
+		console.getShell().waitFor(console);
+	}
+	
+	/**
+	 * Method firsUpperCase()
+	 * Toggle the first Case to upperCase for each word
+	 * Example:
+	 * IGEC_GESTOR_PROYECTO or IGEC GESTOR PROYECTO
+	 * for:
+	 * Igec Gestor Proyecto
+	 */
+	public void firsUpperCase(){
+		String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
+		if(selectedText.trim().equals("")){
+			textArea.selectAll();
+			selectedText = textArea.getSelectedText();
+		}
+		
+		int numUnderscore = replaceSelection("_", " ", "");
+
+		replaceSelection("([ _\\t]+)(\\p{L})(\\p{L}+)", "_1 + _2.toUpperCase() + _3.toLowerCase()", "bir");
+		replaceSelection("(^\\p{L})(\\p{L}+)", "_1.toUpperCase() + _2.toLowerCase()", "bir");
+
+		System.out.println("...numUnderscore:" + numUnderscore);
+		if(numUnderscore > 0){
+			replaceSelection(" ", "_", "");
+		}
+	}
+	
+//	public boolean isMethodInvoker(String methodName){
+//		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+//		//DEBUG:
+////		for(int i=0; i<stackTrace.length; i++) System.out.println("...methodName:" + methodName + ", " + stackTrace[i].getMethodName());
+//		return Arrays.toString(stackTrace).indexOf(methodName) >= 0;
+//	}
 }

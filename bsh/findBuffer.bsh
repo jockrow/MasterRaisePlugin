@@ -1,0 +1,3 @@
+boolean findBuffer(search,flags){
+	return new masterraise.Edit().findBuffer(search,flags);
+}

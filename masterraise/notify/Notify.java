@@ -146,7 +146,7 @@ public class Notify{
 		if(logBuffer == null){
 			logBuffer = jEdit.openFile((View) null,null,
 						MiscUtilities.constructPath(jEdit.getSettingsDirectory(),"macros",
-						"logInspector.log"),true,null);
+						"notify.log"),true,null);
 			view.goToBuffer(logBuffer);
 		}
 		else{
@@ -158,6 +158,7 @@ public class Notify{
 		view.getEditPane().recentBuffer();
 
 		unregisterInspect(location);
+		view.getToolkit().beep();
 		Macros.message(view, message);
 	}
 }

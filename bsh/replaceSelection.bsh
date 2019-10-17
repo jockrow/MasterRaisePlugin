@@ -1,0 +1,3 @@
+int replaceSelection(search,replace,flags){
+	return new masterraise.Edit().replaceSelection(search,replace,flags);
+}

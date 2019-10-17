@@ -103,7 +103,7 @@ public abstract class Pixel{
 						timer.stop();
 						setVisible(false);
 						loc = MouseInfo.getPointerInfo().getLocation();
-						currentDetail = "Position x:" + loc.x+4 + " y:" + loc.y+22;
+						currentDetail = "Position x:" + loc.x + " y:" + loc.y;
 						timerWaitChange.start();
 						
 						new Notify().registerInspect(bOld.getText()

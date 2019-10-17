@@ -22,11 +22,13 @@
 
 package masterraise.notify;
 
+import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Point;
+import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -199,7 +201,7 @@ public class NotifyWidgetFactory implements StatusWidgetFactory{
 		
 		@SuppressWarnings("serial")
 		private InspectionDialog(Frame view){
-			super(view, "Inspect to Cancel", false);
+			super(view, "Notification to Cancel", false);
 			table = new JTable(){
 
 			public String getToolTipText(MouseEvent e) {
@@ -208,8 +210,14 @@ public class NotifyWidgetFactory implements StatusWidgetFactory{
 					int rowIndex = rowAtPoint(p);
 
 					try {
-						if(getValueAt(rowIndex, COL_TYPE).equals("FILE")){
+						String type = getValueAt(rowIndex, COL_TYPE).toString();
+						switch(type){
+						case "FILE":
 							tip = getValueAt(rowIndex, COL_LOCATION) + ": double click to show file";
+							break;
+						case "PIXEL":
+							tip = getValueAt(rowIndex, COL_LOCATION) + ": double click to move pointer";
+							break;
 						}
 					} catch (RuntimeException e1) {
 						e1.printStackTrace();
@@ -219,7 +227,7 @@ public class NotifyWidgetFactory implements StatusWidgetFactory{
 				}
 			};
 			
-			table.setModel(new DefaultTableModel(null, new String[]{"Inspect", "Location", "Inspect Hour", "type"}));
+			table.setModel(new DefaultTableModel(null, new String[]{"Notify for", "Location", "Start Hour", "type"}));
 			table.getColumnModel().getColumn(COL_INSPECT).setPreferredWidth(25);
 			table.getColumnModel().getColumn(COL_LOCATION).setPreferredWidth(150);
 			table.getColumnModel().getColumn(COL_DATE).setPreferredWidth(25);
@@ -259,13 +267,26 @@ public class NotifyWidgetFactory implements StatusWidgetFactory{
 						return this;
 					}
 				});
-				
+
 				table.addMouseListener(new MouseAdapter() {
 					public void mouseClicked(MouseEvent e) {
 						JTable target = (JTable)e.getSource();
 						String type = table.getModel().getValueAt(target.getSelectedRow(), COL_TYPE).toString();
-						if (e.getClickCount() == 2 && type.equals("FILE")) {
-							jEdit.openFile(jEdit.getActiveView(),table.getModel().getValueAt(target.getSelectedRow(), COL_LOCATION).toString());
+						if (e.getClickCount() == 2) {
+							switch(type){
+							case "FILE":
+								jEdit.openFile(jEdit.getActiveView(),table.getModel().getValueAt(target.getSelectedRow(), COL_LOCATION).toString());
+								break;
+							case "PIXEL":
+								try {
+									int xCoord = Integer.parseInt(table.getModel().getValueAt(target.getSelectedRow(), COL_LOCATION).toString().replaceAll("Position x:| y:.*", ""));
+									int yCoord = Integer.parseInt(table.getModel().getValueAt(target.getSelectedRow(), COL_LOCATION).toString().replaceAll(".*y:", ""));
+									new Robot().mouseMove(xCoord, yCoord);
+								} catch (AWTException e1) {
+									e1.printStackTrace();
+								}
+								break;
+							}
 						}
 					}
 				});

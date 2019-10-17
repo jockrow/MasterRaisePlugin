@@ -6,5 +6,7 @@
 	<classpathentry kind="lib" path="C:/Program Files/jEdit/jars/TextObjects.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/jEdit/jars/commons-io-2.4.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/jEdit/jars/Sessions.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/jEdit/jars/Console.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/jEdit/jars/UIManagerDefaults.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

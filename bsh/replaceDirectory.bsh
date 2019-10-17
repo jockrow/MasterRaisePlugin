@@ -1,0 +1,3 @@
+String replaceDirectory(search,replace,flags,directory,filter,openFiles){
+	return new masterraise.Edit().replaceDirectory(search,replace,flags,directory,filter,openFiles);
+}
