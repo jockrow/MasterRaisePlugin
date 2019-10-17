@@ -14,9 +14,16 @@ plugin.masterraise.MasterRaisePlugin.menu.code=new masterraise.MasterRaiseMenuPr
 
 #labels
 masterraise.toggle-favorites.label=Menu Favorites
-open-its-folder.label=Open Its Folder
+
+color-palette.label=Color Palette
+color-picker.label=Color Picker
 
 edit-first-upper-case.label=First Upper Case
+edit-smart-join.label=Smart Join
+
+#files
+open-its-folder.label=Open Its Folder
+open-selection.label=Open Selection
 
 html-fields-list.label=Html Fields List
 html-entities-name.label=Html Entities Name

@@ -1,10 +1,8 @@
 package masterraise;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.gjt.sp.jedit.BeanShell;
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.EditPane;
 import org.gjt.sp.jedit.Registers;
@@ -28,7 +26,7 @@ public class Edit extends Constants{
 	private TextArea textArea = view.getTextArea();
 	private String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
 	Console console = (Console) view.getDockableWindowManager().getDockable("console");
-	
+
 	/**
 	 * Get number of occurrences when replace
 	 * @param identify if is a directory
@@ -97,11 +95,6 @@ public class Edit extends Constants{
 	 * @return numReplaces
 	 */
 	public int replaceBuffer(String search, String replace, String flags){
-//		boolean isRunning = BeanShell.isScriptRunning();
-//		if(isRunning){
-//			BeanShell.runScript(view, jEdit.getSettingsDirectory() + File.separator + "startup" + File.separator + "startBeanShell.bsh",null,false);
-//		}
-
 		boolean ic =  SearchAndReplace.getIgnoreCase();
 		boolean re =  SearchAndReplace.getRegexp();
 		boolean ww = SearchAndReplace.getWholeWord();
@@ -140,22 +133,15 @@ public class Edit extends Constants{
 	 */
 	public int replaceSelection(String search, String replace, String flags){
 		//TODO:corregir la selección para una sóla línea
-//		boolean isRunning = BeanShell.isScriptRunning();
-//		if(isRunning){
-//			BeanShell.runScript(view, jEdit.getSettingsDirectory() + File.separator + "startup" + File.separator + "startBeanShell.bsh",null,false);
-//		}
-
-//		BeanShell.runScript(view, jEdit.getSettingsDirectory() + File.separator + "startup" + File.separator + "startBeanShell.bsh",null,false);
-//		BeanShell.runScript(view, "bsh" + File.separator + "replaceSelection.bsh",null,false);
 		boolean ic =  SearchAndReplace.getIgnoreCase();
 		boolean re =  SearchAndReplace.getRegexp();
 		boolean ww = SearchAndReplace.getWholeWord();
 		boolean bs = SearchAndReplace.getBeanShellReplace();
 		String oldSearch = SearchAndReplace.getSearchString();
-//		System.out.println("...oldSearch:" + oldSearch);
-		
-//		textArea.goToNextLine(true);
-//		textArea.goToStartOfWhiteSpace(true);
+		//		System.out.println("...oldSearch:" + oldSearch);
+
+		//		textArea.goToNextLine(true);
+		//		textArea.goToStartOfWhiteSpace(true);
 
 		SearchAndReplace.setSearchString(search);
 		SearchAndReplace.setReplaceString(replace);
@@ -172,19 +158,18 @@ public class Edit extends Constants{
 		SearchAndReplace.setSearchString(oldSearch);
 
 		try{
-			String retorno = _getNumReplaces(view.getStatus().getMessage(), false);
-			
-//			SearchAndReplace.setIgnoreCase(ic);
-//			SearchAndReplace.setRegexp(re);
-//			SearchAndReplace.setWholeWord(ww);
-//			SearchAndReplace.setBeanShellReplace(bs);
-//			SearchAndReplace.setSearchString(oldSearch);
-			
-			System.out.println("...retorno:" + retorno);
+			//			String retorno = _getNumReplaces(view.getStatus().getMessage(), false);
+
+			//			SearchAndReplace.setIgnoreCase(ic);
+			//			SearchAndReplace.setRegexp(re);
+			//			SearchAndReplace.setWholeWord(ww);
+			//			SearchAndReplace.setBeanShellReplace(bs);
+			//			SearchAndReplace.setSearchString(oldSearch);
+
+			//			System.out.println("...retorno:" + retorno);
 			return Integer.parseInt(_getNumReplaces(view.getStatus().getMessage(), false));
 		}
 		catch(Exception ex){
-//			System.out.println("...ex:" + ex.getMessage());
 			ex.printStackTrace();
 			return 0;
 		}
@@ -225,7 +210,7 @@ public class Edit extends Constants{
 		SearchAndReplace.setBeanShellReplace(bs);
 		return result;
 	}
-	
+
 	public JEditBuffer openTempBuffer(){
 		final EditPane editPane = view.getEditPane();
 
@@ -240,7 +225,7 @@ public class Edit extends Constants{
 
 		return bfTmp;
 	}
-	
+
 	public void closeTempBuffer(JEditBuffer bfTmp){
 		textArea.selectAll();
 		selectedText = textArea.getSelectedText();
@@ -248,7 +233,7 @@ public class Edit extends Constants{
 		Registers.setRegister('$', selectedText);
 		textArea.setSelectedText(selectedText);
 	}
-	
+
 	public String iniSelectedText(){
 		String t = textArea.getSelectedText();
 
@@ -259,7 +244,7 @@ public class Edit extends Constants{
 
 		return t;
 	}
-	
+
 	public void endSelectedText(String t){
 		Selection tmpSelection = (Selection) textArea.getSelection(0).clone();
 
@@ -277,20 +262,20 @@ public class Edit extends Constants{
 	protected void deleteDuplicates(TextArea textArea){
 		invokeDefaultClass("TextToolsSorting", "deleteDuplicates", textArea);
 	}
-	
+
 	protected void transposeLines(TextArea textArea){
 		invokeDefaultClass("TextToolsPlugin", "transposeLines", textArea);
 	}
-	
+
 	protected void sortLines(TextArea textArea){
 		invokeDefaultClass("TextToolsSorting", "sortLines", textArea);
 	}
-	
+
 	private void invokeDefaultClass(String className, String methodName, TextArea textArea){
 		try{
 			Class<?> mainClass = Class.forName(className);
 			Method method = null;
-			
+
 			if(methodName.equals("sortLines")){
 				method = mainClass.getMethod(methodName, JEditTextArea.class, boolean.class);
 				method.invoke(mainClass, textArea, false);
@@ -313,20 +298,20 @@ public class Edit extends Constants{
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected void runCommand(String command)
 	{
 		view.getDockableWindowManager().addDockableWindow("console");
 		Shell _shell = Shell.getShell("System");
 		console.run(_shell, command);
 	}
-	
+
 	protected void waitForConsole()
 	{
 		view.getDockableWindowManager().addDockableWindow("console");
 		console.getShell().waitFor(console);
 	}
-	
+
 	/**
 	 * Method firsUpperCase()
 	 * Toggle the first Case to upperCase for each word
@@ -341,7 +326,7 @@ public class Edit extends Constants{
 			textArea.selectAll();
 			selectedText = textArea.getSelectedText();
 		}
-		
+
 		int numUnderscore = replaceSelection("_", " ", "");
 
 		replaceSelection("([ _\\t]+)(\\p{L})(\\p{L}+)", "_1 + _2.toUpperCase() + _3.toLowerCase()", "bir");
@@ -352,11 +337,20 @@ public class Edit extends Constants{
 			replaceSelection(" ", "_", "");
 		}
 	}
-	
-//	public boolean isMethodInvoker(String methodName){
-//		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-//		//DEBUG:
-////		for(int i=0; i<stackTrace.length; i++) System.out.println("...methodName:" + methodName + ", " + stackTrace[i].getMethodName());
-//		return Arrays.toString(stackTrace).indexOf(methodName) >= 0;
-//	}
+
+	/**
+	 * Method joinSmart()
+	 * Join coherence lines
+	 */
+	public void smartJoin(){
+		String t = iniSelectedText();
+
+		t=t.replaceAll("(?m)^[ \t]+|[ \t]+$", "");
+		t=t.replaceAll("(?m)\n+", " ");
+		t=t.replaceAll("(?m)[ \t]+,[ \t]+", ", ");
+		t=t.replaceAll("(?m)(\\p{Print})([ \t]+)([\\)\\};])", "$1$3");
+		t=t.replaceAll("(?m)([\\(\\{])([ \t]+)(\\p{Print})", "$1$3");
+
+		endSelectedText(t);
+	}
 }

@@ -88,7 +88,7 @@ public class Query extends Edit{
 	public ConvertQuery getConvertQuery(){
 		return new ConvertQuery();
 	}
-	
+
 	public String getQueryType(){
 		return queryType;
 	}
@@ -260,18 +260,18 @@ public class Query extends Edit{
 		private JCheckBox chkUcase;
 		private JCheckBox chkWithNolock;
 		private JCheckBox chkIndent;
-		
+
 		public String getResult(){
 			return opcs;
 		}
-		
+
 		private void setResult(){
 			opcs = "";
 			if(chkUcase.isSelected()) opcs += "u";
 			if(chkWithNolock.isSelected()) opcs += "l";
 			if(chkIndent.isSelected()) opcs += "i";
 		}
-		
+
 		public void setOpcs(String opcs) {
 			this.opcs = opcs;
 		}
@@ -512,11 +512,11 @@ public class Query extends Edit{
 		private JRadioButton rbToUpdate = new JRadioButton("UPDATE");
 		private JRadioButton rbFromCsv = new JRadioButton("CSV");
 		private JRadioButton rbToCsv = new JRadioButton("CSV");
-		
+
 		public String getResult(){
 			return conversion;
 		}
-		
+
 		private void validation(){
 			rbToInsert.setEnabled(true);
 			rbToSelect.setEnabled(true);
@@ -541,7 +541,7 @@ public class Query extends Edit{
 				rbToInsert.setSelected(true);
 			}
 		}
-		
+
 		public void showGui(){
 			ButtonGroup grpFrom = new ButtonGroup();
 			ButtonGroup grpTo = new ButtonGroup();
@@ -899,7 +899,7 @@ public class Query extends Edit{
 			closeTempBuffer(bfTmp);
 		}
 	}
-	
+
 	/**
 	 * Method convertSqlToLanguage()
 	 * Convert fields tables to any Language
@@ -929,11 +929,11 @@ public class Query extends Edit{
 	public void setCdInvoice(String cdInvoice){
 		this.cdInvoice = cdInvoice;
 	}
-	*/
+	 */
 	public void convertSqlToLanguage(){
-/*		
+		/*		
 	Macros.getMacro("Editing/First_To_UpperCase").invoke(view);
-	
+
 import masterraise.Edit;
 //bfTmp = new Edit().openTempBuffer();
 edit = new Edit();
@@ -956,11 +956,11 @@ selection = new Selection.Range(textArea.getLineStartOffset(startLine), textArea
 selections = textArea.getSelection();
 
 replaceSelection("_", " ", "");
-*/	
+		 */	
 		JEditBuffer bfTmp = openTempBuffer();
 		replaceBuffer("^[ \t]+", "", "r");
 		firsUpperCase();
-		
+
 		replaceSelection("_", "", "");
 		replaceSelection("(^)(\\w)(.*.)($)", "\"private String \" + _2.toLowerCase() + _3 + \" = \\\"\\\";\"", "br");
 
@@ -973,7 +973,7 @@ replaceSelection("_", " ", "");
 
 		closeTempBuffer(bfTmp);
 	}
-	
+
 	/**
 	 * Method formatIn()
 	 * Format a list for where:
@@ -1009,23 +1009,23 @@ replaceSelection("_", " ", "");
 
 		closeTempBuffer(bfTmp);
 	}
-	
+
 	/**
 	 * Method convertToSqlLite()
 	 * Convert any Query to SqlLite
 	 */
 	public void convertToSqlLite(){
 		String t = iniSelectedText();
-		
+
 		t=t.replaceAll("(?m)(\"| ENABLE| BYTE)", "");
 		t=t.replaceAll("(?m)(\\w+\\.)(\\w+)", "$2");
 		endSelectedText(t);
 	}
-	
+
 	/**
-	* Settings declared variables into Stored Procedure
-	*
-	* @example
+	 * Settings declared variables into Stored Procedure
+	 *
+	 * @example
 	(@CODIGO VARCHAR(6)=NULL,
 	@NOMBRE VARCHAR(10)=NULL)
 	values(@CODIGO = '',
@@ -1070,7 +1070,7 @@ replaceSelection("_", " ", "");
 	 SET @PageSize = function(1, 2)
 	 SET @i_RegInicial = 1
 	 SET @i_maxRegistros = 30
-	*/
+	 */
 	public boolean sqlServerSetVariablesSp(){
 		String strArroba = "";
 		String strMatchError = "The number rows from this column don't match with anothers columns";
@@ -1279,7 +1279,7 @@ replaceSelection("_", " ", "");
 		closeTempBuffer(bfTmp);
 		return true;
 	}
-	
+
 	private int getNumComa(){
 		int numComa = 0;
 		int currentLine = textArea.getCaretLine();
@@ -1294,11 +1294,11 @@ replaceSelection("_", " ", "");
 
 		return numComa;
 	}
-	
+
 	/**
-	* Method identifyTmpTables()
-	* Identify tempora variables into Stored Procedure
-	*/
+	 * Method identifyTmpTables()
+	 * Identify tempora variables into Stored Procedure
+	 */
 	public void sqlServerIdentifyTmpTables(){
 		if(findBuffer("#", "a")){
 			textArea.selectAll();
@@ -1329,7 +1329,7 @@ replaceSelection("_", " ", "");
 
 			replaceBuffer("^", "DROP TABLE ", "ir");
 			replaceBuffer("^DROP TABLE ##", "--DROP TABLE ##", "r");
-//			TextToolsSorting.sortLines(textArea,false);
+			//			TextToolsSorting.sortLines(textArea,false);
 			sortLines(textArea);
 			textArea.goToBufferEnd(false);
 			textArea.insertEnterAndIndent();
@@ -1337,7 +1337,7 @@ replaceSelection("_", " ", "");
 			replaceBuffer("\\A^\\n", "", "r");
 
 			closeTempBuffer(bfTmp);
-			
+
 			textArea.goToBufferStart(false);
 			EditBus.send(new PositionChanging(editPane));
 			Registers.paste(textArea,'$',false);
@@ -1348,7 +1348,7 @@ replaceSelection("_", " ", "");
 			Macros.message(view, "Not found temp tables");
 		}
 	}
-	
+
 	/**
 	 * Method oracleLdrToBatRenameImages()
 	 * convert ldr file to rename images like as bat file
@@ -1385,16 +1385,16 @@ replaceSelection("_", " ", "");
 		String newFile = selectedText.replace(".ldr", ".bat");
 		String dirNewFile = "\"" + new File(newFile).getParent() + "\"";
 		Buffer ldrBuff = jEdit.openFile(view,selectedText);
-		
+
 		replaceBuffer("\\|\\{EOL\\}", "\\n", "r");
 		replaceBuffer("^[ \\t]+", "ren ", "r");
 		replaceBuffer("|\"", " ", "");
 		replaceBuffer("\"", ".jpg", "");
-		
+
 		ldrBuff.save(view,null,true);
 		jEdit._closeBuffer(view,ldrBuff);
 		new jEditFile().moveFile(selectedText, newFile);
-		
+
 		runCommand("cd " + dirNewFile);
 		runCommand("\"" + newFile + "\"");
 		waitForConsole();

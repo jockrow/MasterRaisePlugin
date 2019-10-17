@@ -21,7 +21,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.gjt.sp.jedit.View;
+import org.gjt.sp.jedit.jEdit;
+import org.gjt.sp.jedit.gui.StatusBar;
+import org.gjt.sp.jedit.textarea.TextArea;
+
 public class jEditFile{
+	private View view = jEdit.getActiveView();
+	private TextArea textArea = view.getTextArea();
+	private String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
+
 	public boolean moveFile(String oldPathFile, String newPathFile){
 		File oldFile = new File(oldPathFile);
 		File newFile = new File(newPathFile);
@@ -60,7 +69,7 @@ public class jEditFile{
 		FileVisitor<Path> simpleFileVisitor = new SimpleFileVisitor<Path>() {
 			@Override
 			public FileVisitResult preVisitDirectory(Path dir,BasicFileAttributes attrs)
-			throws IOException {
+					throws IOException {
 				if(!dir.toFile().getPath().replaceAll("[\\\\/]", "/").equals(path.replaceAll("[\\\\/]", "/"))){
 					listDir.add(new File(dir.toFile().getPath()));
 				}
@@ -70,7 +79,7 @@ public class jEditFile{
 
 			@Override
 			public FileVisitResult visitFile(Path visitedFile,BasicFileAttributes fileAttributes)
-			throws IOException {
+					throws IOException {
 				String fileName = visitedFile.getFileName().toString();
 
 				if(Pattern.compile("(?i)" + filter.replace(".", "\\.").replace("*", ".*")).matcher(fileName).find()){
@@ -91,26 +100,26 @@ public class jEditFile{
 
 		return (File[])listDir.toArray(new File[listDir.size()]);
 	}
-	
+
 	public String readFile(String pathFile){
 		String body = "";
 		try (BufferedReader br = new BufferedReader(new FileReader(pathFile))) {
 			String sCurrentLine;
-			
+
 			while ((sCurrentLine = br.readLine()) != null) {
 				body += sCurrentLine + "\n";
 			}
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return body;
 	}
-	
+
 	public void openFolder(String openPath){
 		boolean isWindows = System.getProperty("os.name").indexOf("Linux") < 0;
 		String fileExplorer = "cmd /c start \"\"";
-		
+
 		if(!isWindows){
 			fileExplorer = "nemo";
 		}
@@ -119,6 +128,32 @@ public class jEditFile{
 			Runtime.getRuntime().exec(fileExplorer + " \"" + openPath + "\"");
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Method openSelection()
+	 * Open the correct selection for path file
+	 */
+	public void openSelection(){
+		selectedText = selectedText.trim();
+		StatusBar sb = view.getStatus();
+		if(selectedText.equals("")){
+			sb.setMessageAndClear("Must to select something");
+			return;
+		}
+
+		File f = new File(selectedText);
+		if(!f.exists()){
+			sb.setMessageAndClear("File or Folder not Found");
+			return;
+		}
+
+		if(f.isDirectory()){
+			new masterraise.files.jEditFile().openFolder(selectedText);
+		}
+		else{
+			jEdit.openFile(view,selectedText);
 		}
 	}
 }

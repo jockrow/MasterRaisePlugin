@@ -9,15 +9,37 @@
 			return masterraise.MasterRaisePlugin.checkFavorites();
 		</IS_SELECTED>
 	</ACTION>
-	<ACTION NAME="open-its-folder">
+	
+	<ACTION NAME="color-palette">
 		<CODE>
-			new masterraise.files.jEditFile().openFolder(buffer.getDirectory());
+			new masterraise.tools.Color().colorPalette();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="color-picker">
+		<CODE>
+			new masterraise.tools.Color().colorPicker();
 		</CODE>
 	</ACTION>
 	
 	<ACTION NAME="edit-first-upper-case">
 		<CODE>
 			new masterraise.Edit().firsUpperCase();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="edit-smart-join">
+		<CODE>
+			new masterraise.Edit().smartJoin();
+		</CODE>
+	</ACTION>
+	
+	<ACTION NAME="open-its-folder">
+		<CODE>
+			new masterraise.files.jEditFile().openFolder(buffer.getDirectory());
+		</CODE>
+	</ACTION>
+	<ACTION NAME="open-selection">
+		<CODE>
+			new masterraise.files.jEditFile().openSelection();
 		</CODE>
 	</ACTION>
 
