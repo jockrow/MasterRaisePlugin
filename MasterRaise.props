@@ -8,9 +8,8 @@ plugin.masterraise.MasterRaisePlugin.jars=Console.jar
 
 #menu
 plugin.masterraise.MasterRaisePlugin.menu=masterraise.toggle-favorites \
-	open-its-folder \
 	- \
-		
+
 plugin.masterraise.MasterRaisePlugin.menu.code=new masterraise.MasterRaiseMenuProvider();
 
 #labels
