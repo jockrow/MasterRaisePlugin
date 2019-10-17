@@ -3,7 +3,6 @@ package masterraise;
 import java.io.IOException;
 
 import org.gjt.sp.jedit.bsh.EvalError;
-import org.gjt.sp.jedit.bsh.Interpreter;
 
 public class BeanShell {
 	private String code = "";

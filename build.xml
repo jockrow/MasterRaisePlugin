@@ -7,9 +7,12 @@
 	<property name="install.dir" value="${jedit.install.dir}/jars"/>
 
 	<path id="project.class.path">
+		<pathelement location="${jedit.install.dir}/jedit.jar"/>
 		<pathelement location="${install.dir}/TextObjects.jar"/>
 		<pathelement location="${install.dir}/commons-io-2.4.jar"/>
-		<pathelement location="${jedit.install.dir}/jedit.jar"/>
+		<pathelement location="${install.dir}/Sessions.jar"/>
+		<pathelement location="${install.dir}/Console.jar"/>
+		<pathelement location="${install.dir}/UIManagerDefaults.jar"/>
 	</path>
 
 	<target name="init">
@@ -29,18 +32,11 @@
 
 	<target name="dist" depends="compile">
 		<mkdir dir="${install.dir}"/>
-		<copy todir="${build.dir}">
-		    <fileset dir="${src.dir}">
-		    	<include name="**/*.props"/>
-				<include name="**/actions.xml"/>
-				<include name="**/services.xml"/>
-				<include name="icons/**"/>
-		    </fileset>
-		</copy>
 		<jar jarfile="${install.dir}/${jar.name}">
 			<fileset dir="${build.dir}">   
 				<exclude name="build*"/>
-				<exclude name="build/"/>
+				<exclude name="\.*"/>
+				<exclude name="\.*/"/>
 			</fileset>
 		</jar>
 	</target>
