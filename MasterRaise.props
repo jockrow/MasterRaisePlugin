@@ -14,7 +14,7 @@ plugin.masterraise.MasterRaisePlugin.menu=masterraise.toggle-favorites \
 		notify-alarm \
 
 plugin.masterraise.MasterRaisePlugin.menu.code=new masterraise.MasterRaiseMenuProvider();
-
+ 
 notify-parent=notify-file notify-pixel notify-alarm
 
 #labels
