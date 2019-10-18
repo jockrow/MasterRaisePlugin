@@ -3,7 +3,7 @@
 *************************************************/
 package masterraise.tools;
 
-import masterraise.Edit;
+import masterraise.Text;
 
 import org.gjt.sp.jedit.Macros;
 import org.gjt.sp.jedit.View;
@@ -11,7 +11,7 @@ import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.buffer.JEditBuffer;
 import org.gjt.sp.jedit.textarea.TextArea;
 
-public class Php extends Edit{
+public class Php extends Text{
 	private final View view = jEdit.getActiveView();
 	private final TextArea textArea = view.getTextArea();
 	

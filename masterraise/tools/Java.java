@@ -10,14 +10,14 @@ import java.lang.reflect.Method;
 import javax.swing.JDialog;
 import javax.swing.JMenuBar;
 
-import masterraise.Edit;
+import masterraise.Text;
 
 import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.buffer.JEditBuffer;
 import org.gjt.sp.jedit.textarea.TextArea;
 
-public class Java extends Edit{
+public class Java extends Text{
 	private final View view = jEdit.getActiveView();
 	private final TextArea textArea = view.getTextArea();
 	

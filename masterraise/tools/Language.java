@@ -15,13 +15,12 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import org.gjt.sp.jedit.Macros;
 import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.buffer.JEditBuffer;
 import org.gjt.sp.jedit.textarea.TextArea;
 
-import masterraise.Edit;
+import masterraise.Text;
 
 /**
  * language-print-debug-variables
@@ -64,7 +63,7 @@ var url = "?uno=" + uno + "&dos=" + dos + "&tres=" + tres;
 		//Imprime el mensaje
 		+ "\nSystem.out.println(\"Hello World\");";
  */
-public class Language extends Edit{
+public class Language extends Text{
 	private final View view = jEdit.getActiveView();
 	private final TextArea textArea = view.getTextArea();
 	private JDialog dialog  = new JDialog(view, "Print Debug Variables", true);
@@ -192,7 +191,7 @@ public class Language extends Edit{
 
 			textArea.selectAll();
 			replaceBuffer("\\w+", "\"&$0=\" + $0 +", "r");
-			Macros.getMacro("Text/joinSmart").invoke(view);
+			smartJoin();
 			replaceBuffer("^\"&", "var url = \"?", "r");
 			replaceBuffer(" \\+$", ";", "r");
 
@@ -226,7 +225,7 @@ public class Language extends Edit{
 
 			textArea.selectAll();
 			replaceBuffer("\\w+", "\", $0:\" + $0 +", "r");
-			Macros.getMacro("Text/joinSmart").invoke(view);
+			smartJoin();
 			replaceBuffer("^\", ", "alert(\"", "r");
 			replaceBuffer(" \\+$", ");", "r");
 
@@ -308,7 +307,7 @@ public class Language extends Edit{
 	 * UNIDAD_MEDIDA_CAFÉ_PERGAMINO_SECO
 	 */
 	public void stringToVars(){
-		new Edit().replaceAccent();
+		new Text().replaceAccent();
 		String t = iniSelectedText();
 
 		t = t.replaceAll("[\\.]|\\b(DE|DEL|OF)\\b", "");

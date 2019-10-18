@@ -28,7 +28,7 @@ import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import masterraise.Edit;
+import masterraise.Text;
 import masterraise.files.MrFile;
 
 import org.gjt.sp.jedit.Buffer;
@@ -42,7 +42,7 @@ import org.gjt.sp.jedit.buffer.JEditBuffer;
 import org.gjt.sp.jedit.msg.PositionChanging;
 import org.gjt.sp.jedit.textarea.TextArea;
 
-public class Query extends Edit{
+public class Query extends Text{
 	private final static String ROUND_BRACKET_LEFT  = "___";
 	private final static String ROUND_BRACKET_RIGHT = "_____";
 	private final static String COMA                = "__";
@@ -901,7 +901,6 @@ public class Query extends Edit{
 	}
 
 	/**
-	 * Method convertSqlToLanguage()
 	 * Convert fields tables to any Language
 	 * Sample:
 
@@ -975,7 +974,6 @@ replaceSelection("_", " ", "");
 	}
 
 	/**
-	 * Method formatIn()
 	 * Format a list for where:
 	 * 1
 	 * 2
@@ -1011,7 +1009,6 @@ replaceSelection("_", " ", "");
 	}
 
 	/**
-	 * Method convertToSqlLite()
 	 * Convert any Query to SqlLite
 	 */
 	public void convertToSqlLite(){
@@ -1296,7 +1293,6 @@ replaceSelection("_", " ", "");
 	}
 
 	/**
-	 * Method identifyTmpTables()
 	 * Identify tempora variables into Stored Procedure
 	 */
 	public void sqlServerIdentifyTmpTables(){
@@ -1350,7 +1346,6 @@ replaceSelection("_", " ", "");
 	}
 
 	/**
-	 * Method oracleLdrToBatRenameImages()
 	 * convert ldr file to rename images like as bat file
 	 * Example:
 	 * Query:

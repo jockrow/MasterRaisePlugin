@@ -20,8 +20,7 @@ import org.gjt.sp.jedit.textarea.TextArea;
 import console.Console;
 import console.Shell;
 
-//TODO:refactor Edit to Text
-public class Edit extends Constants{
+public class Text extends Constants{
 	private View view = jEdit.getActiveView();
 	private TextArea textArea = view.getTextArea();
 	private String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
@@ -390,4 +389,160 @@ public class Edit extends Constants{
 			_searchBack();
 		}
 	}
+
+	//////////Encloses////////{{{
+	/**
+	 * Enclose the selected text with ¡!
+	 */
+	public void encAdmiration(){
+		String s = textArea.getSelectedText();
+		if(s != null){
+			textArea.setSelectedText("¡"+s+"!");
+
+			textArea.goToStartOfWhiteSpace(false);
+			findBuffer(s, "");
+		}else{
+			textArea.setSelectedText("¡!");
+			textArea.goToPrevCharacter(false);
+		}
+	}
+
+	/**
+	 * Enclose the selected text with {}
+	 */
+	public void encCurlyBracket(){
+		String s = textArea.getSelectedText();
+		if(s != null){
+			textArea.setSelectedText("{"+s+"}");
+
+			textArea.goToStartOfWhiteSpace(false);
+			findBuffer(s, "");
+		}else{
+			textArea.setSelectedText("{}");
+			textArea.goToPrevCharacter(false);
+		}
+	}
+
+	/**
+	 * Enclose the selected text with ""
+	 */
+	public void encDoubleQuote(){
+		String s = textArea.getSelectedText();
+		if(s != null){
+			textArea.setSelectedText("\""+s+"\"");
+
+			textArea.goToStartOfWhiteSpace(false);
+			findBuffer(s, "");
+		}else{
+			textArea.setSelectedText("\"\"");
+			textArea.goToPrevCharacter(false);
+		}
+	}
+
+	/**
+	 * Enclose the selected text with <>
+	 */
+	public void encLtGtTag(){
+		String s = textArea.getSelectedText();
+		if(s != null){
+			textArea.setSelectedText("<"+s+">");
+
+			textArea.goToStartOfWhiteSpace(false);
+			findBuffer(s, "");
+		}else textArea.setSelectedText("<");
+	}
+
+	/**
+	 * Enclose the selected text with %%
+	 */
+	public void encPercent(){
+		String s = textArea.getSelectedText();
+		if(s != null){
+			textArea.setSelectedText("%"+s+"%");
+
+			textArea.goToStartOfWhiteSpace(false);
+			findBuffer(s, "");
+		}else textArea.setSelectedText("%");
+	}
+
+	/**
+	 * Enclose the selected text with ¿?
+	 */
+	public void encQuestion(){
+		String s = textArea.getSelectedText();
+		if(s != null){
+			textArea.setSelectedText("¿"+s+"?");
+
+			textArea.goToStartOfWhiteSpace(false);
+			findBuffer(s, "");
+		}else{
+			textArea.setSelectedText("¿?");
+			textArea.goToPrevCharacter(false);
+		}
+	}
+
+	/**
+	 * Enclose the selected text with ``
+	 */
+	public void encQuote(){
+		String s = textArea.getSelectedText();
+		if(s != null){
+			textArea.setSelectedText("`"+s+"`");
+
+			textArea.goToStartOfWhiteSpace(false);
+			findBuffer(s, "");
+		}else{
+			textArea.setSelectedText("``");
+			textArea.goToPrevCharacter(false);
+		}
+	}
+
+	/**
+	 * Enclose the selected text with ()
+	 */
+	public void encRoundBracket(){
+		String s = textArea.getSelectedText();
+		if(s != null){
+			textArea.setSelectedText("("+s+")");
+
+			textArea.goToStartOfWhiteSpace(false);
+			findBuffer(s, "");
+		}else{
+			textArea.setSelectedText("()");
+			textArea.goToPrevCharacter(false);
+		}
+	}
+
+	/**
+	 * Enclose the selected text with a single quote
+	 */
+	public void encSingleQuote(){
+		String s = textArea.getSelectedText();
+		if(s != null){
+			textArea.setSelectedText("\'"+s+"\'");
+
+			textArea.goToStartOfWhiteSpace(false);
+			findBuffer(s, "");
+		}else{
+			textArea.setSelectedText("\'\'");
+			textArea.goToPrevCharacter(false);
+		}
+	}
+
+	/**
+	 * Enclose the selected text with square brackets
+	 */
+	public void encSquareBracket(){
+		String s = textArea.getSelectedText();
+		if(s != null){
+			textArea.setSelectedText("["+s+"]");
+
+			textArea.goToStartOfWhiteSpace(false);
+			findBuffer(s, "");
+		}else{
+			textArea.setSelectedText("[]");
+			textArea.goToPrevCharacter(false);
+		}
+	}
+	//////////Encloses////////}}}
 }

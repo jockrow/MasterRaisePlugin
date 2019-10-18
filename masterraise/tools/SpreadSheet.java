@@ -23,7 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.InternationalFormatter;
 
-import masterraise.Edit;
+import masterraise.Text;
 
 import org.gjt.sp.jedit.Macros;
 import org.gjt.sp.jedit.Registers;
@@ -31,7 +31,7 @@ import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.textarea.TextArea;
 
-public class SpreadSheet extends Edit{
+public class SpreadSheet extends Text{
 	private final View view = jEdit.getActiveView();
 	private final TextArea textArea = view.getTextArea();
 	

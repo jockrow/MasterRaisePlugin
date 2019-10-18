@@ -1,5 +1,4 @@
 <!DOCTYPE ACTIONS SYSTEM "actions.dtd">
-
 <ACTIONS>
 	<ACTION NAME="masterraise.toggle-favorites">
 		<CODE>
@@ -30,17 +29,6 @@
 	<ACTION NAME="color-picker">
 		<CODE>
 			new masterraise.tools.Color().colorPicker();
-		</CODE>
-	</ACTION>
-	
-	<ACTION NAME="edit-first-upper-case">
-		<CODE>
-			new masterraise.Edit().firsUpperCase();
-		</CODE>
-	</ACTION>
-	<ACTION NAME="edit-smart-join">
-		<CODE>
-			new masterraise.Edit().smartJoin();
 		</CODE>
 	</ACTION>
 	
@@ -209,14 +197,76 @@
 	</ACTION>
 	
 	<!-- Text -->
-	<ACTION NAME="text-replace-accent">
+	<ACTION NAME="text-first-upper-case">
 		<CODE>
-			new masterraise.Edit().replaceAccent();
+			new masterraise.Text().firsUpperCase();
 		</CODE>
 	</ACTION>
 	<ACTION NAME="text-search-back">
 		<CODE>
-			new masterraise.Edit().searchBack();
+			new masterraise.Text().searchBack();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="text-smart-join">
+		<CODE>
+			new masterraise.Text().smartJoin();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="text-replace-accent">
+		<CODE>
+			new masterraise.Text().replaceAccent();
+		</CODE>
+	</ACTION>
+	
+	<!-- Encloses -->
+	<ACTION NAME="enc-admiration">
+		<CODE>
+			new masterraise.Text().encAdmiration();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="enc-curly-bracket">
+		<CODE>
+			new masterraise.Text().encCurlyBracket();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="enc-double-quote">
+		<CODE>
+			new masterraise.Text().encDoubleQuote();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="enc-ltgt-tag">
+		<CODE>
+			new masterraise.Text().encLtGtTag();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="enc-percent">
+		<CODE>
+			new masterraise.Text().encPercent();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="enc-question">
+		<CODE>
+			new masterraise.Text().encQuestion();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="enc-quote">
+		<CODE>
+			new masterraise.Text().encQuote();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="enc-round-bracket">
+		<CODE>
+			new masterraise.Text().encRoundBracket();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="enc-single-quote">
+		<CODE>
+			new masterraise.Text().encSingleQuote();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="enc-square-bracket">
+		<CODE>
+			new masterraise.Text().encSquareBracket();
 		</CODE>
 	</ACTION>
 		

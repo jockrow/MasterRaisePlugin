@@ -29,7 +29,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import masterraise.Edit;
+import masterraise.Text;
 
 import org.gjt.sp.jedit.Macros;
 import org.gjt.sp.jedit.Registers;
@@ -39,7 +39,7 @@ import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.textarea.JEditTextArea;
 import org.gjt.sp.jedit.textarea.TextArea;
 
-public class Html extends Edit{
+public class Html extends Text{
 	private final View view = jEdit.getActiveView();
 	private final TextArea textArea = view.getTextArea();
 	

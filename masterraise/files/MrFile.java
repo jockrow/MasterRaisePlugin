@@ -34,10 +34,10 @@ import org.gjt.sp.jedit.gui.DockableWindowManager;
 import org.gjt.sp.jedit.gui.StatusBar;
 import org.gjt.sp.jedit.textarea.TextArea;
 
-import masterraise.Edit;
+import masterraise.Text;
 import masterraise.tools.Bulk;
 
-public class MrFile extends Edit{
+public class MrFile extends Text{
 	private View view = jEdit.getActiveView();
 	private Buffer buffer = view.getBuffer();
 	private TextArea textArea = view.getTextArea();
@@ -144,7 +144,6 @@ public class MrFile extends Edit{
 	}
 
 	/**
-	 * Method openSelection()
 	 * Open the correct selection for path file
 	 */
 	public void openSelection(){
@@ -183,25 +182,23 @@ public class MrFile extends Edit{
 	}
 
 	/**
-	 * Method createFileStructure()
 	 * Crea una estructura de directorios y archivos, de un buffer con una estructura de tabulaciones
-
-	uno f
-	 *unoF.txt
-		uno1
-		uno2
-		uno3
-	dos
-	 *dosF1.txt
-	 *dosF2.txt
-		dosdos
-	 *dosdosF
-			dosdos1
-			dosdos2
-		dos1
-	 *dos1F.txt
-	tres
-	 *tresF.txt
+uno f
+	*unoF.txt
+	uno1
+	uno2
+	uno3
+dos
+	*dosF1.txt
+	*dosF2.txt
+	dosdos
+		*dosdosF
+		dosdos1
+		dosdos2
+	dos1
+		*dos1F.txt
+tres
+	*tresF.txt
 
 		NOTE: * is file
 	 */
@@ -310,7 +307,6 @@ public class MrFile extends Edit{
 	}
 
 	/**
-	 * Method joinBuffers()
 	 * Copy all opened buffers in new buffer
 	 */
 	public void joinBuffers(){

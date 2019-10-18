@@ -73,11 +73,22 @@ public class MasterRaiseMenuProvider implements DynamicMenuProvider{
 		superMenu.add(menu);
 
 		menu = new JMenu("Text");
-		createSubMenu("text-replace-accent");
+		createSubMenu("text-first-upper-case");
 		createSubMenu("text-search-back");
-		//		createSubMenu("text-replace");
-		//		createSubMenu("text-replace");
-		//		createSubMenu("text-replace");
+		createSubMenu("text-replace-accent");
+		superMenu.add(menu);
+		
+		menu = new JMenu("Encloses");
+		createSubMenu("enc-admiration");
+		createSubMenu("enc-curly-bracket");
+		createSubMenu("enc-double-quote");
+		createSubMenu("enc-ltgt-tag");
+		createSubMenu("enc-percent");
+		createSubMenu("enc-question");
+		createSubMenu("enc-quote");
+		createSubMenu("enc-round-bracket");
+		createSubMenu("enc-single-quote");
+		createSubMenu("enc-square-bracket");
 		superMenu.add(menu);
 	}
 

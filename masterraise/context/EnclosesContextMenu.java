@@ -36,18 +36,23 @@ import javax.swing.JMenuItem;
 
 import org.gjt.sp.jedit.Macros;
 import org.gjt.sp.jedit.View;
+import org.gjt.sp.jedit.jEdit;
+
+import masterraise.Text;
 
 /**
  * Subversion context menu to add to the jEdit text area context menu.
  */
 @SuppressWarnings("serial")
 public class EnclosesContextMenu extends JMenu {
-
-	private View view = null;
+//	private View view = null;
+	private final View view = jEdit.getActiveView();
+	private final Text text = new Text();
+	
 
 	public EnclosesContextMenu( View view ) {
-		super( "Encloses" );
-		this.view = view;
+//		super( "Encloses" );
+//		this.view = view;
 		
 		JMenuItem item = new JMenuItem("Enc Admiration i !");
 		item.addActionListener( encAdmiration() );
