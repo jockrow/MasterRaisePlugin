@@ -1,6 +1,6 @@
 /********************************************
-*			@author Richard Martínez 2010	*
-*********************************************/
+ *			@author Richard Martínez 2010	*
+ *********************************************/
 package masterraise.tools;
 
 import java.awt.BorderLayout;
@@ -32,21 +32,21 @@ import masterraise.Edit;
  *
  * a (en javascript):
 	alert("uno:" + uno + "\n dos:" + dos + "\n tres:" + tres);
-*---------------------
-* language-generate-url-string
-* Genera una url string
-*
-* @example (javascript):
+ *---------------------
+ * language-generate-url-string
+ * Genera una url string
+ *
+ * @example (javascript):
 uno
 dos
 tres
-* a:
+ * a:
 var url = "?uno=" + uno + "&dos=" + dos + "&tres=" + tres;
-*---------------------
-*language-code-to-string
-** prepara unas variables para imprimir en pantalla
-* @example
-* pasa de:
+ *---------------------
+ *language-code-to-string
+ ** prepara unas variables para imprimir en pantalla
+ * @example
+ * pasa de:
 		View view = jEdit.getActiveView();
 		JMenuBar menuBar = view.getJMenuBar();
 		//un comentario
@@ -55,7 +55,7 @@ var url = "?uno=" + uno + "&dos=" + dos + "&tres=" + tres;
 		//Imprime el mensaje
 		System.out.println("Hello World");
 
-* 	a (java):
+ * 	a (java):
 	String strCode = "View view = jEdit.getActiveView();"
 		+ "\nJMenuBar menuBar = view.getJMenuBar();"
 		//un comentario
@@ -85,7 +85,7 @@ public class Language extends Edit{
 			, "SqlServer PRINT"
 			, "VB "
 	};
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void showGui(String type){
 		if(!type.equals("printDebugVariables")){
@@ -98,7 +98,7 @@ public class Language extends Edit{
 			};
 		}
 		cmbLanguages = new JComboBox(lista);
-		
+
 		switch(type){
 		case "codeToString":
 			dialog  = new JDialog(view, "Code To String", true);			
@@ -107,28 +107,28 @@ public class Language extends Edit{
 			dialog  = new JDialog(view, "Generate Url String", true);
 			break;
 		}
-		
+
 
 		content.setBorder(new EmptyBorder(8, 8, 8, 8));
 		content.setPreferredSize(new Dimension(200, 40));
 		content.add(cmbLanguages);
 
 		cmbLanguages.addKeyListener(new KeyAdapter(){
-				public void keyReleased(KeyEvent evt){
-					if(evt.getKeyCode() == KeyEvent.VK_ESCAPE){
-						dialog.dispose();
-					}
+			public void keyReleased(KeyEvent evt){
+				if(evt.getKeyCode() == KeyEvent.VK_ESCAPE){
+					dialog.dispose();
 				}
+			}
 		});
 
 		cmbLanguages.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e){
-					if(!cmbLanguages.getSelectedItem().toString().equals("- Languages -")){
-						language = cmbLanguages.getSelectedItem().toString();
-						dialog.dispose();
-						processText(type);
-					}
+			public void actionPerformed(ActionEvent e){
+				if(!cmbLanguages.getSelectedItem().toString().equals("- Languages -")){
+					language = cmbLanguages.getSelectedItem().toString();
+					dialog.dispose();
+					processText(type);
 				}
+			}
 		});
 
 		dialog.setContentPane(content);
@@ -141,7 +141,7 @@ public class Language extends Edit{
 	public String getResult(){
 		return language;
 	}
-	
+
 	public void setResult(){
 		language = cmbLanguages.getSelectedItem().toString();
 	}
@@ -168,23 +168,23 @@ public class Language extends Edit{
 
 			//Inicia cada línea seteando correctamente los comentarios
 			switch(getResult()){
-				case "javaScript":
-					replaceBuffer("String strCode", "var strCode", "");
-					break;
-				case "php":
-					replaceBuffer("String strCode", "$strCode", "");
-					replaceBuffer("+ \"", ". \"", "");
-					break;
-				case "vb":
-					replaceBuffer("(.*)(\\+ \"\\\\n)(.*)", "$1& Chr(10) & \\\"$3 _", "r");
-					replaceBuffer("\"; _", "\"", "");
-					replaceBuffer("\\\"", "\"\"", "");
-					replaceBuffer("//", "'", "");
-					replaceBuffer("(String strCode)(.*)", "Dim strCode As String$2 _", "r");
-					break;
+			case "javaScript":
+				replaceBuffer("String strCode", "var strCode", "");
+				break;
+			case "php":
+				replaceBuffer("String strCode", "$strCode", "");
+				replaceBuffer("+ \"", ". \"", "");
+				break;
+			case "vb":
+				replaceBuffer("(.*)(\\+ \"\\\\n)(.*)", "$1& Chr(10) & \\\"$3 _", "r");
+				replaceBuffer("\"; _", "\"", "");
+				replaceBuffer("\\\"", "\"\"", "");
+				replaceBuffer("//", "'", "");
+				replaceBuffer("(String strCode)(.*)", "Dim strCode As String$2 _", "r");
+				break;
 			}
 			break;
-			
+
 		case "generateUrlString":
 			if(findBuffer("\\n^([ ]|\\t)*\\w+", "air")){
 				replaceBuffer("\\n", " ", "ir");
@@ -197,23 +197,23 @@ public class Language extends Edit{
 			replaceBuffer(" \\+$", ";", "r");
 
 			switch(language.toString()){
-				case "c#": case "java":
-					replaceBuffer("var url = ", "String url = ", "i");
-					break;
-				case "php":
-					replaceBuffer("var url = ", "$url = ", "i");
-					replaceBuffer("(\\+ )(\\w)", ". \\$$2", "ir");
-					replaceBuffer("+ \"", ". \"", "wi");
-					break;
-				case "vb":
-					replaceBuffer("var url = ", "Dim url As String = ", "wi");
-					replaceBuffer("=\" + ", "=\" & ", "i");
-					replaceBuffer("+ \"", "& \"", "i");
-					replaceBuffer(";$", "", "ir");
-					break;
+			case "c#": case "java":
+				replaceBuffer("var url = ", "String url = ", "i");
+				break;
+			case "php":
+				replaceBuffer("var url = ", "$url = ", "i");
+				replaceBuffer("(\\+ )(\\w)", ". \\$$2", "ir");
+				replaceBuffer("+ \"", ". \"", "wi");
+				break;
+			case "vb":
+				replaceBuffer("var url = ", "Dim url As String = ", "wi");
+				replaceBuffer("=\" + ", "=\" & ", "i");
+				replaceBuffer("+ \"", "& \"", "i");
+				replaceBuffer(";$", "", "ir");
+				break;
 			}
 			break;
-			
+
 		case "printDebugVariables":
 			if(language.substring(0, 3).equals("sql") && textArea.getSelectedText().equals("@")){
 				replaceBuffer("@", "", "wi");
@@ -294,7 +294,26 @@ public class Language extends Edit{
 			}
 			break;
 		}
-		
+
 		closeTempBuffer(bfTmp);
+	}
+
+	/**
+	 * Convert String to Vars
+	 * Example:
+	 * CANT. CAFÉ PERGAMINO SECO
+	 * UNIDAD DE MEDIDA CAFÉ PERGAMINO SECO
+	 * to:
+	 * CANT_CAFÉ_PERGAMINO_SECO
+	 * UNIDAD_MEDIDA_CAFÉ_PERGAMINO_SECO
+	 */
+	public void stringToVars(){
+		new Edit().replaceAccent();
+		String t = iniSelectedText();
+
+		t = t.replaceAll("[\\.]|\\b(DE|DEL|OF)\\b", "");
+		t = t.replaceAll("[ ]+", "_");
+
+		endSelectedText(t);
 	}
 }

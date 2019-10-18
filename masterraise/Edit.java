@@ -20,7 +20,7 @@ import org.gjt.sp.jedit.textarea.TextArea;
 import console.Console;
 import console.Shell;
 
-
+//TODO:refactor Edit to Text
 public class Edit extends Constants{
 	private View view = jEdit.getActiveView();
 	private TextArea textArea = view.getTextArea();
@@ -313,7 +313,6 @@ public class Edit extends Constants{
 	}
 
 	/**
-	 * Method firsUpperCase()
 	 * Toggle the first Case to upperCase for each word
 	 * Example:
 	 * IGEC_GESTOR_PROYECTO or IGEC GESTOR PROYECTO
@@ -339,7 +338,6 @@ public class Edit extends Constants{
 	}
 
 	/**
-	 * Method joinSmart()
 	 * Join coherence lines
 	 */
 	public void smartJoin(){
@@ -352,5 +350,44 @@ public class Edit extends Constants{
 		t=t.replaceAll("(?m)([\\(\\{])([ \t]+)(\\p{Print})", "$1$3");
 
 		endSelectedText(t);
+	}
+
+
+	/**
+	 * replace all accent
+	 */
+	public void replaceAccent(){
+		String t = iniSelectedText();
+
+		for(int i=0; i<ARR_CHARS.length; i++){
+			t=t.replace(ARR_CHARS[i][0], ARR_CHARS[i][4]);
+			if(ARR_CHARS[i][0].equals("ñ")){
+				break;
+			}
+		}
+
+		endSelectedText(t);
+	}
+
+	private void _searchBack(){
+		SearchAndReplace.setSearchString(textArea.getSelectedText());
+		SearchAndReplace.setAutoWrapAround(true);
+		SearchAndReplace.setReverseSearch(true);
+		SearchAndReplace.setIgnoreCase(true);
+		SearchAndReplace.setSearchFileSet(new CurrentBufferSet());
+		SearchAndReplace.find(view);
+	}
+
+	/**
+	 * Find selection to back in document
+	 */
+	public void searchBack(){
+		if(textArea.getSelectionCount() == 1){
+			_searchBack();
+		}
+		else if(textArea.getSelectionCount() == 0){
+			textArea.setSelection(textobjects.TextObjectsPlugin.word(textArea, textArea.getCaretPosition(), false));
+			_searchBack();
+		}
 	}
 }

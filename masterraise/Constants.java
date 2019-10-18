@@ -1,5 +1,7 @@
 package masterraise;
 
+import java.io.File;
+
 public abstract class Constants {
 	public static String TRIM_UP = "\\A[\\n$ \\t]*";
 	public static String TRIM_DOWN = "[\\n$ \\t]*\\z";
@@ -7,6 +9,7 @@ public abstract class Constants {
 	public static String TRIM_RIGHT = "[ \\t]+$";
 	public static String BLANK_LINE = "(" + TRIM_UP + ")|(" + TRIM_DOWN + ")|(^[ \\t]*\\n)";
 	public static String BLANK_SPACE = "(^[ \\t]+)|([ \\t]+$)";
+	public static String SEP = File.separator;
 
 	public static String[][] ARR_CHARS = {
 	{"Á","capital a, acute accent","&Aacute;","&#193;","A"}

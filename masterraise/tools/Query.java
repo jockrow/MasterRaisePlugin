@@ -29,7 +29,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import masterraise.Edit;
-import masterraise.files.jEditFile;
+import masterraise.files.MrFile;
 
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.EditBus;
@@ -1393,7 +1393,7 @@ replaceSelection("_", " ", "");
 
 		ldrBuff.save(view,null,true);
 		jEdit._closeBuffer(view,ldrBuff);
-		new jEditFile().moveFile(selectedText, newFile);
+		new MrFile().moveFile(selectedText, newFile);
 
 		runCommand("cd " + dirNewFile);
 		runCommand("\"" + newFile + "\"");

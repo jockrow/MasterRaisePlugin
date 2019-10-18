@@ -10,6 +10,18 @@
 		</IS_SELECTED>
 	</ACTION>
 	
+	<!-- Bulk -->
+	<ACTION NAME="insert-selection">
+		<CODE>
+			new masterraise.tools.Bulk().insertFileSelection();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="invocation-massive">
+		<CODE>
+			new masterraise.tools.Bulk().invocationMassive();
+		</CODE>
+	</ACTION>
+
 	<ACTION NAME="color-palette">
 		<CODE>
 			new masterraise.tools.Color().colorPalette();
@@ -32,14 +44,30 @@
 		</CODE>
 	</ACTION>
 	
+	<!-- Files -->
+	<ACTION NAME="create-file-structure">
+		<CODE>
+			new masterraise.files.MrFile().createFileStructure();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="delete-current-buffer">
+		<CODE>
+			new masterraise.files.MrFile().deleteCurrentBuffer();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="join-buffers">
+		<CODE>
+			new masterraise.files.MrFile().joinBuffers();
+		</CODE>
+	</ACTION>
 	<ACTION NAME="open-its-folder">
 		<CODE>
-			new masterraise.files.jEditFile().openFolder(buffer.getDirectory());
+			new masterraise.files.MrFile().openFolder(buffer.getDirectory());
 		</CODE>
 	</ACTION>
 	<ACTION NAME="open-selection">
 		<CODE>
-			new masterraise.files.jEditFile().openSelection();
+			new masterraise.files.MrFile().openSelection();
 		</CODE>
 	</ACTION>
 
@@ -93,6 +121,11 @@
 	<ACTION NAME="language-print-debug-variables">
 		<CODE>
 			new masterraise.tools.Language().showGui("printDebugVariables");
+		</CODE>
+	</ACTION>
+	<ACTION NAME="language-string-to-vars">
+		<CODE>
+			new masterraise.tools.Language().stringToVars();
 		</CODE>
 	</ACTION>
 	
@@ -172,6 +205,18 @@
 	<ACTION NAME="query-sqlserver-set-variables-sp">
 		<CODE>
 			new masterraise.tools.Query().sqlServerSetVariablesSp();
+		</CODE>
+	</ACTION>
+	
+	<!-- Text -->
+	<ACTION NAME="text-replace-accent">
+		<CODE>
+			new masterraise.Edit().replaceAccent();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="text-search-back">
+		<CODE>
+			new masterraise.Edit().searchBack();
 		</CODE>
 	</ACTION>
 		

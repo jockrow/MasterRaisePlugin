@@ -73,6 +73,7 @@ public abstract class Pixel{
 				}
 			});
 
+			// TODO:Invocar desde mi Color
 			timerWaitChange = new Timer(1000, new ActionListener(){
 				public void actionPerformed(ActionEvent e){
 					setLocation(loc.x+4, loc.y+22);

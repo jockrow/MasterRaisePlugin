@@ -15,6 +15,9 @@ plugin.masterraise.MasterRaisePlugin.menu.code=new masterraise.MasterRaiseMenuPr
 #labels
 masterraise.toggle-favorites.label=Menu Favorites
 
+bulk-insert-selection.label=Insert Selection
+bulk-invocation-massive.label=Invocation Massive
+
 color-palette.label=Color Palette
 color-picker.label=Color Picker
 
@@ -22,6 +25,9 @@ edit-first-upper-case.label=First Upper Case
 edit-smart-join.label=Smart Join
 
 #files
+create-file-structure.label=Create File Structure
+delete-current-buffer.label=Delete Current Buffer
+join-buffers.label=Join Buffers
 open-its-folder.label=Open Its Folder
 open-selection.label=Open Selection
 
@@ -37,6 +43,7 @@ java-gen-get-set.label=Generate Getters and Setters
 language-code-to-string.label=Code To String
 language-generate-url-string.label=Generate Url String
 language-print-debug-variables.label=Print Debug Variables
+language-string-to-vars.label=String to Vars
 
 notify-file.label=File Changed
 notify-pixel.label=Pixel Changed
@@ -57,3 +64,5 @@ spreadsheet-increase-column.label=Increase Column
 spreadsheet-transpose-matrix.label=Transpose Matrix
 spreadsheet-value-column.label=Value From Column
 
+text-replace-accent.label=Replace Accent
+text-search-back.label=Search Back
