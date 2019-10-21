@@ -221,52 +221,54 @@
 	<!-- Encloses -->
 	<ACTION NAME="enc-admiration">
 		<CODE>
-			new masterraise.Text().encAdmiration();
+			new masterraise.Text().encloseText('¡', '!');
 		</CODE>
 	</ACTION>
 	<ACTION NAME="enc-curly-bracket">
 		<CODE>
-			new masterraise.Text().encCurlyBracket();
+			new masterraise.Text().encloseText('{', '}');
 		</CODE>
 	</ACTION>
 	<ACTION NAME="enc-double-quote">
 		<CODE>
-			new masterraise.Text().encDoubleQuote();
+			new masterraise.Text().encloseText('"', '"');
 		</CODE>
 	</ACTION>
 	<ACTION NAME="enc-ltgt-tag">
 		<CODE>
-			new masterraise.Text().encLtGtTag();
+		<![CDATA[
+		new masterraise.Text().encloseText('<', '>');
+		]]>
 		</CODE>
 	</ACTION>
 	<ACTION NAME="enc-percent">
 		<CODE>
-			new masterraise.Text().encPercent();
+			new masterraise.Text().encloseText('%', '%');
 		</CODE>
 	</ACTION>
 	<ACTION NAME="enc-question">
 		<CODE>
-			new masterraise.Text().encQuestion();
+			new masterraise.Text().encloseText('¿', '?');
 		</CODE>
 	</ACTION>
 	<ACTION NAME="enc-quote">
 		<CODE>
-			new masterraise.Text().encQuote();
+			new masterraise.Text().encloseText('`', '`');
 		</CODE>
 	</ACTION>
 	<ACTION NAME="enc-round-bracket">
 		<CODE>
-			new masterraise.Text().encRoundBracket();
+			new masterraise.Text().encloseText('(', ')');
 		</CODE>
 	</ACTION>
 	<ACTION NAME="enc-single-quote">
 		<CODE>
-			new masterraise.Text().encSingleQuote();
+			new masterraise.Text().encloseText('\'', '\'');
 		</CODE>
 	</ACTION>
 	<ACTION NAME="enc-square-bracket">
 		<CODE>
-			new masterraise.Text().encSquareBracket();
+			new masterraise.Text().encloseText('[', ']');
 		</CODE>
 	</ACTION>
 		

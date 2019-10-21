@@ -152,14 +152,13 @@ public class MasterRaisePlugin extends EBPlugin{
 //		setMasterProperty("console.warningColor");
 //	}
 
-	@SuppressWarnings("deprecation")
 	private static void hideMenus(View view){
 		JMenu menu = view.getJMenuBar().getMenu(M_PLUGIN);
 		String strHidePlugins = jEdit.getProperty("masterraise-plugin.menu.favorites.visible");
 
 		for (int i=2; i<menu.getMenuComponentCount()-1; i++){
 			JMenuItem c = (JMenuItem)menu.getMenuComponent((i+1));
-			if(!c.getLabel().matches(strHidePlugins) && !c.getLabel().equals(jEdit.getProperty("plugin.masterraise.MasterRaisePlugin.name"))){
+			if(!c.getText().matches(strHidePlugins) && !c.getText().equals(jEdit.getProperty("plugin.masterraise.MasterRaisePlugin.name"))){
 				c.setVisible(false);
 			}
 		}

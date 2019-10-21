@@ -2,6 +2,12 @@ package masterraise;
 
 import java.io.File;
 
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+
+import org.gjt.sp.jedit.GUIUtilities;
+import org.gjt.sp.jedit.jEdit;
+
 public abstract class Constants {
 	public static String TRIM_UP = "\\A[\\n$ \\t]*";
 	public static String TRIM_DOWN = "[\\n$ \\t]*\\z";
@@ -210,4 +216,48 @@ public abstract class Constants {
 	,{"˛","","&ogon;"}
 	,{"˝","","&dblac;"}
 	};
+	
+	public static void enclosesMenu(JMenu menu) {
+		menu.add(createSubMenu("enc-admiration"));
+		menu.add(createSubMenu("enc-curly-bracket"));
+		menu.add(createSubMenu("enc-double-quote"));
+		menu.add(createSubMenu("enc-ltgt-tag"));
+		menu.add(createSubMenu("enc-percent"));
+		menu.add(createSubMenu("enc-question"));
+		menu.add(createSubMenu("enc-quote"));
+		menu.add(createSubMenu("enc-round-bracket"));
+		menu.add(createSubMenu("enc-single-quote"));
+		menu.add(createSubMenu("enc-square-bracket"));
+	}
+	
+	public static void textObjectMenu(JMenu menu) {
+		menu.add(createSubMenu("textobjects.select-a-word"));
+		menu.add(createSubMenu("textobjects.select-in-word"));
+		menu.add(createSubMenu("textobjects.select-a-brace"));
+		menu.add(createSubMenu("textobjects.select-in-brace"));
+		menu.add(createSubMenu("textobjects.select-a-bracket"));
+		menu.add(createSubMenu("textobjects.select-in-bracket"));
+		menu.add(createSubMenu("textobjects.select-a-paren"));
+		menu.add(createSubMenu("textobjects.select-in-paren"));
+		menu.add(createSubMenu("textobjects.select-a-quote"));
+		menu.add(createSubMenu("textobjects.select-in-quote"));
+		menu.add(createSubMenu("textobjects.select-a-tick"));
+		menu.add(createSubMenu("textobjects.select-in-tick"));
+		menu.add(createSubMenu("textobjects.select-a-back-tick"));
+		menu.add(createSubMenu("textobjects.select-in-back-tick"));
+		menu.add(createSubMenu("textobjects.select-a-paragraph"));
+		menu.add(createSubMenu("textobjects.select-in-paragraph"));
+		menu.add(createSubMenu("textobjects.select-a-angle"));
+		menu.add(createSubMenu("textobjects.select-in-angle"));
+		menu.add(createSubMenu("textobjects.select-a-comment"));
+		menu.add(createSubMenu("textobjects.select-in-comment"));
+		menu.add(createSubMenu("textobjects.select-a-sentence"));
+		menu.add(createSubMenu("textobjects.select-in-sentence"));
+		menu.add(createSubMenu("textobjects.select-a-indent"));
+		menu.add(createSubMenu("textobjects.select-in-indent"));
+	}
+	
+	private static JMenuItem createSubMenu(String title){
+		return GUIUtilities.loadMenuItem(jEdit.getAction(title), false);
+	}
 }

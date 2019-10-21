@@ -20,6 +20,10 @@ public class MasterRaiseMenuProvider implements DynamicMenuProvider{
 		//		createSubMenu("invocation-massive");
 		superMenu.add(menu);
 
+		menu = new JMenu("Encloses");
+		Constants.enclosesMenu(menu);
+		superMenu.add(menu);
+
 		menu = new JMenu("Files");
 		createSubMenu("join-buffers");
 		createSubMenu("open-selection");
@@ -76,19 +80,6 @@ public class MasterRaiseMenuProvider implements DynamicMenuProvider{
 		createSubMenu("text-first-upper-case");
 		createSubMenu("text-search-back");
 		createSubMenu("text-replace-accent");
-		superMenu.add(menu);
-		
-		menu = new JMenu("Encloses");
-		createSubMenu("enc-admiration");
-		createSubMenu("enc-curly-bracket");
-		createSubMenu("enc-double-quote");
-		createSubMenu("enc-ltgt-tag");
-		createSubMenu("enc-percent");
-		createSubMenu("enc-question");
-		createSubMenu("enc-quote");
-		createSubMenu("enc-round-bracket");
-		createSubMenu("enc-single-quote");
-		createSubMenu("enc-square-bracket");
 		superMenu.add(menu);
 	}
 

@@ -31,12 +31,15 @@ package masterraise.context;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.gui.DynamicContextMenuService;
 import org.gjt.sp.jedit.textarea.JEditTextArea;
+
+import masterraise.Constants;
 
 /**
  * This is the implementation of DynamicContextMenuService that lets
@@ -46,27 +49,28 @@ import org.gjt.sp.jedit.textarea.JEditTextArea;
  * add the SVN context menu, this class is declared in the services.xml file.
  */
 public class ContextMenuService extends DynamicContextMenuService {
-
 	// cache menu for quicker response
-	private HashMap<View, EnclosesContextMenu> EncloseMenus = new HashMap<View, EnclosesContextMenu>();
-	private HashMap<View, TextObjectsContextMenu> TextObjectsMenus = new HashMap<View, TextObjectsContextMenu>();
+	private HashMap<View, JMenu> encloseMenus = new HashMap<View, JMenu>();
+	private HashMap<View, JMenu> textObjectsMenus = new HashMap<View, JMenu>();
 
 	// context menu is per View
 	public JMenuItem[] createMenu(JEditTextArea textArea, MouseEvent mouseEvent) {
 		View view = textArea == null ? jEdit.getFirstView() : textArea.getView();
 
-		EnclosesContextMenu EnclosesMenu = EncloseMenus.get(view);
-		if (EnclosesMenu == null) {
-			EnclosesMenu = new EnclosesContextMenu(view);
-			EncloseMenus.put(view, EnclosesMenu);
+		JMenu enclosesMenu = encloseMenus.get(view);
+		if (enclosesMenu == null) {
+			enclosesMenu = new JMenu("Encloses");
+			Constants.enclosesMenu(enclosesMenu);
+			encloseMenus.put(view, enclosesMenu);
 		}
 
-		TextObjectsContextMenu TextObjectsMenu = TextObjectsMenus.get(view);
-		if (TextObjectsMenu == null) {
-			TextObjectsMenu = new TextObjectsContextMenu(view);
-			TextObjectsMenus.put(view, TextObjectsMenu);
+		JMenu textObjectsMenu = textObjectsMenus.get(view);
+		if (textObjectsMenu == null) {
+			textObjectsMenu = new JMenu("Text Object");
+			Constants.textObjectMenu(textObjectsMenu);
+			textObjectsMenus.put(view, textObjectsMenu);
 		}
 
-		return new JMenuItem[]{EnclosesMenu, TextObjectsMenu};
+		return new JMenuItem[]{enclosesMenu, textObjectsMenu};
 	}
 }

@@ -390,159 +390,20 @@ public class Text extends Constants{
 		}
 	}
 
-	//////////Encloses////////{{{
 	/**
-	 * Enclose the selected text with ¡!
+	 * Enclose selected text with prefix or suffix with prefix and suffix 
+	 * @param prefix char before text
+	 * @param suffix char after text
 	 */
-	public void encAdmiration(){
+	public void encloseText(char prefix, char suffix) {
 		String s = textArea.getSelectedText();
 		if(s != null){
-			textArea.setSelectedText("¡"+s+"!");
-
+			textArea.setSelectedText(prefix + s + suffix);
 			textArea.goToStartOfWhiteSpace(false);
 			findBuffer(s, "");
 		}else{
-			textArea.setSelectedText("¡!");
+			textArea.setSelectedText(prefix + "" + suffix);
 			textArea.goToPrevCharacter(false);
 		}
 	}
-
-	/**
-	 * Enclose the selected text with {}
-	 */
-	public void encCurlyBracket(){
-		String s = textArea.getSelectedText();
-		if(s != null){
-			textArea.setSelectedText("{"+s+"}");
-
-			textArea.goToStartOfWhiteSpace(false);
-			findBuffer(s, "");
-		}else{
-			textArea.setSelectedText("{}");
-			textArea.goToPrevCharacter(false);
-		}
-	}
-
-	/**
-	 * Enclose the selected text with ""
-	 */
-	public void encDoubleQuote(){
-		String s = textArea.getSelectedText();
-		if(s != null){
-			textArea.setSelectedText("\""+s+"\"");
-
-			textArea.goToStartOfWhiteSpace(false);
-			findBuffer(s, "");
-		}else{
-			textArea.setSelectedText("\"\"");
-			textArea.goToPrevCharacter(false);
-		}
-	}
-
-	/**
-	 * Enclose the selected text with <>
-	 */
-	public void encLtGtTag(){
-		String s = textArea.getSelectedText();
-		if(s != null){
-			textArea.setSelectedText("<"+s+">");
-
-			textArea.goToStartOfWhiteSpace(false);
-			findBuffer(s, "");
-		}else textArea.setSelectedText("<");
-	}
-
-	/**
-	 * Enclose the selected text with %%
-	 */
-	public void encPercent(){
-		String s = textArea.getSelectedText();
-		if(s != null){
-			textArea.setSelectedText("%"+s+"%");
-
-			textArea.goToStartOfWhiteSpace(false);
-			findBuffer(s, "");
-		}else textArea.setSelectedText("%");
-	}
-
-	/**
-	 * Enclose the selected text with ¿?
-	 */
-	public void encQuestion(){
-		String s = textArea.getSelectedText();
-		if(s != null){
-			textArea.setSelectedText("¿"+s+"?");
-
-			textArea.goToStartOfWhiteSpace(false);
-			findBuffer(s, "");
-		}else{
-			textArea.setSelectedText("¿?");
-			textArea.goToPrevCharacter(false);
-		}
-	}
-
-	/**
-	 * Enclose the selected text with ``
-	 */
-	public void encQuote(){
-		String s = textArea.getSelectedText();
-		if(s != null){
-			textArea.setSelectedText("`"+s+"`");
-
-			textArea.goToStartOfWhiteSpace(false);
-			findBuffer(s, "");
-		}else{
-			textArea.setSelectedText("``");
-			textArea.goToPrevCharacter(false);
-		}
-	}
-
-	/**
-	 * Enclose the selected text with ()
-	 */
-	public void encRoundBracket(){
-		String s = textArea.getSelectedText();
-		if(s != null){
-			textArea.setSelectedText("("+s+")");
-
-			textArea.goToStartOfWhiteSpace(false);
-			findBuffer(s, "");
-		}else{
-			textArea.setSelectedText("()");
-			textArea.goToPrevCharacter(false);
-		}
-	}
-
-	/**
-	 * Enclose the selected text with a single quote
-	 */
-	public void encSingleQuote(){
-		String s = textArea.getSelectedText();
-		if(s != null){
-			textArea.setSelectedText("\'"+s+"\'");
-
-			textArea.goToStartOfWhiteSpace(false);
-			findBuffer(s, "");
-		}else{
-			textArea.setSelectedText("\'\'");
-			textArea.goToPrevCharacter(false);
-		}
-	}
-
-	/**
-	 * Enclose the selected text with square brackets
-	 */
-	public void encSquareBracket(){
-		String s = textArea.getSelectedText();
-		if(s != null){
-			textArea.setSelectedText("["+s+"]");
-
-			textArea.goToStartOfWhiteSpace(false);
-			findBuffer(s, "");
-		}else{
-			textArea.setSelectedText("[]");
-			textArea.goToPrevCharacter(false);
-		}
-	}
-	//////////Encloses////////}}}
 }
