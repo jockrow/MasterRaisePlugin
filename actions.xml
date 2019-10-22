@@ -135,7 +135,7 @@
 
 	<ACTION NAME="spreadsheet-increase-column">
 		<CODE>
-			new masterraise.tools.SpreadSheet().increaseColumn();
+			new masterraise.tools.SpreadSheet().showGui("spreadsheet-increase-column");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="spreadsheet-transpose-matrix">
@@ -145,7 +145,7 @@
 	</ACTION>
 	<ACTION NAME="spreadsheet-value-column">
 		<CODE>
-			new masterraise.tools.SpreadSheet().valueFromColumn();
+			new masterraise.tools.SpreadSheet().showGui("spreadsheet-value-column");
 		</CODE>
 	</ACTION>
 	

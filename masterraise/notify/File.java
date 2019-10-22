@@ -16,12 +16,14 @@ import org.gjt.sp.jedit.Macros;
 import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.gui.FilesChangedDialog;
+import org.gjt.sp.jedit.gui.StatusBar;
 
 public abstract class File{
 	static Timer timer = null;
 
 	public static void start(View view){
 		Buffer buffer = view.getBuffer();
+		StatusBar sb = view.getStatus();
 
 		//TODO:VERIFICAR SI SE PUEDE MOVER ESTO A InspectionWidgetFactory
 		timer = new Timer(1000, new ActionListener(){
@@ -51,12 +53,12 @@ public abstract class File{
 		});
 
 		if(buffer.isUntitled()){
-			Macros.error(view, "Cannot inspect this file, you must to saved to doit");
+			sb.setMessageAndClear("Cannot inspect this file, you must to saved to doit");
 			return;
 		}
 
 		if(Notify.getDetail(buffer.getPath()) != null){
-			Macros.error(view, "Inspection is running for this file");
+			sb.setMessageAndClear("Inspection is running for this file");
 			return;
 		}
 		

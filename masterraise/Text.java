@@ -25,6 +25,11 @@ public class Text extends Constants{
 	private TextArea textArea = view.getTextArea();
 	private String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
 	Console console = (Console) view.getDockableWindowManager().getDockable("console");
+	private Selection[] prevSelection = null;
+	
+	public Selection[] getPrevSelection() {
+		return prevSelection;
+	}
 
 	/**
 	 * Get number of occurrences when replace
@@ -240,22 +245,24 @@ public class Text extends Constants{
 			textArea.selectAll();
 			t=textArea.getSelectedText();
 		}
+		prevSelection = textArea.getSelection();
 
 		return t;
 	}
 
 	public void endSelectedText(String t){
-		Selection tmpSelection = (Selection) textArea.getSelection(0).clone();
+//		Selection tmpSelection = (Selection) textArea.getSelection(0).clone();
 
+		textArea.setSelection(prevSelection);
 		textArea.setSelectedText(t);
 		Registers.setRegister('$', t);
 
-		if(textArea.getCaretPosition() < tmpSelection.getEnd()){
-			textArea.extendSelection(tmpSelection.getStart(), textArea.getCaretPosition());
-		}
-		else{
-			textArea.addToSelection(tmpSelection);
-		}
+//		if(textArea.getCaretPosition() < tmpSelection.getEnd()){
+//			textArea.extendSelection(tmpSelection.getStart(), textArea.getCaretPosition());
+//		}
+//		else{
+//			textArea.addToSelection(tmpSelection);
+//		}
 	}
 
 	protected void deleteDuplicates(TextArea textArea){
@@ -405,5 +412,21 @@ public class Text extends Constants{
 			textArea.setSelectedText(prefix + "" + suffix);
 			textArea.goToPrevCharacter(false);
 		}
+	}
+	
+	/**
+	 * Count number of character for String
+	 * @param str String to count characters
+	 * @param character character to count
+	 * @return number of found characters
+	 */
+	public Integer countChars(String str, char character) {
+		int numChars = 0;
+		for (char c : str.toCharArray()) {
+		    if (c == character) {
+		         numChars++;
+		    }
+		}
+		return numChars;
 	}
 }

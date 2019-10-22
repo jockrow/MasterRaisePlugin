@@ -57,7 +57,7 @@ public class Query extends Text{
 	private final static String REGEXP_SQL_QUOTES_VALUES = "'([ \\t,]*\\w+)+'";
 	private final static String REGEXP_SQL_ALIAS = "([a-z] )((AS ){0,1}\\w+)";
 	private final static String REGEXP_SQL_RESERVED = "\\b(insert|into|values|update|set|as|not|like|in|inner|right|left|join|on|select|distinct|convert|case|when|then|else|end|sum|count|max|min|datetime|smallint|int|varchar|dateadd|isnull|null|from|where|and|or|with|nolock|union|group by|order by|having|desc|cast|concat|substr)\\b";
-	private final static String REGEXP_SQL_COMMENT = "[ \\t]*--.*|/\\*([\\n\\t ]*([#\\w áéíóú]+\\n)+[\\n\\t ]*)+\\*/";
+	private final static String REGEXP_SQL_COMMENT = "[ \\t]*--.*|/\\*([\\n\\t ]*([#\\w áéíóú]+\\n*)+[\\n\\t ]*)+\\*/";
 	private final static String REGEXP_SQL_DOUBLE_SPACES = "[ ]{2,}";
 	private final static String REGEXP_SQL_RESERVED_LINE = "\\b(SET|FROM|WHERE|AND|OR|ORDER|INNER|RIGHT|LEFT)\\b";
 	private final static String REGEXP_SQL_LAST_SEMICOLON = "[\\t ]*;+[\\t ]*$(\\n)*\\z";
@@ -66,7 +66,7 @@ public class Query extends Text{
 	private final static String REGEXP_SQL_RETURN_CARRIAGE = "[ \\t]*(WHERE|AND)[ \\t]*";
 	private final static String REGEXP_SQL_RESERVED_VALUES = "\\b(SYSDATE)\\b";
 	private final static String REGEXP_SQL_SET = "[ \\t]*SET[ \\t]*";
-	private final static String REGEXP_SQL_NUMBER = "'\\d+,\\d+'";
+	private final static String REGEXP_SQL_NUMBER = "\\d+,\\d+";
 
 	private final View view = jEdit.getActiveView();
 	private final TextArea textArea = view.getTextArea();
@@ -140,7 +140,7 @@ public class Query extends Text{
 			iniLine = 2;
 		}
 		if(iniLine > 0 && !new SpreadSheet().isMatchColumns(iniLine)){
-			Macros.message(view, "The number columns is not Match");
+			Macros.message(view, NOT_MATCH_COLUMN);
 			return true;
 		}
 		if(queryType.equals("CSV_") && !findBuffer("\\A" + REGEXP_SQL_OBJECT + "[ \\t]*$", "ar")){
@@ -343,8 +343,10 @@ public class Query extends Text{
 		 */
 		public void beautyQuery(String opcs){
 			//quita todos los comentarios y tabulador
-			//TODO:Revisar cuando venga una sola línea
 			replaceBuffer(REGEXP_SQL_COMMENT, "", "ir");
+
+			//format decimal
+			replaceBuffer(REGEXP_SQL_NUMBER, "_0.replaceAll(\",\", \".\")", "br");
 
 			textArea.selectAll();
 			textArea.joinLines();
@@ -950,9 +952,14 @@ SearchAndReplace.replace(view, buffer, textArea.getSelection(0).getStart(), text
 
 
 startLine = textArea.getCaretLine();
-endLine = startLine;
+endLine = startLine - 1;
 selection = new Selection.Range(textArea.getLineStartOffset(startLine), textArea.getLineEndOffset(endLine));
 selections = textArea.getSelection();
+textArea.setSelection(selection);
+
+
+prevSelection = textArea.getSelection();
+textArea.setSelection(prevSelection);
 
 replaceSelection("_", " ", "");
 		 */	

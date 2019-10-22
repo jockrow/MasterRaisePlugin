@@ -23,39 +23,54 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.InternationalFormatter;
 
-import masterraise.Text;
-
 import org.gjt.sp.jedit.Macros;
 import org.gjt.sp.jedit.Registers;
 import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.textarea.TextArea;
 
+import masterraise.Text;
+
 public class SpreadSheet extends Text{
 	private final View view = jEdit.getActiveView();
 	private final TextArea textArea = view.getTextArea();
-	
+
 	private String LBL_NUMBERS = "Number to Char";
 	private String COPY_NUMBER = "Copy Number Column";
 	private String COPY_LETTER = "Copy Letter Column";
 	private String LBL_TEXT = "Char to Number";
 
-	private JDialog dialog = null;
+	private JDialog dialog = new JDialog(view, "Increase Column", false);
 	private JPanel content = new JPanel(new BorderLayout());
 	private JPanel fieldPanel = new JPanel(new GridLayout(3, 3, 2, 2));
 	private JTextArea lblValidate = new JTextArea("");
 	private JPanel validationPanel = new JPanel();
-	private JRadioButton rbNumbers = null;
+	private JRadioButton rbNumbers = new JRadioButton(LBL_NUMBERS);
 	private JPanel buttonPanel = new JPanel();
 	private JButton cancel = new JButton("Cancel");
-	private JButton copy = null;
+	private JButton copy = new JButton("Copy new Column");
 	private InternationalFormatter formatNumber = new InternationalFormatter();
 	private JFormattedTextField txtNumberColumn = new JFormattedTextField(formatNumber);
 	private JFormattedTextField txtAddColumns = new JFormattedTextField(formatNumber);
-	private JTextField txtLetterColumn = null;
+	private JTextField txtLetterColumn = new JTextField("A");
 	private JTextField txtResult = new JTextField("B");
-	private String dialogType = "";
-	
+	private String dialogType = "spreadsheet-increase-column";
+
+	private ActionListener al = new ActionListener(){
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			validation();
+			if(e.getSource() != cancel){
+				if(e.getSource() == copy && txtResult.getText().trim() != ""){
+					Registers.setRegister('$', txtResult.getText());
+				}
+			}
+			else{
+				dialog.dispose();
+			}
+		}
+	};
+
 	private KeyListener kl = new KeyListener(){
 		@Override
 		public void keyReleased(KeyEvent keyEvent){
@@ -74,25 +89,30 @@ public class SpreadSheet extends Text{
 		public void keyPressed(KeyEvent e) {}
 	};
 
+	/**
+	 * Check if csv match columns
+	 * @param iniLine number line for start csv text
+	 * @return true if match columns in csv
+	 */
 	public boolean isMatchColumns(int iniLine){
+		//TODO:Probar quitar el parámetro iniLine
 		boolean match = true;
-		int maxLines = textArea.getLineCount();
+		int startLine = getPrevSelection()[0].getStartLine();
+		int endLine = getPrevSelection()[0].getEndLine() + 1;
 		int numTabsPrev = 0;
 		int numTabsCurrent = 0;
 
-		textArea.setCaretPosition(textArea.getLineStartOffset(iniLine-1));
-		for(int i=0; i<maxLines; i++){
+		textArea.setCaretPosition(textArea.getLineStartOffset(startLine));
+		for(int i=startLine; i<endLine; i++){
 			textArea.selectLine();
-			numTabsPrev = replaceSelection("(\\p{Print}*)(\\t)(\\p{Print}*)", "$1$2$3", "ir");
-			if(i > 0 && numTabsCurrent != numTabsPrev){
+			numTabsPrev = countChars(textArea.getSelectedText(), '\t');
+			if(i > startLine && numTabsCurrent != numTabsPrev){
 				match = false;
 				break;
 			}
 			numTabsCurrent = numTabsPrev;
 			textArea.goToNextLine(false);
 		}
-		//TODO:QUITAR ESTO SI POR UN BUEN MOMENTO FUNCIONA
-		//textArea.goToBufferStart(false);
 		return match;
 	}
 
@@ -124,41 +144,6 @@ public class SpreadSheet extends Text{
 		String newColumn = numberToLetter(numLetter + diffColumn);
 		return newColumn;
 	}
-	
-	//TODO:ES EL MÉTODO QUE OPTIMIZA increaseColumn y Value_From_Column
-	private void setFields(){
-		System.out.println("...setFields.dialogType:" + dialogType);
-		content.setBorder(new EmptyBorder(12, 12, 12, 12));
-		dialog.setContentPane(content);
-		formatNumber.setMinimum(new Integer(1));
-		lblValidate.setEditable(false);
-		lblValidate.setBackground(content.getBackground());
-
-		validationPanel.add(lblValidate);
-		validationPanel.setBorder(new EmptyBorder(0, 30, 20, 30));
-		content.add(validationPanel, "Center");
-		
-		txtLetterColumn = new JTextField("A");
-		txtLetterColumn.addKeyListener(kl);
-		fieldPanel.add(new JLabel("Letter Column"));
-		fieldPanel.add(txtLetterColumn);
-	
-		content.add(fieldPanel, "North");
-		
-		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-		buttonPanel.setBorder(new EmptyBorder(12, 30, 0, 30));
-		
-		dialog.getRootPane().setDefaultButton(copy);
-		buttonPanel.add(Box.createHorizontalStrut(6));
-		buttonPanel.add(copy);
-		buttonPanel.add(cancel);
-		content.add(buttonPanel, "South");
-
-		dialog.pack();
-		dialog.setLocationRelativeTo(view);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		dialog.setVisible(true);
-	}
 
 	/**
 	* Transpose the grid for this way:
@@ -175,13 +160,15 @@ public class SpreadSheet extends Text{
 	13	23	33	43
 	*/
 	public void transposeMatrix(){
-		if(textArea.getSelectedText() == null){
-			textArea.selectAll();
-		}
-
 		String t = iniSelectedText();
+
 		if(!java.util.regex.Pattern.compile("\\A(\\p{Print})+\\t").matcher(t).find()){
 			Macros.message(view, "The Selection or Text must Separated by TABS");
+			return;
+		}
+
+		if(!isMatchColumns(getPrevSelection()[0].getStart())) {
+			Macros.message(view, NOT_MATCH_COLUMN);
 			return;
 		}
 
@@ -204,283 +191,108 @@ public class SpreadSheet extends Text{
 	}
 	
 	/**
-	* Get the letter or Number from column:
+	* @dialogType is "spreadsheet-value-column" Get the letter or Number from column
 	* @example
 	*	11 To: K
 	*	or 731 To: ABC
-	*/
-/*	public void valueFromColumn(){
-		System.out.println("...valueFromColumn");
-		dialogType = "valueFromColumn";
-		dialog = new JDialog(view, "Get Value From Column", false);
-		
-		ActionListener al = new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(e.getActionCommand().equals(LBL_NUMBERS) || e.getActionCommand().equals(LBL_TEXT)){
-					if(e.getActionCommand().equals(LBL_NUMBERS)){
-						txtNumberColumn.setEditable(true);
-						txtLetterColumn.setEditable(false);
-						copy.setText(COPY_LETTER);
-					}
-					else{
-						txtNumberColumn.setEditable(false);
-						txtLetterColumn.setEditable(true);
-						copy.setText(COPY_NUMBER);
-					}
-
-					validation();
-				}
-				else{
-					if(e.getSource() != cancel){
-						if(e.getSource() == copy){
-							if(rbNumbers.isSelected()){
-								Registers.setRegister('$', txtLetterColumn.getText());
-							}
-							else{
-								Registers.setRegister('$', txtNumberColumn.getText());
-							}
-						}
-					}
-					else{
-						dialog.dispose();
-					}
-				}
-			}
-		};
-
-		txtNumberColumn.setValue(1);
-		txtNumberColumn.addKeyListener(kl);
-		fieldPanel.add(new JLabel("Number Column"));
-		fieldPanel.add(txtNumberColumn);
-		
-		txtLetterColumn.setEditable(false);
-
-		rbNumbers = new JRadioButton(LBL_NUMBERS);
-		rbNumbers.setActionCommand(LBL_NUMBERS);
-		rbNumbers.addActionListener(al);
-		rbNumbers.setSelected(true);
-
-		JRadioButton rbText = new JRadioButton(LBL_TEXT);
-		rbText.setActionCommand(LBL_TEXT);
-		rbText.addActionListener(al);
-		
-		ButtonGroup group = new ButtonGroup();
-		group.add(rbText);
-		group.add(rbNumbers);
-		fieldPanel.add(rbNumbers);
-		fieldPanel.add(rbText);
-		
-		copy = new JButton(COPY_LETTER);
-		cancel.addActionListener(al);
-		copy.addActionListener(al);
-		
-		setFields();
-	}
-	*/
-
-	public void valueFromColumn(){
-		dialogType = "valueFromColumn";
-		dialog = new JDialog(view, "Get Value From Column", false);
-		
-		ActionListener al = new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(e.getActionCommand().equals(LBL_NUMBERS) || e.getActionCommand().equals(LBL_TEXT)){
-					if(e.getActionCommand().equals(LBL_NUMBERS)){
-						txtNumberColumn.setEditable(true);
-						txtLetterColumn.setEditable(false);
-						copy.setText(COPY_LETTER);
-					}
-					else{
-						txtNumberColumn.setEditable(false);
-						txtLetterColumn.setEditable(true);
-						copy.setText(COPY_NUMBER);
-					}
-
-					validation();
-				}
-				else{
-					if(e.getSource() != cancel){
-						if(e.getSource() == copy){
-							if(rbNumbers.isSelected()){
-								Registers.setRegister('$', txtLetterColumn.getText());
-							}
-							else{
-								Registers.setRegister('$', txtNumberColumn.getText());
-							}
-						}
-					}
-					else{
-						dialog.dispose();
-					}
-				}
-			}
-		};
-
-		content.setBorder(new EmptyBorder(12, 12, 12, 12));
-		dialog.setContentPane(content);
-
-		formatNumber.setMinimum(new Integer(1));
-		
-		lblValidate.setEditable(false);
-		lblValidate.setBackground(content.getBackground());
-
-		validationPanel.add(lblValidate);
-		validationPanel.setBorder(new EmptyBorder(0, 30, 20, 30));
-		content.add(validationPanel, "Center");
-		
-		txtNumberColumn.setValue(1);
-		txtNumberColumn.addKeyListener(kl);
-		fieldPanel.add(new JLabel("Number Column"));
-		fieldPanel.add(txtNumberColumn);
-		
-		txtLetterColumn = new JTextField("A");
-		txtLetterColumn.setEditable(false);
-		txtLetterColumn.addKeyListener(kl);
-		fieldPanel.add(new JLabel("Letter Column"));
-		fieldPanel.add(txtLetterColumn);
-		
-
-		rbNumbers = new JRadioButton(LBL_NUMBERS);
-		rbNumbers.setActionCommand(LBL_NUMBERS);
-		rbNumbers.addActionListener(al);
-		rbNumbers.setSelected(true);
-
-		JRadioButton rbText = new JRadioButton(LBL_TEXT);
-		rbText.setActionCommand(LBL_TEXT);
-		rbText.addActionListener(al);
-		
-		ButtonGroup group = new ButtonGroup();
-		group.add(rbText);
-		group.add(rbNumbers);
-		fieldPanel.add(rbNumbers);
-		fieldPanel.add(rbText);
-		content.add(fieldPanel, "North");
-		
-		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-		buttonPanel.setBorder(new EmptyBorder(12, 30, 0, 30));
-		copy = new JButton(COPY_LETTER);
-		dialog.getRootPane().setDefaultButton(copy);
-		buttonPanel.add(Box.createHorizontalStrut(6));
-		buttonPanel.add(copy);
-		buttonPanel.add(cancel);
-		content.add(buttonPanel, "South");
-
-		cancel.addActionListener(al);
-		copy.addActionListener(al);
-
-		dialog.pack();
-		dialog.setLocationRelativeTo(view);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		dialog.setVisible(true);
-	}
-	
-	/**
-	* Get value for Increase or Decrease in Column
+	*
+	* @dialogType is "spreadsheet-increase-column" Get value for Increase or Decrease in Column
 	* @example
 	*	Z + 1 = AA
 	*/
-/*	public void increaseColumn(){
-		dialogType = "increaseColumn";
-		
-		ActionListener al = new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				validation();
-				if(e.getSource() != cancel){
-					if(e.getSource() == copy && txtResult.getText().trim() != ""){
-						Registers.setRegister('$', txtResult.getText());
+	public void showGui(String dialogType){
+		this.dialogType = dialogType;
+
+		if(dialogType.equals("spreadsheet-value-column")){
+			dialog = new JDialog(view, "Get Value From Column", false);
+			al = new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if(e.getActionCommand().equals(LBL_NUMBERS) || e.getActionCommand().equals(LBL_TEXT)){
+						if(e.getActionCommand().equals(LBL_NUMBERS)){
+							txtNumberColumn.setEditable(true);
+							txtLetterColumn.setEditable(false);
+							copy.setText(COPY_LETTER);
+						}
+						else{
+							txtNumberColumn.setEditable(false);
+							txtLetterColumn.setEditable(true);
+							copy.setText(COPY_NUMBER);
+						}
+
+						validation();
+					}
+					else{
+						if(e.getSource() != cancel){
+							if(e.getSource() == copy){
+								if(rbNumbers.isSelected()){
+									Registers.setRegister('$', txtLetterColumn.getText());
+								}
+								else{
+									Registers.setRegister('$', txtNumberColumn.getText());
+								}
+							}
+						}
+						else{
+							dialog.dispose();
+						}
 					}
 				}
-				else{
-					dialog.dispose();
-				}
-			}
-		};
+			};
+		}
 
-		dialog = new JDialog(view, "Increase Column", false);
-		content = new JPanel(new BorderLayout());
-		fieldPanel = new JPanel(new GridLayout(3, 3, 2, 2));
-
-		lblValidate = new JTextArea("");
-
-		validationPanel = new JPanel();
-		
-		txtAddColumns.setValue(1);
-		txtAddColumns.addKeyListener(kl);
-		fieldPanel.add(new JLabel("Additional Columns"));
-		fieldPanel.add(txtAddColumns);
-		
-		txtResult.setEditable(false);
-		fieldPanel.add(new JLabel("Result:"));
-		fieldPanel.add(txtResult);
-		
-		copy = new JButton("Copy new Column");
-
-		cancel.addActionListener(al);
-		copy.addActionListener(al);
-
-		setFields();
-	}*/
-
-	public void increaseColumn(){
-		dialogType = "increaseColumn";
-		
-		ActionListener al = new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				validation();
-				if(e.getSource() != cancel){
-					if(e.getSource() == copy && txtResult.getText().trim() != ""){
-						Registers.setRegister('$', txtResult.getText());
-					}
-				}
-				else{
-					dialog.dispose();
-				}
-			}
-		};
-
-		dialog = new JDialog(view, "Get Value From Column", false);
-		content = new JPanel(new BorderLayout());
 		content.setBorder(new EmptyBorder(12, 12, 12, 12));
 		dialog.setContentPane(content);
-		fieldPanel = new JPanel(new GridLayout(3, 3, 2, 2));
 
-		InternationalFormatter formatNumber = new InternationalFormatter();
 		formatNumber.setMinimum(new Integer(1));
-		
-		lblValidate = new JTextArea("");
+
 		lblValidate.setEditable(false);
 		lblValidate.setBackground(content.getBackground());
 
-		validationPanel = new JPanel();
 		validationPanel.add(lblValidate);
 		validationPanel.setBorder(new EmptyBorder(0, 30, 20, 30));
 		content.add(validationPanel, "Center");
-		
-		txtLetterColumn = new JTextField("A");
+
 		txtLetterColumn.addKeyListener(kl);
 		fieldPanel.add(new JLabel("Letter Column"));
 		fieldPanel.add(txtLetterColumn);
-		
-		txtAddColumns.setValue(1);
-		txtAddColumns.addKeyListener(kl);
-		fieldPanel.add(new JLabel("Additional Columns"));
-		fieldPanel.add(txtAddColumns);
-		
-		txtResult.setEditable(false);
-		fieldPanel.add(new JLabel("Result:"));
-		fieldPanel.add(txtResult);
-		
+
+		if(dialogType.equals("spreadsheet-value-column")){
+			txtNumberColumn.setValue(1);
+			txtNumberColumn.addKeyListener(kl);
+			fieldPanel.add(new JLabel("Number Column"));
+			fieldPanel.add(txtNumberColumn);
+			txtLetterColumn.setEditable(false);
+
+			rbNumbers.setActionCommand(LBL_NUMBERS);
+			rbNumbers.addActionListener(al);
+			rbNumbers.setSelected(true);
+
+			JRadioButton rbText = new JRadioButton(LBL_TEXT);
+			rbText.setActionCommand(LBL_TEXT);
+			rbText.addActionListener(al);
+
+			ButtonGroup group = new ButtonGroup();
+			group.add(rbText);
+			group.add(rbNumbers);
+			fieldPanel.add(rbNumbers);
+			fieldPanel.add(rbText);
+			copy = new JButton(COPY_LETTER);
+		}
+		else{
+			txtAddColumns.setValue(1);
+			txtAddColumns.addKeyListener(kl);
+			fieldPanel.add(new JLabel("Additional Columns"));
+			fieldPanel.add(txtAddColumns);
+
+			txtResult.setEditable(false);
+			fieldPanel.add(new JLabel("Result:"));
+			fieldPanel.add(txtResult);		
+		}
 		content.add(fieldPanel, "North");
-		
-//		buttonPanel = new JPanel();
+
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 		buttonPanel.setBorder(new EmptyBorder(12, 30, 0, 30));
-		cancel = new JButton("Cancel");
-		copy = new JButton("Copy new Column");
 		dialog.getRootPane().setDefaultButton(copy);
 		buttonPanel.add(Box.createHorizontalStrut(6));
 		buttonPanel.add(copy);
@@ -495,12 +307,12 @@ public class SpreadSheet extends Text{
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
-	
+
 	private boolean displayError(String message){
 		lblValidate.setForeground(Color.red);
 		lblValidate.setText(message);
-		
-		if(dialogType.equals("valueFromColumn")){
+
+		if(dialogType.equals("spreadsheet-value-column")){
 			if(rbNumbers.isSelected()){
 				txtLetterColumn.setText("");
 			}
@@ -511,29 +323,30 @@ public class SpreadSheet extends Text{
 		else{
 			txtResult.setText("");
 		}
-		
+
 		return false;
 	}
-	
+
 	private boolean validation(){
 		String ERROR_NUMBERS = "This field must have only Numbers";
 		String ERROR_LETTER = "This field must have only Letters";
 		String NOT_ZERO = "Not less Zero Values";
+
 		try{
 			Pattern p = Pattern.compile(".*[0-9].*");
 			boolean isErrorLetter = txtLetterColumn == null ? false : p.matcher(txtLetterColumn.getText()).find();
-			
-			if(dialogType.equals("valueFromColumn")){
+
+			if(dialogType.equals("spreadsheet-value-column")){
 				if(rbNumbers.isSelected()){
 					int numberColumn = Integer.valueOf(txtNumberColumn.getText());
 					if(numberColumn<=0){
 						return displayError(NOT_ZERO);
 					}
-					
+
 					isErrorLetter = false;
 				}
 			}
-			
+
 			if(isErrorLetter){
 				return displayError(ERROR_LETTER);
 			}
@@ -548,11 +361,11 @@ public class SpreadSheet extends Text{
 		processText();
 		return true;
 	}
-	
+
 	private void processText(){
 		String textColumn = txtLetterColumn == null ? "" : txtLetterColumn.getText();
-		
-		if(dialogType.equals("valueFromColumn")){
+
+		if(dialogType.equals("spreadsheet-value-column")){
 			if(rbNumbers.isSelected()){
 				txtLetterColumn.setText(numberToLetter(Integer.valueOf(txtNumberColumn.getText())));
 			}

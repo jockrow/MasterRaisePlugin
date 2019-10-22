@@ -41,7 +41,7 @@
 		</jar>
 	</target>
 
-	<target name="clean">
+	<target name="clean" description="Clean">
 		<delete dir="${build.dir}"/>
 		<delete file="${install.dir}/${jar.name}" />
 	</target>

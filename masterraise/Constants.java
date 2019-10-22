@@ -16,6 +16,8 @@ public abstract class Constants {
 	public static String BLANK_LINE = "(" + TRIM_UP + ")|(" + TRIM_DOWN + ")|(^[ \\t]*\\n)";
 	public static String BLANK_SPACE = "(^[ \\t]+)|([ \\t]+$)";
 	public static String SEP = File.separator;
+	
+	public static String NOT_MATCH_COLUMN = "The number columns is not Match";
 
 	public static String[][] ARR_CHARS = {
 	{"Á","capital a, acute accent","&Aacute;","&#193;","A"}
