@@ -55,6 +55,7 @@ public class SpreadSheet extends Text{
 	private JTextField txtLetterColumn = new JTextField("A");
 	private JTextField txtResult = new JTextField("B");
 	private String dialogType = "spreadsheet-increase-column";
+	private String[][] matrix = null;
 
 	private ActionListener al = new ActionListener(){
 		@Override
@@ -89,30 +90,35 @@ public class SpreadSheet extends Text{
 		public void keyPressed(KeyEvent e) {}
 	};
 
+	private String[][] setMatrixText(String selectedText){
+		String[] lines = selectedText.replaceAll("(?m)\\t$", "\t\"\"").replaceAll("(?m)(^[ \\t]*|[ ]*$)", "").split("\\r?\\n");
+		matrix = new String[lines.length][];
+		for(int l = 0; l < lines.length; l++){
+			matrix[l] = lines[l].split("\\t");
+		}
+
+		return matrix;
+	}
+
 	/**
 	 * Check if csv match columns
-	 * @param iniLine number line for start csv text
+	 * @param selectedText selected text in textArea
 	 * @return true if match columns in csv
 	 */
-	public boolean isMatchColumns(int iniLine){
-		//TODO:Probar quitar el parámetro iniLine
+	public boolean isMatchColumns(String selectedText){
 		boolean match = true;
-		int startLine = getPrevSelection()[0].getStartLine();
-		int endLine = getPrevSelection()[0].getEndLine() + 1;
 		int numTabsPrev = 0;
 		int numTabsCurrent = 0;
-
-		textArea.setCaretPosition(textArea.getLineStartOffset(startLine));
-		for(int i=startLine; i<endLine; i++){
-			textArea.selectLine();
-			numTabsPrev = countChars(textArea.getSelectedText(), '\t');
-			if(i > startLine && numTabsCurrent != numTabsPrev){
+		matrix = setMatrixText(selectedText);
+		for(int l = 0; l < matrix.length; l++){
+			numTabsPrev = matrix[l].length;
+			if(numTabsCurrent !=0 && numTabsCurrent != numTabsPrev){
 				match = false;
 				break;
 			}
 			numTabsCurrent = numTabsPrev;
-			textArea.goToNextLine(false);
 		}
+
 		return match;
 	}
 
@@ -160,6 +166,11 @@ public class SpreadSheet extends Text{
 	13	23	33	43
 	*/
 	public void transposeMatrix(){
+		String notMatchColumn = NOT_MATCH_COLUMN;
+		if(textArea.getSelectedText() != null){
+			notMatchColumn += ", be sure only selected valid text";
+		}
+
 		String t = iniSelectedText();
 
 		if(!java.util.regex.Pattern.compile("\\A(\\p{Print})+\\t").matcher(t).find()){
@@ -167,21 +178,15 @@ public class SpreadSheet extends Text{
 			return;
 		}
 
-		if(!isMatchColumns(getPrevSelection()[0].getStart())) {
-			Macros.message(view, NOT_MATCH_COLUMN);
+		if(!isMatchColumns(t)){
+			Macros.message(view, notMatchColumn);
 			return;
 		}
 
 		String transposeText = "";
-		String[] lines = t.replaceAll("(?m)\\t$", "\t\"\"").replaceAll("(?m)(^[ \\t]*|[ ]*$)", "").split("\\r?\\n");
-		String[][] matrix = new String[lines.length][];
-		for(int l = 0; l < lines.length; l++){
-			matrix[l] = lines[l].split("\\t");
-		}
-
-		for(int c=0; c<matrix[0].length; c++){
-			for(int r=0; r<matrix.length; r++){
-				transposeText += matrix[r][c] + "\t";
+		for(int r=0; r<matrix[0].length; r++){
+			for(int c=0; c<matrix.length; c++){
+				transposeText += matrix[c][r].trim().equals("") ? "\"\"" : matrix[c][r] + "\t";
 			}
 			transposeText += "\n";
 		}
@@ -189,17 +194,17 @@ public class SpreadSheet extends Text{
 		t = transposeText.replaceAll("(?m)(\\n$|[ \\t]*$)", "");
 		endSelectedText(t);
 	}
-	
+
 	/**
-	* @dialogType is "spreadsheet-value-column" Get the letter or Number from column
-	* @example
-	*	11 To: K
-	*	or 731 To: ABC
-	*
-	* @dialogType is "spreadsheet-increase-column" Get value for Increase or Decrease in Column
-	* @example
-	*	Z + 1 = AA
-	*/
+	 * @dialogType is "spreadsheet-value-column" Get the letter or Number from column
+	 * @example
+	 *	11 To: K
+	 *	or 731 To: ABC
+	 *
+	 * @dialogType is "spreadsheet-increase-column" Get value for Increase or Decrease in Column
+	 * @example
+	 *	Z + 1 = AA
+	 */
 	public void showGui(String dialogType){
 		this.dialogType = dialogType;
 

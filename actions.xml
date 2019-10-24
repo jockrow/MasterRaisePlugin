@@ -98,17 +98,17 @@
 	
 	<ACTION NAME="language-code-to-string">
 		<CODE>
-			new masterraise.tools.Language().showGui("codeToString");
+			new masterraise.tools.Language().showGui("language-code-to-string");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="language-generate-url-string">
 		<CODE>
-			new masterraise.tools.Language().showGui("generateUrlString");
+			new masterraise.tools.Language().showGui("language-generate-url-string");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="language-print-debug-variables">
 		<CODE>
-			new masterraise.tools.Language().showGui("printDebugVariables");
+			new masterraise.tools.Language().showGui("language-print-debug-variables");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="language-string-to-vars">
@@ -116,7 +116,18 @@
 			new masterraise.tools.Language().stringToVars();
 		</CODE>
 	</ACTION>
-	
+
+	<ACTION NAME="mygeneration-columns-to-properies">
+		<CODE>
+			new masterraise.tools.MyGeneration().columnsToProperies();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="mygeneration-csv-to-properies">
+		<CODE>
+			new masterraise.tools.MyGeneration().csvToProperies();
+		</CODE>
+	</ACTION>
+
 	<ACTION NAME="notify-file">
 		<CODE>
 			masterraise.notify.File.start(view);

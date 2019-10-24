@@ -49,6 +49,11 @@ public class MasterRaiseMenuProvider implements DynamicMenuProvider{
 		createSubMenu("language-string-to-vars");
 		superMenu.add(menu);
 
+		menu = new JMenu("MyGeneration");
+		createSubMenu("mygeneration-columns-to-properies");
+		createSubMenu("mygeneration-csv-to-properies");
+		superMenu.add(menu);
+
 		menu = new JMenu("Notify");
 		createSubMenu("notify-file");
 		createSubMenu("notify-pixel");

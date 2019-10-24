@@ -42,6 +42,9 @@ language-generate-url-string.label=Generate Url String
 language-print-debug-variables.label=Print Debug Variables
 language-string-to-vars.label=String to Vars
 
+mygeneration-columns-to-properies.label=Columns to Properties
+mygeneration-csv-to-properies.label=csv to Properties
+
 notify-file.label=File Changed
 notify-pixel.label=Pixel Changed
 notify-alarm.label=Alarm

@@ -87,7 +87,7 @@ public class Language extends Text{
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void showGui(String type){
-		if(!type.equals("printDebugVariables")){
+		if(!type.equals("language-print-debug-variables")){
 			lista = new String[]{"- Languages -"
 					, "c#"
 					, "java"
@@ -99,10 +99,10 @@ public class Language extends Text{
 		cmbLanguages = new JComboBox(lista);
 
 		switch(type){
-		case "codeToString":
+		case "language-code-to-string":
 			dialog  = new JDialog(view, "Code To String", true);			
 			break;
-		case "generateUrlString":
+		case "language-generate-url-string":
 			dialog  = new JDialog(view, "Generate Url String", true);
 			break;
 		}
@@ -147,7 +147,7 @@ public class Language extends Text{
 
 	public void processText(String type){
 		JEditBuffer bfTmp = openTempBuffer();
-		if(!type.equals("codeToString")){
+		if(!type.equals("language-code-to-string")){
 			replaceBuffer("[!\"#$%&'()*+,-/:;=>?@\\[\\\\\\]^`{|}~]", " ", "ir");
 			replaceBuffer("^(\\t|[ ])+|(\\t|[ ])+$.*", "", "ir");
 			textArea.goToBufferStart(false);
@@ -158,7 +158,7 @@ public class Language extends Text{
 		}
 
 		switch(type){
-		case "codeToString":
+		case "language-code-to-string":
 			replaceBuffer("\"", "\\\"", "");
 			replaceBuffer("(^[ \\t]*)(.*)", "$1+ \"\\\\n$2\"", "r");
 			replaceBuffer("(\\+ \"\\\\n//)(.*)(\")", "//$2", "r");
@@ -184,14 +184,10 @@ public class Language extends Text{
 			}
 			break;
 
-		case "generateUrlString":
-			if(findBuffer("\\n^([ ]|\\t)*\\w+", "air")){
-				replaceBuffer("\\n", " ", "ir");
-			}
-
+		case "language-generate-url-string":
 			textArea.selectAll();
-			replaceBuffer("\\w+", "\"&$0=\" + $0 +", "r");
 			smartJoin();
+			replaceBuffer("\\w+", "\"&$0=\" + $0 +", "r");
 			replaceBuffer("^\"&", "var url = \"?", "r");
 			replaceBuffer(" \\+$", ";", "r");
 
@@ -213,7 +209,7 @@ public class Language extends Text{
 			}
 			break;
 
-		case "printDebugVariables":
+		case "language-print-debug-variables":
 			if(language.substring(0, 3).equals("sql") && textArea.getSelectedText().equals("@")){
 				replaceBuffer("@", "", "wi");
 			}
@@ -299,7 +295,7 @@ public class Language extends Text{
 
 	/**
 	 * Convert String to Vars
-	 * Example:
+	 * @example
 	 * CANT. CAFÉ PERGAMINO SECO
 	 * UNIDAD DE MEDIDA CAFÉ PERGAMINO SECO
 	 * to:

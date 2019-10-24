@@ -2,7 +2,10 @@ package masterraise;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.EditPane;
 import org.gjt.sp.jedit.Registers;
@@ -20,41 +23,69 @@ import org.gjt.sp.jedit.textarea.TextArea;
 import console.Console;
 import console.Shell;
 
+/**
+ * 
+ * @author Richard Martinez
+ *
+ */
 public class Text extends Constants{
 	private View view = jEdit.getActiveView();
 	private TextArea textArea = view.getTextArea();
 	private String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
-	Console console = (Console) view.getDockableWindowManager().getDockable("console");
+	private Console console = (Console) view.getDockableWindowManager().getDockable("console");
 	private Selection[] prevSelection = null;
-	
+
 	public Selection[] getPrevSelection() {
 		return prevSelection;
 	}
 
 	/**
-	 * Get number of occurrences when replace
-	 * @param identify if is a directory
-	 * @return number of occurences replaced, if is directory return: "number occurences,number files"
+	 * Count number of character for String
+	 * @param str String to count characters
+	 * @param expression expression to Find number occurrences
+	 * @param opts Options: i to setIgnoreCase, r to setRegexp, w to Whole word
+	 * @return number of found characters
 	 */
-	private String _getNumReplaces(String numReplaces, boolean isDirectory){
-		if(!isDirectory){
-			return numReplaces.replaceAll("(\\w+ )(\\d+)(.*in )(\\d+)(.*)", "$2");
-		}
+	private Integer countOccurrences(String str, String expression, String opts){
+		int count = 0;
+		
+		opts = opts.toLowerCase().trim();
+		if(opts.indexOf('r') >= 0 || opts.indexOf('w') >= 0) {
+			if(opts.indexOf('w') >= 0) {
+				expression = "\\b" + expression + "\\b"; 
+			}
+//			if(opts.trim().equals("") || opts.indexOf('i') >= 0) {
+			if(opts.indexOf('i') >= 0) {
+				expression = "(?i)" + expression;
+			}
+//			System.out.println("...expression:" + expression);
+			
+			Pattern pattern = Pattern.compile(expression);
+			Matcher matcher = pattern.matcher(str);
 
-		return numReplaces.replaceAll("(\\w+ )(\\d+)(.*in )(\\d+)(.*)", "$2,$4");
+			while (matcher.find()) {
+				count++;
+			}
+		}
+		else {
+//			System.out.println("...no regExp");
+			count = StringUtils.countMatches(str, expression);
+		}
+		
+		return count;
 	}
 
 	/**
 	 * Replace all phrases from directory
-	 * @param search - phrase to find
-	 * @param replace - phrase to replace
-	 * @param flags - params b to setBeanShellReplace, i to setIgnoreCase, r to setRegexp, w to Whole word
-	 * @param directory - String from directory
-	 * @param filter - filter to apply the files
-	 * @param openFiles - flag to open files in jEdit without save, for edit later
-	 * @return numReplaces
+	 * @param search phrase to find
+	 * @param replace phrase to replace
+	 * @param opts Options: b to setBeanShellReplace, i to setIgnoreCase, r to setRegexp, w to Whole word
+	 * @param directory String from directory
+	 * @param filter filter to apply the files
+	 * @param openFiles if is true open files in jEdit without save, for edit later
+	 * @return Number of replaces
 	 */
-	public String replaceDirectory(String search, String replace, String flags, String directory, String filter, boolean openFiles){
+	public String replaceDirectory(String search, String replace, String opts, String directory, String filter, boolean openFiles){
 		boolean ic =  SearchAndReplace.getIgnoreCase();
 		boolean re =  SearchAndReplace.getRegexp();
 		boolean ww = SearchAndReplace.getWholeWord();
@@ -63,10 +94,10 @@ public class Text extends Constants{
 
 		SearchAndReplace.setSearchString(search);
 		SearchAndReplace.setReplaceString(replace);
-		SearchAndReplace.setWholeWord(flags.indexOf('w') >= 0);
-		SearchAndReplace.setBeanShellReplace(flags.indexOf('b') >= 0);
-		SearchAndReplace.setIgnoreCase(flags.indexOf('i') >= 0);
-		SearchAndReplace.setRegexp(flags.indexOf('r') >= 0);
+		SearchAndReplace.setWholeWord(opts.indexOf('w') >= 0);
+		SearchAndReplace.setBeanShellReplace(opts.indexOf('b') >= 0);
+		SearchAndReplace.setIgnoreCase(opts.indexOf('i') >= 0);
+		SearchAndReplace.setRegexp(opts.indexOf('r') >= 0);
 		SearchAndReplace.setSearchFileSet(new DirectoryListSet(directory,filter,true));
 		SearchAndReplace.hyperSearch(view,false);
 		SearchAndReplace.replaceAll(view);
@@ -88,29 +119,30 @@ public class Text extends Constants{
 			}
 		}
 
-		return _getNumReplaces(statusBar, true);
+		return statusBar.replaceAll("(\\w+ )(\\d+)(.*in )(\\d+)(.*)", "$2,$4");
 	}
 
 	/**
 	 * Replace all phrases from buffer
-	 * @param search - phrase to find
-	 * @param replace - phrase to replace
-	 * @param flags - params b to setBeanShellReplace, i to setIgnoreCase, r to setRegexp, w to Whole word
-	 * @return numReplaces
+	 * @param search phrase to find
+	 * @param replace phrase to replace
+	 * @param opts Options: b to setBeanShellReplace, i to setIgnoreCase, r to setRegexp, w to Whole word
+	 * @return Number of replaces
 	 */
-	public int replaceBuffer(String search, String replace, String flags){
+	public int replaceBuffer(String search, String replace, String opts){
 		boolean ic =  SearchAndReplace.getIgnoreCase();
 		boolean re =  SearchAndReplace.getRegexp();
 		boolean ww = SearchAndReplace.getWholeWord();
 		boolean bs = SearchAndReplace.getBeanShellReplace();
 		String oldSearch = SearchAndReplace.getSearchString();
+		int numReplaces = countOccurrences(textArea.getText(), search, opts);
 
 		SearchAndReplace.setSearchString(search);
 		SearchAndReplace.setReplaceString(replace);
-		SearchAndReplace.setBeanShellReplace(flags.indexOf('b') >= 0);
-		SearchAndReplace.setWholeWord(flags.indexOf('w') >= 0);
-		SearchAndReplace.setIgnoreCase(flags.indexOf('i') >= 0);
-		SearchAndReplace.setRegexp(flags.indexOf('r') >= 0);
+		SearchAndReplace.setBeanShellReplace(opts.indexOf('b') >= 0);
+		SearchAndReplace.setWholeWord(opts.indexOf('w') >= 0);
+		SearchAndReplace.setIgnoreCase(opts.indexOf('i') >= 0);
+		SearchAndReplace.setRegexp(opts.indexOf('r') >= 0);
 		SearchAndReplace.setSearchFileSet(new CurrentBufferSet());
 		SearchAndReplace.replaceAll(view);
 
@@ -120,39 +152,31 @@ public class Text extends Constants{
 		SearchAndReplace.setBeanShellReplace(bs);
 		SearchAndReplace.setSearchString(oldSearch);
 
-		try{
-			return Integer.parseInt(_getNumReplaces(view.getStatus().getMessage(), false));
-		}
-		catch(Exception ex){
-			return 0;
-		}
+		return numReplaces;
 	}
 
 	/**
 	 * Replace all phrases from selection
-	 * @param search - phrase to find
-	 * @param replace - phrase to replace
-	 * @param flags - params b to setBeanShellReplace, i to setIgnoreCase, r to setRegexp, w to Whole word
-	 * @return numReplaces
+	 * @param search phrase to find
+	 * @param replace phrase to replace
+	 * @param opts Options: b to setBeanShellReplace, i to setIgnoreCase, r to setRegexp, w to Whole word
+	 * @return Number of replaces
 	 */
-	public int replaceSelection(String search, String replace, String flags){
+	public int replaceSelection(String search, String replace, String opts){
 		//TODO:corregir la selección para una sóla línea
 		boolean ic =  SearchAndReplace.getIgnoreCase();
 		boolean re =  SearchAndReplace.getRegexp();
 		boolean ww = SearchAndReplace.getWholeWord();
 		boolean bs = SearchAndReplace.getBeanShellReplace();
 		String oldSearch = SearchAndReplace.getSearchString();
-		//		System.out.println("...oldSearch:" + oldSearch);
-
-		//		textArea.goToNextLine(true);
-		//		textArea.goToStartOfWhiteSpace(true);
+		int numReplaces = countOccurrences(textArea.getSelectedText(), search, opts);
 
 		SearchAndReplace.setSearchString(search);
 		SearchAndReplace.setReplaceString(replace);
-		SearchAndReplace.setBeanShellReplace(flags.indexOf('b') >= 0);
-		SearchAndReplace.setWholeWord(flags.indexOf('w') >= 0);
-		SearchAndReplace.setIgnoreCase(flags.indexOf('i') >= 0);
-		SearchAndReplace.setRegexp(flags.indexOf('r') >= 0);
+		SearchAndReplace.setBeanShellReplace(opts.indexOf('b') >= 0);
+		SearchAndReplace.setWholeWord(opts.indexOf('w') >= 0);
+		SearchAndReplace.setIgnoreCase(opts.indexOf('i') >= 0);
+		SearchAndReplace.setRegexp(opts.indexOf('r') >= 0);
 		SearchAndReplace.replace(view);
 
 		SearchAndReplace.setIgnoreCase(ic);
@@ -160,32 +184,17 @@ public class Text extends Constants{
 		SearchAndReplace.setWholeWord(ww);
 		SearchAndReplace.setBeanShellReplace(bs);
 		SearchAndReplace.setSearchString(oldSearch);
-
-		try{
-			//			String retorno = _getNumReplaces(view.getStatus().getMessage(), false);
-
-			//			SearchAndReplace.setIgnoreCase(ic);
-			//			SearchAndReplace.setRegexp(re);
-			//			SearchAndReplace.setWholeWord(ww);
-			//			SearchAndReplace.setBeanShellReplace(bs);
-			//			SearchAndReplace.setSearchString(oldSearch);
-
-			//			System.out.println("...retorno:" + retorno);
-			return Integer.parseInt(_getNumReplaces(view.getStatus().getMessage(), false));
-		}
-		catch(Exception ex){
-			ex.printStackTrace();
-			return 0;
-		}
+		
+		return numReplaces;
 	}
 
 	/**
 	 * Replace all phrases from selection
-	 * @param search - phrase to find
-	 * @param flags - params w to setAutoWrapAround, v to setReverseSearch, i to setIgnoreCase, r to setRegexp, w to Whole word
+	 * @param search phrase to find
+	 * @param opts Options: w to setAutoWrapAround, v to setReverseSearch, i to setIgnoreCase, r to setRegexp, w to Whole word
 	 * @return true if expression found
 	 */
-	public boolean findBuffer(String search, String flags){
+	public boolean findBuffer(String search, String opts){
 		boolean ic =  SearchAndReplace.getIgnoreCase();
 		boolean re =  SearchAndReplace.getRegexp();
 		boolean ww = SearchAndReplace.getWholeWord();
@@ -193,16 +202,16 @@ public class Text extends Constants{
 		boolean aw = SearchAndReplace.getAutoWrapAround();
 		String oldSearch = SearchAndReplace.getSearchString();
 
-		if(flags.indexOf('a') >= 0){
+		if(opts.indexOf('a') >= 0){
 			jEdit.getActiveView().getTextArea().goToBufferStart(false);
 		}
 
 		SearchAndReplace.setSearchString(search);
-		SearchAndReplace.setAutoWrapAround(flags.indexOf('a') >= 0);
-		SearchAndReplace.setReverseSearch(flags.indexOf('v') >= 0);
-		SearchAndReplace.setWholeWord(flags.indexOf('w') >= 0);
-		SearchAndReplace.setIgnoreCase(flags.indexOf('i') >= 0);
-		SearchAndReplace.setRegexp(flags.indexOf('r') >= 0);
+		SearchAndReplace.setAutoWrapAround(opts.indexOf('a') >= 0);
+		SearchAndReplace.setReverseSearch(opts.indexOf('v') >= 0);
+		SearchAndReplace.setWholeWord(opts.indexOf('w') >= 0);
+		SearchAndReplace.setIgnoreCase(opts.indexOf('i') >= 0);
+		SearchAndReplace.setRegexp(opts.indexOf('r') >= 0);
 		SearchAndReplace.setSearchFileSet(new CurrentBufferSet());
 		boolean result = SearchAndReplace.find(jEdit.getActiveView());
 
@@ -251,18 +260,9 @@ public class Text extends Constants{
 	}
 
 	public void endSelectedText(String t){
-//		Selection tmpSelection = (Selection) textArea.getSelection(0).clone();
-
 		textArea.setSelection(prevSelection);
 		textArea.setSelectedText(t);
 		Registers.setRegister('$', t);
-
-//		if(textArea.getCaretPosition() < tmpSelection.getEnd()){
-//			textArea.extendSelection(tmpSelection.getStart(), textArea.getCaretPosition());
-//		}
-//		else{
-//			textArea.addToSelection(tmpSelection);
-//		}
 	}
 
 	protected void deleteDuplicates(TextArea textArea){
@@ -320,7 +320,7 @@ public class Text extends Constants{
 
 	/**
 	 * Toggle the first Case to upperCase for each word
-	 * Example:
+	 * @example
 	 * IGEC_GESTOR_PROYECTO or IGEC GESTOR PROYECTO
 	 * for:
 	 * Igec Gestor Proyecto
@@ -337,7 +337,6 @@ public class Text extends Constants{
 		replaceSelection("([ _\\t]+)(\\p{L})(\\p{L}+)", "_1 + _2.toUpperCase() + _3.toLowerCase()", "bir");
 		replaceSelection("(^\\p{L})(\\p{L}+)", "_1.toUpperCase() + _2.toLowerCase()", "bir");
 
-		System.out.println("...numUnderscore:" + numUnderscore);
 		if(numUnderscore > 0){
 			replaceSelection(" ", "_", "");
 		}
@@ -375,6 +374,9 @@ public class Text extends Constants{
 		endSelectedText(t);
 	}
 
+	/**
+	 * Search backward in text area with selected text expression
+	 */
 	private void _searchBack(){
 		SearchAndReplace.setSearchString(textArea.getSelectedText());
 		SearchAndReplace.setAutoWrapAround(true);
@@ -383,7 +385,7 @@ public class Text extends Constants{
 		SearchAndReplace.setSearchFileSet(new CurrentBufferSet());
 		SearchAndReplace.find(view);
 	}
-
+	
 	/**
 	 * Find selection to back in document
 	 */
@@ -412,21 +414,5 @@ public class Text extends Constants{
 			textArea.setSelectedText(prefix + "" + suffix);
 			textArea.goToPrevCharacter(false);
 		}
-	}
-	
-	/**
-	 * Count number of character for String
-	 * @param str String to count characters
-	 * @param character character to count
-	 * @return number of found characters
-	 */
-	public Integer countChars(String str, char character) {
-		int numChars = 0;
-		for (char c : str.toCharArray()) {
-		    if (c == character) {
-		         numChars++;
-		    }
-		}
-		return numChars;
 	}
 }

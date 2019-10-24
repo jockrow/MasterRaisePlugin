@@ -13,6 +13,7 @@
 		<pathelement location="${install.dir}/Sessions.jar"/>
 		<pathelement location="${install.dir}/Console.jar"/>
 		<pathelement location="${install.dir}/UIManagerDefaults.jar"/>
+		<pathelement location="${install.dir}/commons-lang3-3.3.2.jar"/>
 	</path>
 
 	<target name="init">

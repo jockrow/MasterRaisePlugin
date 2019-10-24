@@ -14,6 +14,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.Enumeration;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractButton;
 import javax.swing.Box;
@@ -28,9 +29,6 @@ import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import masterraise.Text;
-import masterraise.files.MrFile;
-
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.EditBus;
 import org.gjt.sp.jedit.EditPane;
@@ -41,6 +39,9 @@ import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.buffer.JEditBuffer;
 import org.gjt.sp.jedit.msg.PositionChanging;
 import org.gjt.sp.jedit.textarea.TextArea;
+
+import masterraise.Text;
+import masterraise.files.MrFile;
 
 public class Query extends Text{
 	private final static String ROUND_BRACKET_LEFT  = "___";
@@ -72,7 +73,7 @@ public class Query extends Text{
 	private final TextArea textArea = view.getTextArea();
 	private final EditPane editPane = view.getEditPane();
 
-	JEditBuffer bfTmp = null;
+	private JEditBuffer bfTmp = null;
 	private String queryType = "";
 	private JDialog dialog = new JDialog(view, "Convert Query", true);
 	private JPanel content = new JPanel(new BorderLayout());
@@ -93,10 +94,6 @@ public class Query extends Text{
 		return queryType;
 	}
 
-	public void setQueryType(String queryType){
-		this.queryType = queryType;
-	}
-
 	/**
 	 * Verify if query haf syntaxError
 	 * @return boolean - if true has Syntax error
@@ -104,7 +101,6 @@ public class Query extends Text{
 	private boolean hasSyntaxError(){
 		String msgSyntaxError = "Syntax Error in %s Query";
 		boolean syntaxError = false;
-		int iniLine = 0;
 
 		if(queryType.equals("SELECT") && !findBuffer("\\bSELECT\\b.*\\bFROM\\b[ ]+\\w", "air")){
 			syntaxError = true;
@@ -136,14 +132,13 @@ public class Query extends Text{
 				return true;
 			}
 		}
-		else if(queryType.equals("CSV_")){
-			iniLine = 2;
-		}
-		if(iniLine > 0 && !new SpreadSheet().isMatchColumns(iniLine)){
+		else if(queryType.equals("CSV_") && !new SpreadSheet().isMatchColumns(selectedText.replaceAll("\\A.*\n", ""))){
 			Macros.message(view, NOT_MATCH_COLUMN);
 			return true;
 		}
-		if(queryType.equals("CSV_") && !findBuffer("\\A" + REGEXP_SQL_OBJECT + "[ \\t]*$", "ar")){
+
+		boolean isFirstLineNameTable = Pattern.compile("(?i)\\A" + REGEXP_SQL_OBJECT + "[ \t]*\n").matcher(selectedText).find();
+		if(queryType.equals("CSV_") && !isFirstLineNameTable){
 			Macros.message(view, String.format(msgSyntaxError, new Object[] {"CSV"}) + ", \nMust have table Name in first line");
 			return true;
 		}
@@ -166,8 +161,8 @@ public class Query extends Text{
 
 	/**
 	 * to format the special assigns
-	 * @param boolean ini: si quiere que se formatee la primera asignación
-	 * @param boolean end: si quiere que se formatee la segunda asignación
+	 * @param boolean ini: format first assignment
+	 * @param boolean end: format second assignment
 	 */
 	private void formatSpecialValues(boolean ini, boolean end){
 		replaceBuffer("([()])([()])", "$1 $2", "r");
@@ -201,7 +196,6 @@ public class Query extends Text{
 			//Se realiza la asignación directa de los campos para valores como = 1 o = 'uno' o = FUNCION(PARAM1, 'PARAM2')
 			replaceBuffer("\\t", "\\n", "r");
 			replaceBuffer("(" + REGEXP_SQL_OBJECT + ")(\\n.*).*", "_0.replaceAll(\"\\n\", \"	\")", "bir");
-
 			replaceBuffer(DOT, ".", "");
 			replaceBuffer(ROUND_BRACKET_RIGHT, ")", "");
 			replaceBuffer(ROUND_BRACKET_LEFT, "(", "");
@@ -214,7 +208,7 @@ public class Query extends Text{
 	}
 
 	/**
-	 * Formatea el query para que se vea presentable
+	 * Format a query for easy read
 	 *
 	 * @example
 	select distinct Prestar.dbo.autAutorizacionASP.autIDAutorizacion as AUTORIZACON, commDivision_2.divNom AS REGIONAL_IPS_ORIGEN
@@ -235,7 +229,7 @@ public class Query extends Text{
 								 IPS_Origen.ipsIDDivision = commDivision_1.divIDDivision and  Ips_Transcriptor.ipsIDIPS = Prestar.dbo.autDetalleAutorizacionASP.autIDIPS 
 								 WHERE Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 1 AND Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 123 OR Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 456
 
-	POR:
+	to:
 	SELECT DISTINCT Prestar.dbo.autAutorizacionASP.autIDAutorizacion, commDivision_2.divNom
 		, dos, '1, 2'
 		, funcion, funcion(par1, 'par2')
@@ -256,24 +250,25 @@ public class Query extends Text{
 		OR Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 456
 	 */
 	public class BeautyQuery{
-		private String opcs = "";
+		private String opts = "";
 		private JCheckBox chkUcase;
 		private JCheckBox chkWithNolock;
 		private JCheckBox chkIndent;
 
-		public String getResult(){
-			return opcs;
+		//TODO:VERIFICAR SI SE PUEDE mover DIRECTAMENTE EN Query class, igual para convertQuery
+		private BeautyQuery() {
+			selectedText = iniSelectedText();
 		}
 
 		private void setResult(){
-			opcs = "";
-			if(chkUcase.isSelected()) opcs += "u";
-			if(chkWithNolock.isSelected()) opcs += "l";
-			if(chkIndent.isSelected()) opcs += "i";
+			opts = "";
+			if(chkUcase.isSelected()) opts += "u";
+			if(chkWithNolock.isSelected()) opts += "l";
+			if(chkIndent.isSelected()) opts += "i";
 		}
 
 		public void setOpcs(String opcs) {
-			this.opcs = opcs;
+			this.opts = opcs;
 		}
 
 		public void showGui(){
@@ -281,7 +276,6 @@ public class Query extends Text{
 			chkWithNolock = new JCheckBox("set WithNolock", false);
 			chkIndent = new JCheckBox("Indent", true);
 			String bufferText = textArea.getBuffer().getText().toUpperCase();
-
 			JPanel checkBoxPanel = new JPanel(new BorderLayout());
 
 			checkBoxPanel.add(chkUcase, BorderLayout.NORTH);
@@ -341,7 +335,7 @@ public class Query extends Text{
 		 * @param String opcs: u: set upper case reserved words, l: set WITH(NOLOCK) when query is SELECT, i: Indent query, f:if this function invoked from beauty Query Macro
 		 * @return String - return a message
 		 */
-		public void beautyQuery(String opcs){
+		public void beautyQuery(String opts){
 			//quita todos los comentarios y tabulador
 			replaceBuffer(REGEXP_SQL_COMMENT, "", "ir");
 
@@ -351,9 +345,6 @@ public class Query extends Text{
 			textArea.selectAll();
 			textArea.joinLines();
 			replaceBuffer("\\t+", " ", "r");
-
-			//		String selectedText = textArea == null ? "" : textArea.getSelectedText();
-			selectedText = textArea.getSelectedText();
 
 			if(selectedText.toUpperCase().indexOf("FROM") >= 0 && selectedText.toUpperCase().indexOf("INSERT") >= 0){
 				queryType = "INSERT SELECT";
@@ -377,9 +368,9 @@ public class Query extends Text{
 			replaceBuffer("([^\\(])('[ \\t]*)(\\d{4}/\\d{2}/\\d{2})('[ \\t]*)", "TO_DATE('$3', 'yyyy/MM/dd')", "r");
 
 			// Pongo las palabras reservadas en mayúsculas
-			if(opcs.indexOf('u') >= 0){
+			if(opts.indexOf('u') >= 0){
 				replaceBuffer(REGEXP_SQL_RESERVED, "_1.toUpperCase()", "br");
-				if(opcs.equals("u")){
+				if(opts.equals("u")){
 					return;
 				}
 			}
@@ -416,7 +407,7 @@ public class Query extends Text{
 
 						replaceBuffer("(\\bWHERE\\b.*)((.*\\n)+)(.*\\bORDER\\b)", "_1 + _2.replaceAll(\"(?m)^\",\"\\t\") + _4", "bir");
 
-						if(opcs.indexOf('l') >= 0){
+						if(opts.indexOf('l') >= 0){
 							replaceBuffer("(with)*[ \\(]*nolock[ \\)]*", "", "ir");
 							replaceBuffer("\\b(from|join)\\b[ \\t\\n]*(\\w+\\.*)+[ \\t]*(\\bas\\b[ \\t]+)*\\w+", "$0 WITH(NOLOCK) ", "ir");
 						}
@@ -442,25 +433,21 @@ public class Query extends Text{
 			replaceBuffer("[ \\t]*;[ \\t]*", ";", "r");
 		}
 
-		//renombrar este y convertQueryProcess a queryProcess
-		//o revisar cómo se puede resolver para Apply_Massive_Macro.bsh
 		public void processText(){
-			if(opcs == ""){
+			if(opts == ""){
 				Macros.message(view, "You have to Check at least one Option");
 				return;
 			}
 
-			if(bfTmp == null){
-				bfTmp = openTempBuffer();
-				beautyQuery(opcs);
-				closeTempBuffer(bfTmp);
-			}
+			bfTmp = openTempBuffer();
+			beautyQuery(opts);
+			closeTempBuffer(bfTmp);
 			dialog.dispose();
 		}
 	}
 
 	/**
-	Convert a querys an another query
+	Convert a query in another query
 
 		SELECT_UPDATE	SELECT_INSERT	INSERT_SELECT	INSERT_UPDATE	INSERT_CSV	UPDATE_INSERT	UPDATE_SELECT	UPDATE_CSV	CSV_INSERT	CSV_SELECT	CSV_UPDATE
 	putWhere	ok	ok	-	-	-	-	ok		-	-	-
@@ -514,6 +501,10 @@ public class Query extends Text{
 		private JRadioButton rbToUpdate = new JRadioButton("UPDATE");
 		private JRadioButton rbFromCsv = new JRadioButton("CSV");
 		private JRadioButton rbToCsv = new JRadioButton("CSV");
+
+		private ConvertQuery() {
+			selectedText = iniSelectedText();
+		}
 
 		public String getResult(){
 			return conversion;
@@ -595,8 +586,6 @@ public class Query extends Text{
 						else if(query1.equals("CSV") && !query2.equals("CSV_SELECT")){
 							queryType = "CSV_";
 						}
-
-						setQueryType(queryType);
 						if(hasSyntaxError()){
 							return;
 						}
@@ -895,7 +884,6 @@ public class Query extends Text{
 			}
 
 			if(!query1.equals("CSV") && !query2.equals("CSV")){
-				textArea.selectAll();
 				new BeautyQuery().beautyQuery("ui");
 			}
 			closeTempBuffer(bfTmp);
@@ -904,16 +892,13 @@ public class Query extends Text{
 
 	/**
 	 * Convert fields tables to any Language
-	 * Sample:
-
+	 * @example
 	NU_TO_INVOICE
 	CD_INVOICE
 
 	TO:
-
 	private String nuToInvoice = "";
 	private String cdInvoice = "";
-
 
 	public String getNuToInvoice(){
 		return nuToInvoice;
@@ -932,37 +917,6 @@ public class Query extends Text{
 	}
 	 */
 	public void convertSqlToLanguage(){
-		/*		
-	Macros.getMacro("Editing/First_To_UpperCase").invoke(view);
-
-import masterraise.Edit;
-//bfTmp = new Edit().openTempBuffer();
-edit = new Edit();
-edit.firsUpperCase();
-edit.replaceSelection("_", " ", "");
-
-search="_";
-replace=" ";
-SearchAndReplace.setSearchString(search);
-SearchAndReplace.setReplaceString(replace);
-SearchAndReplace.setWholeWord(false);
-//SearchAndReplace.replace(view);
-//SearchAndReplace.replace(view, buffer, 0, 13);
-SearchAndReplace.replace(view, buffer, textArea.getSelection(0).getStart(), textArea.getSelection(0).getEnd());
-
-
-startLine = textArea.getCaretLine();
-endLine = startLine - 1;
-selection = new Selection.Range(textArea.getLineStartOffset(startLine), textArea.getLineEndOffset(endLine));
-selections = textArea.getSelection();
-textArea.setSelection(selection);
-
-
-prevSelection = textArea.getSelection();
-textArea.setSelection(prevSelection);
-
-replaceSelection("_", " ", "");
-		 */	
 		JEditBuffer bfTmp = openTempBuffer();
 		replaceBuffer("^[ \t]+", "", "r");
 		firsUpperCase();
@@ -1095,7 +1049,7 @@ replaceSelection("_", " ", "");
 		//formateo el texto
 		replaceBuffer("\\)[  \\t]*values[  \\t]*\\(", ")\\nvalues(", "ir");
 
-		setQueryType("SP");
+		queryType = "SP";
 		if(hasSyntaxError()){
 			return false;
 		}
@@ -1300,7 +1254,7 @@ replaceSelection("_", " ", "");
 	}
 
 	/**
-	 * Identify tempora variables into Stored Procedure
+	 * Identify temporal variables into Stored Procedure
 	 */
 	public void sqlServerIdentifyTmpTables(){
 		if(findBuffer("#", "a")){
@@ -1332,7 +1286,6 @@ replaceSelection("_", " ", "");
 
 			replaceBuffer("^", "DROP TABLE ", "ir");
 			replaceBuffer("^DROP TABLE ##", "--DROP TABLE ##", "r");
-			//			TextToolsSorting.sortLines(textArea,false);
 			sortLines(textArea);
 			textArea.goToBufferEnd(false);
 			textArea.insertEnterAndIndent();
@@ -1354,7 +1307,7 @@ replaceSelection("_", " ", "");
 
 	/**
 	 * convert ldr file to rename images like as bat file
-	 * Example:
+	 * @example
 	 * Query:
 	 * SELECT 
 	 * FC.FOTO_CAFICULTOR, CAF.NRO_DOC_CAFICULTOR
