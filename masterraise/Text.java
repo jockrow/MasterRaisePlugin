@@ -18,6 +18,8 @@ import org.gjt.sp.jedit.search.DirectoryListSet;
 import org.gjt.sp.jedit.search.SearchAndReplace;
 import org.gjt.sp.jedit.textarea.JEditTextArea;
 import org.gjt.sp.jedit.textarea.Selection;
+import org.gjt.sp.jedit.textarea.Selection.Range;
+import org.gjt.sp.jedit.textarea.Selection.Rect;
 import org.gjt.sp.jedit.textarea.TextArea;
 
 import console.Console;
@@ -46,32 +48,41 @@ public class Text extends Constants{
 	 * @param opts Options: i to setIgnoreCase, r to setRegexp, w to Whole word
 	 * @return number of found characters
 	 */
-	private Integer countOccurrences(String str, String expression, String opts){
+	//TODO buscar todo lo que tenga Pattern
+	public Integer countOccurrences(String str, String expression, String opts){
 		int count = 0;
-		
 		opts = opts.toLowerCase().trim();
-		if(opts.indexOf('r') >= 0 || opts.indexOf('w') >= 0) {
+		
+		switch(opts.trim()) {
+		case "":
+			count = StringUtils.countMatches(str, expression);
+			break;
+		case "i":
+			count = StringUtils.countMatches(str.toUpperCase(), expression.toUpperCase());
+			break;
+		default:
+			String prefix = "(?m";
+
 			if(opts.indexOf('w') >= 0) {
 				expression = "\\b" + expression + "\\b"; 
 			}
-//			if(opts.trim().equals("") || opts.indexOf('i') >= 0) {
 			if(opts.indexOf('i') >= 0) {
-				expression = "(?i)" + expression;
+				prefix += "i";
 			}
-//			System.out.println("...expression:" + expression);
+			prefix += ")";
 			
+			expression = prefix + expression;
+
 			Pattern pattern = Pattern.compile(expression);
 			Matcher matcher = pattern.matcher(str);
 
 			while (matcher.find()) {
 				count++;
 			}
+			break;
 		}
-		else {
-//			System.out.println("...no regExp");
-			count = StringUtils.countMatches(str, expression);
-		}
-		
+
+//		System.out.println("...expression:" + expression + ", count:" + count + ", str:" + str);
 		return count;
 	}
 
@@ -194,6 +205,7 @@ public class Text extends Constants{
 	 * @param opts Options: w to setAutoWrapAround, v to setReverseSearch, i to setIgnoreCase, r to setRegexp, w to Whole word
 	 * @return true if expression found
 	 */
+	//TODO: EN LOS WHILE EVITAR QUE NO MUESTRE LOS MENSAJES while(findBuffer(REGEXP_SQL_IN_VALUES, "r")){
 	public boolean findBuffer(String search, String opts){
 		boolean ic =  SearchAndReplace.getIgnoreCase();
 		boolean re =  SearchAndReplace.getRegexp();
@@ -227,7 +239,7 @@ public class Text extends Constants{
 	public JEditBuffer openTempBuffer(){
 		final EditPane editPane = view.getEditPane();
 
-		//En el caso que no haya seleccionado nada tomará todo el buffer
+		//if is not selection take all textArea
 		if(selectedText.trim().equals("")){
 			textArea.selectAll();
 			selectedText = textArea.getSelectedText();
@@ -407,9 +419,12 @@ public class Text extends Constants{
 	public void encloseText(char prefix, char suffix) {
 		String s = textArea.getSelectedText();
 		if(s != null){
+			Selection[] selection = textArea.getSelection();
+			Selection select0 = selection[0];
+
+			selection[0] = new Range(new Rect(select0.getStartLine(), select0.getStart() + 1, select0.getEndLine(), select0.getEnd() + 1));
 			textArea.setSelectedText(prefix + s + suffix);
-			textArea.goToStartOfWhiteSpace(false);
-			findBuffer(s, "");
+			textArea.setSelection(selection);
 		}else{
 			textArea.setSelectedText(prefix + "" + suffix);
 			textArea.goToPrevCharacter(false);

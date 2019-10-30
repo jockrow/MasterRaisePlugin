@@ -65,9 +65,9 @@ public class MasterRaiseMenuProvider implements DynamicMenuProvider{
 		superMenu.add(menu);
 
 		menu = new JMenu("Query");
-		createSubMenu("query-beauty-query");
-		createSubMenu("query-convert-query");
-		createSubMenu("query-convert-sql-to-language");
+		createSubMenu("query-beauty");
+		createSubMenu("query-convert");
+		createSubMenu("query-to-language");
 		createSubMenu("query-convert-to-sqllite");
 		createSubMenu("query-format-in");
 		createSubMenu("query-oracle-ldr-to-bat-rename-images");

@@ -21,21 +21,21 @@ public class MyGeneration extends Text{
 	<Column p="FECHA_ENTREGA_FSP_EVALUACION" n="Fecha Entrega FSP Evaluación" />
 
 	Change to:
-            <Column p="FECHA_FSP" n="Fecha FSP">
-              <Properties>
-                <Property k="required" v="true" />
-              </Properties>
-            </Column>
-            <Column p="COSTOS_EST_REQUERIMIENTO" n="Costos Estimados para el Requerimiento">
-              <Properties>
-                <Property k="required" v="true" />
-              </Properties>
-            </Column>
-            <Column p="FECHA_ENTREGA_FSP_EVALUACION" n="Fecha Entrega FSP Evaluación">
-              <Properties>
-                <Property k="required" v="true" />
-              </Properties>
-            </Column>
+	<Column p="FECHA_FSP" n="Fecha FSP">
+	  <Properties>
+		 <Property k="required" v="true" />
+	  </Properties>
+	</Column>
+	<Column p="COSTOS_EST_REQUERIMIENTO" n="Costos Estimados para el Requerimiento">
+	  <Properties>
+		 <Property k="required" v="true" />
+	  </Properties>
+	</Column>
+	<Column p="FECHA_ENTREGA_FSP_EVALUACION" n="Fecha Entrega FSP Evaluación">
+	  <Properties>
+		 <Property k="required" v="true" />
+	  </Properties>
+	</Column>
 	 */
 	public void columnsToProperies(){
 		prefix = "            ";
@@ -50,21 +50,21 @@ public class MyGeneration extends Text{
 	 FECHA_REAL_COMITE	Fecha Real Comité
 	 FECHA_INI_EST_PRUEBAS_USU	Fecha Inicio Estimada Pruebas de Usuario
 	 Change to
-            <Column p="FECHA_EST_COMITE" n="Fecha Estimada Comité">
-              <Properties>
-                <Property k="required" v="true" />
-              </Properties>
-            </Column>
-            <Column p="FECHA_REAL_COMITE" n="Fecha Real Comité">
-              <Properties>
-                <Property k="required" v="true" />
-              </Properties>
-            </Column>
-            <Column p="FECHA_INI_EST_PRUEBAS_USU" n="Fecha Inicio Estimada Pruebas de Usuario">
-              <Properties>
-                <Property k="required" v="true" />
-              </Properties>
-            </Column>
+	<Column p="FECHA_EST_COMITE" n="Fecha Estimada Comité">
+	  <Properties>
+		 <Property k="required" v="true" />
+	  </Properties>
+	</Column>
+	<Column p="FECHA_REAL_COMITE" n="Fecha Real Comité">
+	  <Properties>
+		 <Property k="required" v="true" />
+	  </Properties>
+	</Column>
+	<Column p="FECHA_INI_EST_PRUEBAS_USU" n="Fecha Inicio Estimada Pruebas de Usuario">
+	  <Properties>
+		 <Property k="required" v="true" />
+	  </Properties>
+	</Column>
 	 **/
 	public void csvToProperies(){
 		t=t.replaceAll("(?m)(^)(.*.)($)", prefix + "$2" + suffix);

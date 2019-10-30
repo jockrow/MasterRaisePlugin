@@ -166,19 +166,19 @@
 		</CODE>
 	</ACTION>
 	
-	<ACTION NAME="query-beauty-query">
+	<ACTION NAME="query-beauty">
 		<CODE>
 			new masterraise.tools.Query().getBeautyQuery().showGui();
 		</CODE>
 	</ACTION>
-	<ACTION NAME="query-convert-query">
+	<ACTION NAME="query-convert">
 		<CODE>
 			new masterraise.tools.Query().getConvertQuery().showGui();
 		</CODE>
 	</ACTION>
-	<ACTION NAME="query-convert-sql-to-language">
+	<ACTION NAME="query-to-language">
 		<CODE>
-			new masterraise.tools.Query().convertSqlToLanguage();
+			new masterraise.tools.Query().queryToLanguage();
 		</CODE>
 	</ACTION>
 	<ACTION NAME="query-convert-to-sqllite">
