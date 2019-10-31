@@ -61,7 +61,10 @@ public class MasterRaiseInfoViewer {
 
 	private static String[] convertCommandString(String command, String url) {
 		Vector<String> args = new Vector<String>();
+		//TODO: PARECE QUE NO FUNCIONA POR EL $ AL FINAL
 		Pattern p = Pattern.compile("^(http.{0,1}://){0,1}(\\w+\\.)+\\w+(\\S+)*$");
+		//TODO: Verificar con esta línea
+//		Pattern p = Pattern.compile("^(http.{0,1}://){0,1}(\\w+\.)+\\w+(\\S+)*\n");
 		StringBuffer arg = new StringBuffer();
 		boolean foundDollarU = false;
 		boolean inQuotes = false;
