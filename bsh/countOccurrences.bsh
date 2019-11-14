@@ -1,0 +1,3 @@
+int countOccurrences(str,expression,opts){
+	return new masterraise.Text().countOccurrences(str,expression,opts);
+}

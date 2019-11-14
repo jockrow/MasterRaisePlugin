@@ -48,7 +48,7 @@ public class Text extends Constants{
 	 * @param opts Options: i to setIgnoreCase, r to setRegexp, w to Whole word
 	 * @return number of found characters
 	 */
-	//TODO buscar todo lo que tenga Pattern
+	//TODO: buscar todo lo que tenga Pattern
 	public Integer countOccurrences(String str, String expression, String opts){
 		int count = 0;
 		opts = opts.toLowerCase().trim();
@@ -82,7 +82,6 @@ public class Text extends Constants{
 			break;
 		}
 
-//		System.out.println("...expression:" + expression + ", count:" + count + ", str:" + str);
 		return count;
 	}
 
@@ -294,13 +293,19 @@ public class Text extends Constants{
 			Class<?> mainClass = Class.forName(className);
 			Method method = null;
 
-			if(methodName.equals("sortLines")){
+			switch(methodName) {
+			case "sortLines":
 				method = mainClass.getMethod(methodName, JEditTextArea.class, boolean.class);
 				method.invoke(mainClass, textArea, false);
-			}
-			else{
+				break;
+			case "transposeLines":
+				method = mainClass.getMethod(methodName, JEditTextArea.class);
+				method.invoke(mainClass, textArea);
+				break;
+			default:
 				method = mainClass.getMethod(methodName, View.class, JEditTextArea.class);
 				method.invoke(mainClass, view, textArea);
+				break;
 			}
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
