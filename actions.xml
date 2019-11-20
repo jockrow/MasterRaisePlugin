@@ -173,6 +173,7 @@
 	</ACTION>
 	<ACTION NAME="query-convert">
 		<CODE>
+			//TODO: revisar si se puede instanciarlo de esta manera: ConvertQuery cq = new Query().new ConvertQuery(query1, query2);
 			new masterraise.tools.Query().getConvertQuery().showGui();
 		</CODE>
 	</ACTION>

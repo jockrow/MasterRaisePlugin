@@ -4,7 +4,7 @@ import masterraise.Text;
 
 /**
  * 
- * @author Richard Martínez 2013/06/12
+ * @author Richard Martï¿½nez 2013/06/12
  *
  */
 //TODO: optimice with t.replaceAll...
@@ -18,7 +18,7 @@ public class MyGeneration extends Text{
 	@Sample:
 	<Column p="FECHA_FSP" n="Fecha FSP" />
 	<Column p="COSTOS_EST_REQUERIMIENTO" n="Costos Estimados para el Requerimiento" />
-	<Column p="FECHA_ENTREGA_FSP_EVALUACION" n="Fecha Entrega FSP Evaluación" />
+	<Column p="FECHA_ENTREGA_FSP_EVALUACION" n="Fecha Entrega FSP Evaluaciï¿½n" />
 
 	Change to:
 	<Column p="FECHA_FSP" n="Fecha FSP">
@@ -31,7 +31,7 @@ public class MyGeneration extends Text{
 		 <Property k="required" v="true" />
 	  </Properties>
 	</Column>
-	<Column p="FECHA_ENTREGA_FSP_EVALUACION" n="Fecha Entrega FSP Evaluación">
+	<Column p="FECHA_ENTREGA_FSP_EVALUACION" n="Fecha Entrega FSP Evaluaciï¿½n">
 	  <Properties>
 		 <Property k="required" v="true" />
 	  </Properties>
@@ -46,16 +46,16 @@ public class MyGeneration extends Text{
 	/**
 	 * format csv to My Generation columns properties
 	 *@Sample
-	 FECHA_EST_COMITE	Fecha Estimada Comité
-	 FECHA_REAL_COMITE	Fecha Real Comité
+	 FECHA_EST_COMITE	Fecha Estimada ComitÃ©
+	 FECHA_REAL_COMITE	Fecha Real ComitÃ©
 	 FECHA_INI_EST_PRUEBAS_USU	Fecha Inicio Estimada Pruebas de Usuario
 	 Change to
-	<Column p="FECHA_EST_COMITE" n="Fecha Estimada Comité">
+	<Column p="FECHA_EST_COMITE" n="Fecha Estimada ComitÃ©">
 	  <Properties>
 		 <Property k="required" v="true" />
 	  </Properties>
 	</Column>
-	<Column p="FECHA_REAL_COMITE" n="Fecha Real Comité">
+	<Column p="FECHA_REAL_COMITE" n="Fecha Real ComitÃ©">
 	  <Properties>
 		 <Property k="required" v="true" />
 	  </Properties>

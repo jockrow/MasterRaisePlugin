@@ -1,14 +1,14 @@
 /************************************************
-*			@author Richard Martínez 2011/05/13	*
+*			@author Richard MartÃ­nez 2011/05/13	*
 *************************************************/
 package masterraise.tools;
 
 import masterraise.Text;
 
+import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.Macros;
 import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
-import org.gjt.sp.jedit.buffer.JEditBuffer;
 import org.gjt.sp.jedit.textarea.TextArea;
 
 public class Php extends Text{
@@ -24,7 +24,7 @@ public class Php extends Text{
 			Macros.message(view, "Fields not found");
 			return;
 		}
-		JEditBuffer bfTmp = openTempBuffer();
+		Buffer bfTmp = openTempBuffer();
 		
 		new Html().getFieldsList();
 		replaceBuffer("(.*)(\\b(name|id)\\b[\"= ]+)(\\w+)(.*)", "\\$$4;", "ir");

@@ -35,7 +35,6 @@ import org.gjt.sp.jedit.Macros;
 import org.gjt.sp.jedit.Registers;
 import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
-import org.gjt.sp.jedit.buffer.JEditBuffer;
 import org.gjt.sp.jedit.msg.PositionChanging;
 import org.gjt.sp.jedit.textarea.TextArea;
 
@@ -48,31 +47,30 @@ public class Query extends Text{
 	private final static String COMA                = "__";
 	private final static String SHARP               = "____";
 	private final static String DOT                 = "_______";
-
-	private final static String TRIM = "^[ \\t]+|[ \\t]+$";
-	private final static String TRIM_COMA = "[ \\t]*,[ \\t]*";
+	private final static String TRIM_COMA           = "[ \\t]*,[ \\t]*";
 
 	private final static String REGEXP_SQL_OBJECT = "(\\w+\\.){0,}+\\w+";
 	private final static String REGEXP_SQL_FUNC_VALUES = "\\w+\\(([' \\t]*[\\w/]+[' \\t,.]*)+\\)";
 	private final static String REGEXP_SQL_QUOTES_VALUES = "'([ \\t,]*\\w+)+'";
 	private final static String REGEXP_SQL_ALIAS = "([a-z] )((AS ){0,1}\\w+)";
 	private final static String REGEXP_SQL_RESERVED = "\\b(insert|into|values|update|set|as|not|like|in|inner|right|left|join|on|select|distinct|convert|case|when|then|else|end|sum|count|max|min|datetime|smallint|int|varchar|dateadd|isnull|null|from|where|and|or|with|nolock|union|group by|order by|having|desc|cast|concat|substr|declare|numeric)\\b";
-	private final static String REGEXP_SQL_COMMENT = "[ \\t]*--.*|/\\*([\\n\\t ]*([#\\w áéíóú]+\\n*)+[\\n\\t ]*)+\\*/";
+	private final static String REGEXP_SQL_COMMENT = "[ \\t]*--.*|/\\*([\\n\\t ]*([#\\w Ã¡Ã©Ã­Ã³Ãº]+\\n*)+[\\n\\t ]*)+\\*/";
 	private final static String REGEXP_SQL_DOUBLE_SPACES = "[ ]{2,}";
 	private final static String REGEXP_SQL_RESERVED_LINE = "\\b(SET|FROM|WHERE|AND|OR|ORDER|INNER|RIGHT|LEFT)\\b";
 	private final static String REGEXP_SQL_LAST_SEMICOLON = "[\\t ]*;+[\\t ]*$(\\n)*\\z";
 	private final static String REGEXP_SQL_FUNCTION = REGEXP_SQL_OBJECT + "[ \\t]*\\([ \\t]*[ \\(:\\d\\w',\\./-]+\\)+";
-	private final static String REGEXP_SQL_RETURN_CARRIAGE = "[ \\t]*(WHERE|AND)[ \\t]*";
 	private final static String REGEXP_SQL_RESERVED_VALUES = "\\b(SYSDATE)\\b";
 	private final static String REGEXP_SQL_SET = "[ \\t]*SET[ \\t]*";
 	private final static String REGEXP_SQL_NUMBER = "\\d+,\\d+";
 	private final static String REGEXP_SQL_IN_VALUES = "([\\('])([ ]*\\w+)([, ]+)";
+	private final static String REGEXP_CSV_PREFIX = "Structure table: %s\nFIELD	VALUE\n";
 
+	//TODO:Ver si se pueden inicializar estas propiedades en Constantes
 	private final View view = jEdit.getActiveView();
 	private final TextArea textArea = view.getTextArea();
 	private final EditPane editPane = view.getEditPane();
 
-	private JEditBuffer bfTmp = null;
+	private Buffer bfTmp = null;
 	private String queryType = "";
 	private JDialog dialog = new JDialog(view, "Convert Query", true);
 	private JPanel content = new JPanel(new BorderLayout());
@@ -97,8 +95,6 @@ public class Query extends Text{
 	private boolean hasSyntaxError(){
 		boolean syntaxError = false;
 		if(queryType.indexOf("CSV_") < 0) {
-			selectedText = selectedText.replaceAll("\n", " ");
-
 			if(queryType.equals("")){
 				syntaxError = true;
 			}
@@ -149,22 +145,9 @@ public class Query extends Text{
 	}
 
 	/**
-	 * Return name table from query
-	 * @param String regExQuery: Regular Expression to find query
-	 * @param String deleteRegExpToReplace: Regular Expression to delete for query
-	 * @return String - name for table
-	 */
-	private String getNameTable(String regExQuery, String deleteRegExpToReplace){
-		findBuffer(regExQuery, "air");
-		String tableName = textArea.getSelectedText().replaceAll(deleteRegExpToReplace, "");
-		textArea.delete();
-		return tableName;
-	}
-
-	/**
 	 * to format the special assigns
-	 * @param boolean ini: format first assignment
-	 * @param boolean end: format second assignment
+	 * @param ini format first assignment
+	 * @param end format second assignment
 	 */
 	private void formatSpecialValues(boolean ini, boolean end){
 		replaceBuffer("([()])([()])", "$1 $2", "r");
@@ -195,7 +178,7 @@ public class Query extends Text{
 			}
 		}
 		if(end){
-			//Se realiza la asignación directa de los campos para valores como = 1 o = 'uno' o = FUNCION(PARAM1, 'PARAM2')
+			//apply assignment directly from fields to values like = 1 or = 'one' o = FUNCION(PARAM1, 'PARAM2')
 			replaceBuffer("\\t", "\\n", "r");
 			replaceBuffer("(" + REGEXP_SQL_OBJECT + ")(\\n.*).*", "_0.replaceAll(\"\\n\", \"	\")", "bir");
 			replaceBuffer(DOT, ".", "");
@@ -333,8 +316,7 @@ public class Query extends Text{
 
 		/**
 		 * Beauty format query
-		 * @param String opcs: u: set upper case reserved words, l: set WITH(NOLOCK) when query is SELECT, i: Indent query, f:if this function invoked from beauty Query Macro
-		 * @return String - return a message
+		 * @param opts u: set upper case reserved words, l: set WITH(NOLOCK) when query is SELECT, i: Indent query, f:if this function invoked from beauty Query Macro
 		 */
 		public void beautyQuery(String opts){
 			//quita todos los comentarios y tabulador
@@ -350,7 +332,7 @@ public class Query extends Text{
 			if(selectedText.toUpperCase().indexOf("FROM") >= 0 && selectedText.toUpperCase().indexOf("INSERT") >= 0){
 				queryType = "INSERT SELECT";
 			}
-			//En el caso de query SELECT Optimizo para que quede sólo con el segmento del FROM y no se demore al verificar la síntaxis
+			//at case query SELECT, optimize for only set with segment for FROM and don't delay to checking syntax
 			else if(selectedText.toUpperCase().indexOf("FROM") >= 0){
 				queryType = "SELECT";
 			}
@@ -361,7 +343,7 @@ public class Query extends Text{
 				queryType = "UPDATE";
 			}
 			if(hasSyntaxError()){
-				Macros.message(view, String.format(msgSyntaxError, new Object[] {queryType}));
+				Macros.message(view, msgSyntaxError);
 				return;
 			}
 
@@ -369,7 +351,7 @@ public class Query extends Text{
 			replaceBuffer("([^\\(])('[ \\t]*)(\\d{2}/\\d{2}/\\d{4})('[ \\t]*)", "TO_DATE('$3', 'dd/MM/yyyy')", "r");
 			replaceBuffer("([^\\(])('[ \\t]*)(\\d{4}/\\d{2}/\\d{2})('[ \\t]*)", "TO_DATE('$3', 'yyyy/MM/dd')", "r");
 
-			// Pongo las palabras reservadas en mayúsculas
+			//set reserved word to Uppercase
 			if(opts.indexOf('u') >= 0){
 				replaceBuffer(REGEXP_SQL_RESERVED, "_1.toUpperCase()", "br");
 				if(opts.equals("u")){
@@ -383,7 +365,7 @@ public class Query extends Text{
 				replaceBuffer("(\\w+)([ \\t]+)(\\()", "$1(", "r");
 				replaceBuffer("(\\()([ \\t])|([ \\t])(\\))", "$1$4", "r");
 
-				// formateo correctamente el query en el caso que esté en una sola línea
+				// format wright query at case is only one line
 				if(!queryType.equals("CSV")){
 					replaceBuffer("\\[|\\]", "", "r");
 
@@ -391,7 +373,7 @@ public class Query extends Text{
 					replaceBuffer(TRIM_UP, "", "r");
 					replaceBuffer(TRIM_DOWN, "", "r");
 
-					//modifica las tablas temporales, para recuperarlas después
+					//modify the temp tables, for recovery later
 					replaceBuffer("#", SHARP, "");
 					if(queryType.equals("INSERT")){
 						replaceBuffer("(\\bINSERT\\b \\bINTO\\b " + REGEXP_SQL_OBJECT + ")(\\()", "$1\\n$3", "ir");
@@ -450,50 +432,13 @@ public class Query extends Text{
 
 	/**
 	Convert a query in another query
-
-		SELECT_UPDATE	SELECT_INSERT	INSERT_SELECT	INSERT_UPDATE	INSERT_CSV	UPDATE_INSERT	UPDATE_SELECT	UPDATE_CSV	CSV_INSERT	CSV_SELECT	CSV_UPDATE
-	convert	ok	ok	ok	ok	ok	ok	ok	ok	ok	ok	ok
-	putWhere	ok	ok	-	-	-	-	ok		-	-	-
-	whereIn	ok	ok	-	-	-				-	-	-
-	beauty	ok	ok	ok		-
-	return	-	-	ok	ok	ok
-	comments	ok	ok
-
-	SELECT ESTADO_FINCA, 'ACT'
-	, CN_USUARIO_MODIFICACION, 'SICA_USER'
-	, FECHA_MODIFICACION, SYSDATE
-	, Fecha_Inactivacion, TO_DATE('31/01/2016', 'dd/mm/yyyy')
-	, Area_Cultivo, 6,24
-	FROM SICA.SC_FINCA
-	WHERE CODIGO_SICA ='1700100378'
-	ORDER BY ESTADO_FINCA
-	;
-
-	SC_FINCA
-	FIELD	VALUE
-	CODIGO_SICA	'1700100378'
-	ESTADO_FINCA	'ACT'
-	CN_USUARIO_MODIFICACION	'SICA_USER'
-	FECHA_MODIFICACION	SYSDATE
-	Fecha_Inactivacion	TO_DATE('31/01/2016','dd/mm/yyyy')
-	Area_Cultivo	6,24
-
-	INSERT INTO SICA.SC_FINCA (CODIGO_SICA, ESTADO_FINCA, CN_USUARIO_MODIFICACION, FECHA_MODIFICACION, Fecha_Inactivacion, Area_Cultivo)
-	VALUES ('1700100378', 'ACT', 'SICA_USER', SYSDATE, TO_DATE('31/01/2016', 'dd/mm/yyyy'), 6,24);
-
-	UPDATE SICA.SC_FINCA
-	SET CODIGO_SICA = '1700100378'
-	, ESTADO_FINCA = 'ACT'
-	, CN_USUARIO_MODIFICACION = 'SICA_USER'
-	, FECHA_MODIFICACION = SYSDATE
-	, Fecha_Inactivacion = TO_DATE('31/01/2016','dd/mm/yyyy')
-	, Area_Cultivo = 6,24
-	WHERE CODIGO_SICA = '2529300114';
 	 */
 	public class ConvertQuery{
 		private String query1 = "";
 		private String query2 = "";
 		private String conversion = "";
+		private String tableName = "";
+		private String csvPrefix = "";
 		private JRadioButton rbFromInsert = new JRadioButton("INSERT");
 		private JRadioButton rbToInsert = new JRadioButton("INSERT");
 		private JRadioButton rbFromSelect = new JRadioButton("SELECT");
@@ -502,13 +447,73 @@ public class Query extends Text{
 		private JRadioButton rbToUpdate = new JRadioButton("UPDATE");
 		private JRadioButton rbFromCsv = new JRadioButton("CSV");
 		private JRadioButton rbToCsv = new JRadioButton("CSV");
-
-		private ConvertQuery() {
-			selectedText = iniSelectedText();
+		
+		
+		/**
+		 * Constructor for test or bulk process use
+		 * @param query1 first query query to convert
+		 * @param query2 final converted query
+		 */
+		public ConvertQuery(String query1, String query2) {
+			this.query1 = query1;
+			this.query2 = query2;
 		}
+		
+		/**
+		 * Constructor only for jEdit use 
+		 */
+		public ConvertQuery() { }
 
 		public String getResult(){
 			return conversion;
+		}
+
+		/**
+		 * Set name table from query
+		 */
+		private void setNameTable(){
+			String regExQuery = "";
+			String deleteRegExpToReplace = "";
+			switch(query1){
+			case "INSERT":
+				regExQuery = "\\bINSERT\\b[ \\t]\\bINTO\\b " + REGEXP_SQL_OBJECT;
+				deleteRegExpToReplace = "^\\w+ \\w+ ";
+				break;
+			case "SELECT":
+				regExQuery = "\\bFROM\\b[ \\t]+" + REGEXP_SQL_OBJECT;
+				deleteRegExpToReplace = "^\\w+[ \\t]+";
+				break;
+			case "UPDATE":
+				regExQuery = "UPDATE " + REGEXP_SQL_OBJECT;
+				deleteRegExpToReplace = "^\\w+ ";
+				break;
+			case "CSV":
+				if(!query2.equals("SELECT")){
+					regExQuery = "\\A" + REGEXP_SQL_OBJECT + "\\n";
+					deleteRegExpToReplace = "";
+				}
+				break;
+			}
+
+			findBuffer(regExQuery, "air");
+			tableName = textArea.getSelectedText().replaceAll(deleteRegExpToReplace, "");
+			textArea.delete();
+		}
+
+		private void startFormatQuery(){	
+			//format decimal
+			replaceBuffer(REGEXP_SQL_NUMBER, "_0.replaceAll(\",\", \".\")", "br");
+
+			//remove all possible comments
+			replaceBuffer(REGEXP_SQL_COMMENT, "", "ir");
+
+			replaceBuffer(TRIM_UP, "", "r");
+			replaceBuffer(TRIM_DOWN, "", "r");
+
+			if(!query1.equals("CSV")){
+				textArea.selectAll();
+				textArea.joinLines();
+			}
 		}
 
 		private void validation(){
@@ -577,22 +582,7 @@ public class Query extends Text{
 							}
 						}
 
-						conversion = query1 + "_" + query2;
-						queryType = query1;
 						dialog.dispose();
-
-						if(conversion.equals("CSV_SELECT")){
-							queryType = conversion;
-						}
-						else if(query1.equals("CSV") && !query2.equals("CSV_SELECT")){
-							queryType = "CSV_";
-						}
-						
-						if(hasSyntaxError()){
-							Macros.message(view, String.format(msgSyntaxError, new Object[] {queryType}));
-							return;
-						}
-
 						processText();
 						break;
 					case "Cancel":
@@ -681,29 +671,31 @@ public class Query extends Text{
 			dialog.setVisible(true);
 		}
 
-		/**
-		 * Convert a query to another query
-		 * @param String query1: first query query to convert
-		 * @param String query2: final converted query
-		 */
-		public void convertQuery(String query1, String query2){
-			String tableName = "";
+		public String processText(){
+			bfTmp = openTempBuffer();
 			String fowardQuery = "";
-			SpreadSheet sp = new SpreadSheet();
-			String conversion = query1 + "_" + query2;
-			int semiColon = replaceBuffer(REGEXP_SQL_LAST_SEMICOLON, "", "ar");
+			int lastSemiColon = replaceBuffer(REGEXP_SQL_LAST_SEMICOLON, "", "ar");
 
-			//format decimal
-			replaceBuffer(REGEXP_SQL_NUMBER, "_0.replaceAll(\",\", \".\")", "br");
+			conversion = query1 + "_" + query2;
+			queryType = query1;
 
-			//quita todos los posibles comentarios que puedan quedar
-			replaceBuffer(REGEXP_SQL_COMMENT, "", "ir");
-			if(!query1.equals("CSV")){
-				textArea.selectAll();
-				textArea.joinLines();
+			if(conversion.equals("CSV_SELECT")){
+				queryType = conversion;
+			}
+			else if(query1.equals("CSV") && !query2.equals("CSV_SELECT")){
+				queryType = "CSV_";
 			}
 
-			if(conversion.equals("SELECT_UPDATE") || conversion.equals("UPDATE_SELECT")){
+			startFormatQuery();
+
+			selectedText = iniSelectedText();
+			if(hasSyntaxError()){
+				jEdit._closeBuffer(view,(Buffer) bfTmp);
+				Macros.error(view, msgSyntaxError);
+				return msgSyntaxError;
+			}
+
+			if(query1.equals("SELECT") || query1.equals("UPDATE")){
 				replaceBuffer("ORDER[ \\t]BY.*(\\n.*)*", "", "ir");
 
 				if(findBuffer("WHERE.*", "air")){
@@ -712,62 +704,108 @@ public class Query extends Text{
 				}
 			}
 
+			if(!query1.equals("CSV")) {
+				setNameTable();
+			}
+			
+			switch(conversion){
+			case "CSV_UPDATE":
+				convertQuery("CSV", "INSERT");
+				startFormatQuery();
+				setNameTable();
+				convertQuery("INSERT", "UPDATE");
+				break;
+			case "INSERT_SELECT": case "UPDATE_SELECT":
+				convertQuery("INSERT", "CSV");
+				replaceBuffer(csvPrefix, "", "r");
+				replaceBuffer("\t|^", ", ", "r");
+				replaceBuffer("\\A,", "SELECT", "r");
+				replaceBuffer("\\z", "\nFROM " + tableName, "r");
+				break;
+			case "SELECT_INSERT": case "UPDATE_INSERT":
+				convertQuery("UPDATE", "CSV");
+				replaceBuffer(csvPrefix, "", "");
+				convertQuery("CSV", "INSERT");
+				if(conversion.equals("SELECT_INSERT")){
+					replaceBuffer("(SELECT", "(", "");
+				}
+				break;
+				/*
+				TODO:VERIFICAR QUE EN LA POSICION EN LA QUE SE ENCUENTRE EL CURSOR SE PUEDA SELECCIONAR SIN DAR VUELTA COMO
+				textArea.goToBufferStart(false);
+				textArea.goToEndOfWhiteSpace(false);
+				textArea.goToBufferEnd(true);
+
+				Y TOMARLO como para menos lineas textArea.goToBufferEnd(true);
+				 */
+			default:
+				convertQuery(query1, query2);
+				break;
+			}
+
+			if(!fowardQuery.equals("") && (query2.equals("UPDATE") || query2.equals("SELECT"))){
+				textArea.goToBufferEnd(false);
+				textArea.insertEnterAndIndent();
+				textArea.setSelectedText(fowardQuery);
+			}
+			//put semicolon to end of query if had it
+			if(!query2.equals("CSV") && lastSemiColon > 0){
+				replaceBuffer("\\z", ";", "r");
+			}
+			
+//			if(!query1.equals("CSV") && !query2.equals("CSV")){
+//				//TODO:EVITAR EN LO POSIBLE SI NO SE DEBE INVOCAR beautyQuery
+//				new BeautyQuery().beautyQuery("ui");
+//			}
+			String convertedQuery = bfTmp.getText();
+			closeTempBuffer(bfTmp);
+
+			return convertedQuery;
+		}
+
+		/**
+		 * Convert a query to another query
+		 * @param query1 first query query to convert
+		 * @param query2 final converted query
+		 */
+		public void convertQuery(String query1, String query2){
+			SpreadSheet sp = new SpreadSheet();
 			switch(query1){
 			case "INSERT":
-				tableName = getNameTable("\\bINSERT\\b[ \\t]\\bINTO\\b " + REGEXP_SQL_OBJECT, "^\\w+ \\w+ ");
-
 				if(!query2.equals("SELECT")){
 					replaceBuffer("\\)[ \\t]*\\bVALUES\\b[ \\t]*\\(", "\\n", "ir");
 					replaceBuffer(TRIM_UP + "\\(", "", "r");
 					replaceBuffer(TRIM_COMA, ",", "r");
 					replaceBuffer("\\)" + TRIM_DOWN, "", "r");
-
 					formatSpecialValues(true, false);
-					sp.transposeMatrix();
+					if(!conversion.equals("UPDATE_SELECT")){
+						sp.transposeMatrix();
+					}
 					formatSpecialValues(false, true);
 					replaceBuffer("^", ", ", "r");
 				}
 				break;
 			case "SELECT":
 				replaceBuffer("^[ \\t]*\\b(SELECT|DISTINCT)\\b[ \\t]*", "", "ir");
-				tableName = getNameTable("\\bFROM\\b[ \\t]+" + REGEXP_SQL_OBJECT, "^\\w+[ \\t]+");
 				formatSpecialValues(true, true);
 				replaceBuffer("^", ", ", "r");
 				break;
 			case "UPDATE":
-				tableName = getNameTable("UPDATE " + REGEXP_SQL_OBJECT, "^\\w+ ");
-
 				findBuffer("\\bWHERE\\b.*", "air");
 				Registers.cut(textArea,'$');
-
-				replaceBuffer("=", ",", "r");
 				formatSpecialValues(true, true);
 				break;
 			case "CSV":
 				replaceBuffer("\"", "", "");
-				if(!query2.equals("SELECT")){
-					tableName = getNameTable("\\A" + REGEXP_SQL_OBJECT + "\\n", "");
-				}
-				//remove spaces like trim
-				replaceBuffer(TRIM_UP, "", "r");
-				replaceBuffer(TRIM_DOWN, "", "r");
+				//				//remove spaces like trim
+				//				replaceBuffer(TRIM_UP, "", "r");
+				//				replaceBuffer(TRIM_DOWN, "", "r");
 				break;
 			}
 
 			switch(conversion){
-			case "UPDATE_SELECT":
-				replaceBuffer(REGEXP_SQL_SET, "", "ir");
-				replaceBuffer("(^|\\t)", ", ", "r");
-
-				replaceBuffer(REGEXP_SQL_RETURN_CARRIAGE, "\\n, ", "ir");
-				replaceBuffer(TRIM, "", "r");
-				deleteDuplicates(textArea);
-
-				replaceBuffer("\\A, ", "SELECT ", "r");
-				replaceBuffer("\\z", "\\nFROM " + tableName, "r");
-				break;
 			case "CSV_SELECT":
-				int numLines = view.getTextArea().getText().split("\n").length;
+				int numLines = countOccurrences(view.getTextArea().getText(), "\n", "r") + 1;
 				boolean hasTwoCols = findBuffer("\\A.*\\t", "ar");
 
 				// encloses quote for blank spaces
@@ -832,64 +870,16 @@ public class Query extends Text{
 				replaceBuffer("\\A, ", "UPDATE " + tableName + "\\nSET ", "r");
 				break;
 			case "CSV":
+				csvPrefix = String.format(REGEXP_CSV_PREFIX, new Object[] { tableName });
 				replaceBuffer(REGEXP_SQL_SET, "", "ir");
-				replaceBuffer("\\A", "Structure table: " + tableName + "\nFIELD	VALUE\n", "r");
+				replaceBuffer("\\A", csvPrefix, "r");
 				replaceBuffer(BLANK_LINE, "", "r");
 				replaceBuffer("^" + TRIM_COMA, "", "r");
+				replaceBuffer(TRIM_RIGHT, "", "r");
+				replaceBuffer("[ \t]*=[ \t]*", "\t", "r");
 				return;
 			}
-
-			if(!fowardQuery.equals("")){
-				textArea.goToBufferEnd(false);
-				textArea.insertEnterAndIndent();
-				textArea.setSelectedText(fowardQuery);
-			}
-			// Vuelve a poner el punto y coma al final de la sentencia en el caso de que haya exisitido
-			if(!query2.equals("CSV") && semiColon > 0){
-				replaceBuffer("\\z", ";", "r");
-			}
-		}
-
-		public void processText(){
-			if(query1 == null){
-				query1 = conversion.split("_")[0];
-			}
-			if(query2 == null){
-				query2 = conversion.split("_")[1];
-			}
-			bfTmp = openTempBuffer();
-
-			if(!query1.equals("CSV")){
-				replaceBuffer("[ \\t]+", " ", "r");
-			}
-			switch(conversion){
-			case "CSV_UPDATE":
-				convertQuery("CSV", "INSERT");
-				convertQuery("INSERT", "UPDATE");
-				break;
-			case "INSERT_SELECT":
-				convertQuery("INSERT", "CSV");
-				replaceBuffer("(Structure table: )(" + REGEXP_SQL_OBJECT + ")(\\nFIELD\\tVALUE)((\\n.*)+)", "\"SELECT\" + _4.replaceAll(\"(?m)(^|\\t)\", \", \") + \"\\nFROM \" + _2", "br");
-				replaceBuffer("SELECT, \\n, ", "SELECT ", "r");
-				break;
-			case "SELECT_INSERT":
-				convertQuery("SELECT", "UPDATE");
-				replaceBuffer("(\\bSET\\b)((.*\\n)+)(\\bWHERE\\b[ \\t]*)((.*\\n*)+)", "$1 $5, $2", "ir");
-			case "UPDATE_INSERT":
-				convertQuery("UPDATE", "CSV");
-				//TODO:VERIFICAR SI FUNCIONA
-				replaceBuffer("Structure table: (" + REGEXP_SQL_OBJECT + ")\\nFIELD\\tVALUE.*\\n", "$1\\n", "ir");
-				convertQuery("CSV", "INSERT");
-				break;
-			default:
-				convertQuery(query1, query2);
-				break;
-			}
-
-			if(!query1.equals("CSV") && !query2.equals("CSV")){
-				new BeautyQuery().beautyQuery("ui");
-			}
-			closeTempBuffer(bfTmp);
+			this.query1 = query2;
 		}
 	}
 
@@ -920,7 +910,7 @@ public class Query extends Text{
 	}
 	 */
 	public void queryToLanguage(){
-		JEditBuffer bfTmp = openTempBuffer();
+		Buffer bfTmp = openTempBuffer();
 		replaceBuffer("^[ \t]+", "", "r");
 		firsUpperCase();
 
@@ -955,7 +945,7 @@ public class Query extends Text{
 	 * in('one', 'two', '3')
 	 */
 	public void formatIn(){
-		JEditBuffer bfTmp = openTempBuffer();
+		Buffer bfTmp = openTempBuffer();
 		deleteDuplicates(textArea);
 		boolean isNotNumber = findBuffer("[\\p{Alpha}/\\*\\-\\+,\\(\\)\\\"#\\$&]", "air");
 
@@ -1031,7 +1021,7 @@ public class Query extends Text{
 	 SET @i_maxRegistros = 30
 	 */
 	public void sqlServerSetVariablesSp(){
-		JEditBuffer bfTmp = openTempBuffer();
+		Buffer bfTmp = openTempBuffer();
 
 		//format query
 		replaceBuffer(REGEXP_SQL_COMMENT, "", "ir");
@@ -1046,7 +1036,7 @@ public class Query extends Text{
 
 		if(!findBuffer("^\\(.*\\bvalues\\b[ \\t]*\\(.*\\)$", "air")){
 			jEdit._closeBuffer(view,(Buffer) bfTmp);
-			Macros.message(view, String.format(msgSyntaxError, new Object[] { "SP" }));
+			Macros.error(view, String.format(msgSyntaxError, new Object[] { "Sql Server Variables SP" }));
 			return;
 		}
 
@@ -1077,7 +1067,7 @@ public class Query extends Text{
 
 		if(numComaAsig!=numComaValue){
 			jEdit._closeBuffer(view,(Buffer) bfTmp);
-			Macros.message(view, "The number rows from this column don't match with anothers columns");
+			Macros.error(view, "The number rows from this column don't match with anothers columns");
 			return;
 		}
 
@@ -1101,9 +1091,14 @@ public class Query extends Text{
 			replaceSelection("[ \\t]+\\(\\w+\\)", "", "r");
 
 			textArea.goToBufferStart(false);
-			textArea.setSelectedText("INSERT INTO garbage ");
+			//			textArea.setSelectedText("INSERT INTO garbage ");
+			textArea.setSelectedText("INSERT INTO %s ");
 			new ConvertQuery().convertQuery("INSERT", "CSV");
-			replaceBuffer("Structure table: \\w+\\nFIELD	VALUE\\n", "", "r");
+			//TODO:PROBAR NUEVAMENTE
+			//replaceBuffer("Structure table: \\w+\\nFIELD	VALUE\\n", "", "r");
+			//			System.out.println("...csvPrefix:" + csvPrefix);
+			System.out.println("...REGEXP_CSV_PREFIX:" + REGEXP_CSV_PREFIX);
+			replaceBuffer(REGEXP_CSV_PREFIX, "", "r");
 			replaceBuffer("\t", " = ", "r");
 			replaceBuffer("^", "SET ", "r");
 
@@ -1147,9 +1142,9 @@ public class Query extends Text{
 			replaceBuffer("(\\w+)(#)(\\b\\w+\\b)", "$1__$3", "ir");
 			replaceBuffer("#{1,2}\\b[^ 0-9\\(]+\\w+\\b", "\\n$0\\n", "ir");
 			replaceBuffer("^.*#[!\"$%&'\\(\\)*+,-./:;=>?@\\[\\\\\\]^_`{|}~].*\\n", "", "ir");
-			// reemplazo todas las líneas que no comienzan por la tabla tempora (#temporal)
+			// replace all lines that doesn't begin for temp table (#temporal)
 			replaceBuffer("^[^#].*(\\n|\\z)", "", "ir");
-			// quito los posibles caracteres extraños
+			// remove possibles extrange chars
 			replaceBuffer("[!\"$%&'\\(\\)*+,-./:;=>?@\\[\\\\\\]^`{|}~]", "", "r");
 			replaceBuffer("(^[ \\t]+|[ \\t]+$)", "", "r");
 

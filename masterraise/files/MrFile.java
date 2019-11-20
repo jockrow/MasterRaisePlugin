@@ -1,5 +1,5 @@
 /**********************************************/
-/*      Develop by Richard Martinez 2018      */
+/*      Develop by Richard Martínez 2018      */
 /**********************************************/
 package masterraise.files;
 
@@ -113,6 +113,11 @@ public class MrFile extends Text{
 		return (File[])listDir.toArray(new File[listDir.size()]);
 	}
 
+	/**
+	 * read content for a file
+	 * @param pathFile complete path location file
+	 * @return content file
+	 */
 	public String readFile(String pathFile){
 		String body = "";
 		try (BufferedReader br = new BufferedReader(new FileReader(pathFile))) {
@@ -239,7 +244,7 @@ tres
 		int maxTabs = 0;
 		String tab = "\\t";
 
-		// Mira el número máximo de tabulaciones
+		// Check the max tabs number
 		while(findBuffer(tab, "ar")){
 			tab += "\\t";
 			maxTabs++;

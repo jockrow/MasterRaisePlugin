@@ -1,5 +1,5 @@
 /********************************************
- *			@author Richard Martínez 2010	*
+ *			@author Richard MartÃ­nez 2010			*
  *********************************************/
 package masterraise.tools;
 
@@ -15,9 +15,9 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
-import org.gjt.sp.jedit.buffer.JEditBuffer;
 import org.gjt.sp.jedit.textarea.TextArea;
 
 import masterraise.Text;
@@ -146,7 +146,7 @@ public class Language extends Text{
 	}
 
 	public void processText(String type){
-		JEditBuffer bfTmp = openTempBuffer();
+		Buffer bfTmp = openTempBuffer();
 		if(!type.equals("language-code-to-string")){
 			replaceBuffer("[!\"#$%&'()*+,-/:;=>?@\\[\\\\\\]^`{|}~]", " ", "ir");
 			replaceBuffer("^(\\t|[ ])+|(\\t|[ ])+$.*", "", "ir");
@@ -165,7 +165,7 @@ public class Language extends Text{
 			replaceBuffer(TRIM_UP + "(\\+ \"\\\\n)", "String strCode = \"", "r");
 			replaceBuffer(TRIM_DOWN, ";", "r");
 
-			//Inicia cada línea seteando correctamente los comentarios
+			//Inicia cada lï¿½nea seteando correctamente los comentarios
 			switch(getResult()){
 			case "javaScript":
 				replaceBuffer("String strCode", "var strCode", "");
@@ -209,6 +209,17 @@ public class Language extends Text{
 			}
 			break;
 
+		/*
+		 TODO: formatear 
+		 System.out.println("...conversion:" + conversion + ", queryType:" + queryType + ", query2:" + query2 + ", tableName:" + tableName + ", lastSemiColon:" + lastSemiColon);
+		 como:
+		 		System.out.println("...conversion:" + conversion 
+				+ ", queryType:" + queryType 
+				+ ", query2:" + query2 
+				+ ", tableName:" + tableName 
+				+ ", lastSemiColon:" + lastSemiColon
+				);
+		*/
 		case "language-print-debug-variables":
 			if(language.substring(0, 3).equals("sql") && textArea.getSelectedText().equals("@")){
 				replaceBuffer("@", "", "wi");
@@ -296,11 +307,11 @@ public class Language extends Text{
 	/**
 	 * Convert String to Vars
 	 * @example
-	 * CANT. CAFÉ PERGAMINO SECO
-	 * UNIDAD DE MEDIDA CAFÉ PERGAMINO SECO
+	 * CANT. CAFÃ‰ PERGAMINO SECO
+	 * UNIDAD DE MEDIDA CAFÃ‰ PERGAMINO SECO
 	 * to:
-	 * CANT_CAFÉ_PERGAMINO_SECO
-	 * UNIDAD_MEDIDA_CAFÉ_PERGAMINO_SECO
+	 * CANT_CAFÃ‰_PERGAMINO_SECO
+	 * UNIDAD_MEDIDA_CAFÃ‰_PERGAMINO_SECO
 	 */
 	public void stringToVars(){
 		new Text().replaceAccent();

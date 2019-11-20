@@ -2,12 +2,13 @@
 <classpath>
 	<classpathentry kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Program Files/jEdit/jedit.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/jEdit/jedit.jar" sourcepath="D:/Users/RMARTIN029/Documents/SETTINGS/jEdit Installer/jedit5.4.0source/jEdit"/>
 	<classpathentry kind="lib" path="C:/Program Files/jEdit/jars/TextObjects.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/jEdit/jars/commons-io-2.4.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/jEdit/jars/Sessions.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/jEdit/jars/Console.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/jEdit/jars/UIManagerDefaults.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/jEdit/jars/commons-lang3-3.3.2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

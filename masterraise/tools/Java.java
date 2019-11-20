@@ -12,9 +12,9 @@ import javax.swing.JMenuBar;
 
 import masterraise.Text;
 
+import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
-import org.gjt.sp.jedit.buffer.JEditBuffer;
 import org.gjt.sp.jedit.textarea.TextArea;
 
 public class Java extends Text{
@@ -37,7 +37,7 @@ public class Java extends Text{
 	 * }
 	 */
 	public void genGetSet(){
-		JEditBuffer bfTmp = openTempBuffer();
+		Buffer bfTmp = openTempBuffer();
 
 		replaceBuffer("^[ \\t]+", "", "r");
 		replaceBuffer("([ \\t]*)(=.*|;)", "", "r");
@@ -80,7 +80,7 @@ public class Java extends Text{
 	 */
 	public void fields2javaProperties(){
 		String REPLACE = "(object)(\\.set)(\\w+)(.*)(get)(\\w+)(.*)";
-		JEditBuffer bfTmp = openTempBuffer();
+		Buffer bfTmp = openTempBuffer();
 		textArea.selectAll();
 
 		replaceSelection("^[  \\t]+|\"", "", "r");

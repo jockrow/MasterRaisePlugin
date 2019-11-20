@@ -2,6 +2,8 @@ package masterraise;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,7 +13,6 @@ import org.gjt.sp.jedit.EditPane;
 import org.gjt.sp.jedit.Registers;
 import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
-import org.gjt.sp.jedit.buffer.JEditBuffer;
 import org.gjt.sp.jedit.bufferset.BufferSetManager;
 import org.gjt.sp.jedit.search.CurrentBufferSet;
 import org.gjt.sp.jedit.search.DirectoryListSet;
@@ -214,7 +215,7 @@ public class Text extends Constants{
 		String oldSearch = SearchAndReplace.getSearchString();
 
 		if(opts.indexOf('a') >= 0){
-			jEdit.getActiveView().getTextArea().goToBufferStart(false);
+			textArea.goToBufferStart(false);
 		}
 
 		SearchAndReplace.setSearchString(search);
@@ -224,7 +225,7 @@ public class Text extends Constants{
 		SearchAndReplace.setIgnoreCase(opts.indexOf('i') >= 0);
 		SearchAndReplace.setRegexp(opts.indexOf('r') >= 0);
 		SearchAndReplace.setSearchFileSet(new CurrentBufferSet());
-		boolean result = SearchAndReplace.find(jEdit.getActiveView());
+		boolean result = SearchAndReplace.find(view);
 
 		SearchAndReplace.setAutoWrapAround(aw);
 		SearchAndReplace.setSearchString(oldSearch);
@@ -235,7 +236,7 @@ public class Text extends Constants{
 		return result;
 	}
 
-	public JEditBuffer openTempBuffer(){
+	public Buffer openTempBuffer(){
 		final EditPane editPane = view.getEditPane();
 
 		//if is not selection take all textArea
@@ -246,16 +247,19 @@ public class Text extends Constants{
 		Buffer bfTmp = BufferSetManager.createUntitledBuffer();
 		bfTmp.insert(0, selectedText);
 		editPane.setBuffer(bfTmp);
-
 		return bfTmp;
 	}
 
-	public void closeTempBuffer(JEditBuffer bfTmp){
-		textArea.selectAll();
-		selectedText = textArea.getSelectedText();
-		jEdit._closeBuffer(view,(Buffer) bfTmp);
-		Registers.setRegister('$', selectedText);
-		textArea.setSelectedText(selectedText);
+	public void closeTempBuffer(Buffer bfTmp){
+		if(!isJUnitTest()) {
+			//TODO: se puede poner textArea.setBuffer(bfTmp) en vez de esto:
+			textArea.selectAll();
+			selectedText = textArea.getSelectedText();
+
+			jEdit._closeBuffer(view, bfTmp);
+			textArea.setSelectedText(selectedText);
+			Registers.setRegister('$', selectedText);
+		}
 	}
 
 	public String iniSelectedText(){
@@ -383,6 +387,7 @@ public class Text extends Constants{
 
 		for(int i=0; i<ARR_CHARS.length; i++){
 			t=t.replace(ARR_CHARS[i][0], ARR_CHARS[i][4]);
+			//TODO:CAMBIAR "ñ" LOW_ENIE
 			if(ARR_CHARS[i][0].equals("ñ")){
 				break;
 			}
@@ -434,5 +439,17 @@ public class Text extends Constants{
 			textArea.setSelectedText(prefix + "" + suffix);
 			textArea.goToPrevCharacter(false);
 		}
+	}
+	
+//	private static boolean isJUnitTest() {
+	private boolean isJUnitTest() {
+	    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+	    List<StackTraceElement> list = Arrays.asList(stackTrace);
+	    for (StackTraceElement element : list) {
+	        if (element.getClassName().startsWith("org.junit.")) {
+	            return true;
+	        }           
+	    }
+	    return false;
 	}
 }
