@@ -4,7 +4,7 @@ import masterraise.Text;
 
 /**
  * 
- * @author Richard Mart�nez 2013/06/12
+ * @author Richard Martínez 2013/06/12
  *
  */
 //TODO: optimice with t.replaceAll...
@@ -18,7 +18,7 @@ public class MyGeneration extends Text{
 	@Sample:
 	<Column p="FECHA_FSP" n="Fecha FSP" />
 	<Column p="COSTOS_EST_REQUERIMIENTO" n="Costos Estimados para el Requerimiento" />
-	<Column p="FECHA_ENTREGA_FSP_EVALUACION" n="Fecha Entrega FSP Evaluaci�n" />
+	<Column p="FECHA_ENTREGA_FSP_EVALUACION" n="Fecha Entrega FSP Evaluación" />
 
 	Change to:
 	<Column p="FECHA_FSP" n="Fecha FSP">
@@ -31,7 +31,7 @@ public class MyGeneration extends Text{
 		 <Property k="required" v="true" />
 	  </Properties>
 	</Column>
-	<Column p="FECHA_ENTREGA_FSP_EVALUACION" n="Fecha Entrega FSP Evaluaci�n">
+	<Column p="FECHA_ENTREGA_FSP_EVALUACION" n="Fecha Entrega FSP Evaluación">
 	  <Properties>
 		 <Property k="required" v="true" />
 	  </Properties>

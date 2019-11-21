@@ -310,15 +310,14 @@ public class Language extends Text{
 	 * CANT. CAFÉ PERGAMINO SECO
 	 * UNIDAD DE MEDIDA CAFÉ PERGAMINO SECO
 	 * to:
-	 * CANT_CAFÉ_PERGAMINO_SECO
-	 * UNIDAD_MEDIDA_CAFÉ_PERGAMINO_SECO
+	 * CANT_CAFE_PERGAMINO_SECO
+	 * UNIDAD_MEDIDA_CAFE_PERGAMINO_SECO
 	 */
 	public void stringToVars(){
-		new Text().replaceAccent();
 		String t = iniSelectedText();
-
-		t = t.replaceAll("[\\.]|\\b(DE|DEL|OF)\\b", "");
-		t = t.replaceAll("[ ]+", "_");
+		t=replaceAccent(t);
+		t=t.replaceAll("[\\.]|\\b(DE|DEL|OF)\\b", "");
+		t=t.replaceAll("[ ]+", "_");
 
 		endSelectedText(t);
 	}

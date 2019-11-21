@@ -382,18 +382,15 @@ public class Text extends Constants{
 	/**
 	 * replace all accent
 	 */
-	public void replaceAccent(){
-		String t = iniSelectedText();
-
+	public String replaceAccent(String t){
 		for(int i=0; i<ARR_CHARS.length; i++){
 			t=t.replace(ARR_CHARS[i][0], ARR_CHARS[i][4]);
-			//TODO:CAMBIAR "ñ" LOW_ENIE
-			if(ARR_CHARS[i][0].equals("ñ")){
+			if(ARR_CHARS[i][0].equals(LOW_ENIE)){
 				break;
 			}
 		}
 
-		endSelectedText(t);
+		return t;
 	}
 
 	/**
@@ -441,7 +438,6 @@ public class Text extends Constants{
 		}
 	}
 	
-//	private static boolean isJUnitTest() {
 	private boolean isJUnitTest() {
 	    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 	    List<StackTraceElement> list = Arrays.asList(stackTrace);

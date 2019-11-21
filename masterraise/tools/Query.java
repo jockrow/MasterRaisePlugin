@@ -747,7 +747,10 @@ public class Query extends Text{
 				textArea.goToBufferEnd(false);
 				textArea.insertEnterAndIndent();
 				textArea.setSelectedText(fowardQuery);
+				
+				replaceBuffer("(SET.*\\n)((.*\\n)+)", "_1 + _2.replaceAll(\"(?m)^,\", \"\\t,\")", "br");
 			}
+			replaceBuffer(TRIM_RIGHT, "", "r");
 			//put semicolon to end of query if had it
 			if(!query2.equals("CSV") && lastSemiColon > 0){
 				replaceBuffer("\\z", ";", "r");

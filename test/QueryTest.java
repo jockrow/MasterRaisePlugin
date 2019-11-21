@@ -10,7 +10,6 @@ import org.gjt.sp.jedit.jEdit;
 import org.junit.Before;
 import org.junit.Test;
 
-import masterraise.Constants;
 import masterraise.files.MrFile;
 import masterraise.tools.Query;
 import masterraise.tools.Query.ConvertQuery;
@@ -55,9 +54,7 @@ SET CODIGO_SICA = '1700100378'
 , Area_Cultivo = 6,24
 WHERE CODIGO_SICA = '2529300114';
 */
-public class QueryTest extends Constants{
-	private String contentTo = "";
-	private String convertedQuery = "";
+public class QueryTest extends Tester{
 	private View view = jEdit.getActiveView();
 
 	@Before
@@ -79,28 +76,80 @@ public class QueryTest extends Constants{
 //	}
 
 	@Test //DONE
+	public void convertSelectToUpdate() {
+		setVars("SELECT", "UPDATE");
+		assertEquals(contentTo.trim(), convertedQuery.trim());
+	}
+
+//	@Test //TODO
+//	public void convertSelectToInsert() {
+//		setVars("SELECT", "INSERT");
+//		assertEquals(contentTo.trim(), convertedQuery.trim());
+//	}
+//
+//	@Test //TODO
+//	public void convertInsertToSelect() {
+//		setVars("INSERT", "SELECT");
+//		assertEquals(contentTo.trim(), convertedQuery.trim());
+//	}
+//
+//	@Test //TODO
+//	public void convertInsertToUpdate() {
+//		setVars("INSERT", "UPDATE");
+//		assertEquals(contentTo.trim(), convertedQuery.trim());
+//	}
+//
+//	@Test //TODO
+//	public void convertInsertToCsv() {
+//		setVars("INSERT", "CSV");
+//		assertEquals(contentTo.trim(), convertedQuery.trim());
+//	}
+//
+//	@Test //TODO
+//	public void convertUpdateToInsert() {
+//		setVars("UPDATE", "INSERT");
+//		assertEquals(contentTo.trim(), convertedQuery.trim());
+//	}
+
+	@Test //DONE
 	public void convertUpdateToSelect() {
 		setVars("UPDATE", "SELECT");
 		assertEquals(contentTo.trim(), convertedQuery.trim());
 	}
 	
 //	@Test //TODO
-//	public void convertSelectToUpdate() {
-//		setVars("SELECT", "UPDATE");
+//	public void convertUpdateToCsv() {
+//		setVars("UPDATE", "CSV");
+//		assertEquals(contentTo.trim(), convertedQuery.trim());
+//	}
+//
+//	@Test //TODO
+//	public void convertCsvToInsert() {
+//		setVars("CSV", "INSERT");
+//		assertEquals(contentTo.trim(), convertedQuery.trim());
+//	}
+//
+//	@Test //TODO
+//	public void convertCsvToSelect() {
+//		setVars("CSV", "SELECT");
+//		assertEquals(contentTo.trim(), convertedQuery.trim());
+//	}
+//
+//	@Test //TODO
+//	public void convertCsvToUpdate() {
+//		setVars("CSV", "UPDATE");
 //		assertEquals(contentTo.trim(), convertedQuery.trim());
 //	}
 
 	private void setVars(String query1, String query2) {
-		String query1Path = PATH + "from/" + query1 + ".sql";
-//		String query2Path = PATH + "to/" + query2 + ".sql";
-		String query2Path = PATH + "converted/" + query1 + "_" + query2 + ".sql";
-		MrFile mf = new MrFile();
-		contentTo = mf.readFile(query2Path);
+		String fromFolder = PATH + "from/" + query1 + ".sql";
+		String convertedFolder = PATH + "converted/" + query1 + "_" + query2 + ".sql";
+		contentTo = new MrFile().readFile(convertedFolder);
 		
 		try {
 			view.setFocusable(true);
 			view.getMousePosition(true);
-			jEdit.openFile(view, query1Path);
+			jEdit.openFile(view, fromFolder);
 			ConvertQuery cq = new Query().new ConvertQuery(query1, query2);
 			view.repaint();
 			convertedQuery = cq.processText();

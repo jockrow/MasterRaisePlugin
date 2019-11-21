@@ -16,11 +16,7 @@ public abstract class Constants {
 	public static String BLANK_LINE = "(" + TRIM_UP + ")|(" + TRIM_DOWN + ")|(^[ \\t]*\\n)";
 	public static String BLANK_SPACE = "(^[ \\t]+)|([ \\t]+$)";
 	public static String SEP = File.separator;
-	
-	//Test
-//	public final static String PATH = System.getProperty("user.dir") + "/test/convert/";
-	public final static String PATH = "D:\\myProjects\\MasterRaisePlugin/test/convert/";
-	public final static String MSG_ERROR = "Sorry :( Error Testing, please try Again";
+	public static String LOW_ENIE = "ñ";
 	
 	public static String NOT_MATCH_COLUMN = "The number columns is not Match";
 

@@ -265,8 +265,8 @@ public class Html extends Text{
 	<OPTION value=-1>Seleccione</OPTION><OPTION value=127>Bogot&#225; D.C.-Aero Ambulancias 24 Ltda
 	</OPTION><OPTION value=298>Bogot&aacute; D.C.-Aga Fano Fabrica Nacional De Oxigeno S A Cundi</OPTION><OPTION value=324>Bogot&#225; D.C.-Ambulancias Abc Ltda</OPTION>
 	<OPTION value=371>Bogot&#225; D.C.-Ambulancias auxilios y emergencias</OPTION><OPTION value=346>Bogot&#225; D.C.-Ambulancias Meyday Ltda</OPTION><OPTION value=326>Bogot&#225; D.C.-Ambulancias Urgencia Vital</OPTION>
-	<OPTION value=326>Ni&#241;o</OPTION>
-	<OPTION value=326>NI&#209;O Jes&uacute;s</OPTION>
+	<OPTION value=327>Ni&#241;o</OPTION>
+	<OPTION value=328>NI&#209;O Jes&uacute;s</OPTION>
 
 	* A:
 	*
@@ -277,15 +277,13 @@ public class Html extends Text{
 	371	Bogotá D.C.-Ambulancias auxilios y emergencias
 	346	Bogotá D.C.-Ambulancias Meyday Ltda
 	326	Bogotá D.C.-Ambulancias Urgencia Vital
+	327	Niño
+	328	NIÑO Jesús
 	*/
 	public void options2Csv(){
 		String strSyntaxError = "Syntax Error Html Options";
-		String t=textArea.getSelectedText();
+		String t=iniSelectedText();
 
-		if(t=="" || t==null){
-			textArea.selectAll();
-			t=textArea.getSelectedText();
-		}
 		if(!Pattern.compile("(?m)<option[ ]+.*</option>").matcher(t.toLowerCase()).find()){
 			Macros.message(view, strSyntaxError);
 			return;
@@ -298,7 +296,7 @@ public class Html extends Text{
 
 		for(int i=0; i<ARR_CHARS.length; i++){
 			t=t.replaceAll(ARR_CHARS[i][2] + "|" + ARR_CHARS[i][3], ARR_CHARS[i][0]);
-			if(ARR_CHARS[i][0].equals("ñ")){
+			if(ARR_CHARS[i][0].equals(LOW_ENIE)){
 				break;
 			}
 		}

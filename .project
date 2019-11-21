@@ -16,12 +16,12 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1574277593710</id>
+			<id>1574348595282</id>
 			<name></name>
-			<type>6</type>
+			<type>22</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-false-*.xlsx</arguments>
+				<arguments>1.0-name-matches-false-true-.*\.(xlsx|sql|html)</arguments>
 			</matcher>
 		</filter>
 	</filteredResources>
