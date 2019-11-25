@@ -165,22 +165,22 @@ public class SpreadSheet extends Text{
 	12	22	32	42
 	13	23	33	43
 	*/
-	public void transposeMatrix(){
-		String notMatchColumn = NOT_MATCH_COLUMN;
+	public boolean transposeMatrix(){
+		String notMatchColumn = ERR_NOT_MATCH_COLUMN;
 		if(textArea.getSelectedText() != null){
 			notMatchColumn += ", be sure only selected valid text";
 		}
 
 		String t = iniSelectedText();
 
-		if(!java.util.regex.Pattern.compile("\\A(\\p{Print})+\\t").matcher(t).find()){
-			Macros.message(view, "The Selection or Text must Separated by TABS");
-			return;
+		if(countOccurrences(t, "\\t", "r") == 0){
+			Macros.message(view, ERR_INVALID_CSV);
+			return false;
 		}
-
+		
 		if(!isMatchColumns(t)){
 			Macros.message(view, notMatchColumn);
-			return;
+			return false;
 		}
 
 		String transposeText = "";
@@ -193,6 +193,8 @@ public class SpreadSheet extends Text{
 
 		t = transposeText.replaceAll("(?m)(\\n$|[ \\t]*$)", "");
 		endSelectedText(t);
+		
+		return true;
 	}
 
 	/**

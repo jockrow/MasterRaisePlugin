@@ -30,46 +30,15 @@ import javax.swing.border.EmptyBorder;
 
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.EditBus;
-import org.gjt.sp.jedit.EditPane;
 import org.gjt.sp.jedit.Macros;
 import org.gjt.sp.jedit.Registers;
-import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.msg.PositionChanging;
-import org.gjt.sp.jedit.textarea.TextArea;
 
 import masterraise.Text;
 import masterraise.files.MrFile;
 
 public class Query extends Text{
-	private final static String ROUND_BRACKET_LEFT  = "___";
-	private final static String ROUND_BRACKET_RIGHT = "_____";
-	private final static String COMA                = "__";
-	private final static String SHARP               = "____";
-	private final static String DOT                 = "_______";
-	private final static String TRIM_COMA           = "[ \\t]*,[ \\t]*";
-
-	private final static String REGEXP_SQL_OBJECT = "(\\w+\\.){0,}+\\w+";
-	private final static String REGEXP_SQL_FUNC_VALUES = "\\w+\\(([' \\t]*[\\w/]+[' \\t,.]*)+\\)";
-	private final static String REGEXP_SQL_QUOTES_VALUES = "'([ \\t,]*\\w+)+'";
-	private final static String REGEXP_SQL_ALIAS = "([a-z] )((AS ){0,1}\\w+)";
-	private final static String REGEXP_SQL_RESERVED = "\\b(insert|into|values|update|set|as|not|like|in|inner|right|left|join|on|select|distinct|convert|case|when|then|else|end|sum|count|max|min|datetime|smallint|int|varchar|dateadd|isnull|null|from|where|and|or|with|nolock|union|group by|order by|having|desc|cast|concat|substr|declare|numeric)\\b";
-	private final static String REGEXP_SQL_COMMENT = "[ \\t]*--.*|/\\*([\\n\\t ]*([#\\w áéíóú]+\\n*)+[\\n\\t ]*)+\\*/";
-	private final static String REGEXP_SQL_DOUBLE_SPACES = "[ ]{2,}";
-	private final static String REGEXP_SQL_RESERVED_LINE = "\\b(SET|FROM|WHERE|AND|OR|ORDER|INNER|RIGHT|LEFT)\\b";
-	private final static String REGEXP_SQL_LAST_SEMICOLON = "[\\t ]*;+[\\t ]*$(\\n)*\\z";
-	private final static String REGEXP_SQL_FUNCTION = REGEXP_SQL_OBJECT + "[ \\t]*\\([ \\t]*[ \\(:\\d\\w',\\./-]+\\)+";
-	private final static String REGEXP_SQL_RESERVED_VALUES = "\\b(SYSDATE)\\b";
-	private final static String REGEXP_SQL_SET = "[ \\t]*SET[ \\t]*";
-	private final static String REGEXP_SQL_NUMBER = "\\d+,\\d+";
-	private final static String REGEXP_SQL_IN_VALUES = "([\\('])([ ]*\\w+)([, ]+)";
-	private final static String REGEXP_CSV_PREFIX = "Structure table: %s\nFIELD	VALUE\n";
-
-	//TODO:Ver si se pueden inicializar estas propiedades en Constantes
-	private final View view = jEdit.getActiveView();
-	private final TextArea textArea = view.getTextArea();
-	private final EditPane editPane = view.getEditPane();
-
 	private Buffer bfTmp = null;
 	private String queryType = "";
 	private JDialog dialog = new JDialog(view, "Convert Query", true);
@@ -118,7 +87,7 @@ public class Query extends Text{
 				return true;
 			}
 			if(!new SpreadSheet().isMatchColumns(selectedText.replaceAll("\\A.*\n", ""))){
-				msgSyntaxError = NOT_MATCH_COLUMN;
+				msgSyntaxError = ERR_NOT_MATCH_COLUMN;
 				return true;
 			}
 
@@ -131,7 +100,7 @@ public class Query extends Text{
 			}
 			else{
 				if(countOccurrences(selectedText, "\\t", "r") == 0){
-					msgSyntaxError = "Text must have Tabs";
+					msgSyntaxError = ERR_INVALID_CSV;
 					return true;
 				}
 				if(countOccurrences(selectedText, "\\A" + REGEXP_SQL_OBJECT + "[ \\t]*\\n", "ir") == 0){
@@ -434,6 +403,9 @@ public class Query extends Text{
 	Convert a query in another query
 	 */
 	public class ConvertQuery{
+		private static final String SELECT = "SELECT";
+		private static final String SELECT_JOIN = "SELECT JOIN";
+		
 		private String query1 = "";
 		private String query2 = "";
 		private String conversion = "";
@@ -441,8 +413,8 @@ public class Query extends Text{
 		private String csvPrefix = "";
 		private JRadioButton rbFromInsert = new JRadioButton("INSERT");
 		private JRadioButton rbToInsert = new JRadioButton("INSERT");
-		private JRadioButton rbFromSelect = new JRadioButton("SELECT");
-		private JRadioButton rbToSelect = new JRadioButton("SELECT");
+		private JRadioButton rbFromSelect = new JRadioButton(SELECT);
+		private JRadioButton rbToSelect = new JRadioButton(SELECT);
 		private JRadioButton rbFromUpdate = new JRadioButton("UPDATE");
 		private JRadioButton rbToUpdate = new JRadioButton("UPDATE");
 		private JRadioButton rbFromCsv = new JRadioButton("CSV");
@@ -521,6 +493,7 @@ public class Query extends Text{
 			rbToSelect.setEnabled(true);
 			rbToUpdate.setEnabled(true);
 			rbToCsv.setEnabled(true);
+			rbToSelect.setText(SELECT);
 
 			if(rbFromInsert.isSelected()){
 				rbToInsert.setEnabled(false);
@@ -538,6 +511,7 @@ public class Query extends Text{
 			else if(rbFromCsv.isSelected()){
 				rbToCsv.setEnabled(false);
 				rbToInsert.setSelected(true);
+				rbToSelect.setText(SELECT_JOIN);
 			}
 		}
 
@@ -704,16 +678,13 @@ public class Query extends Text{
 				}
 			}
 
-			if(!query1.equals("CSV")) {
-				setNameTable();
-			}
+			setNameTable();
 			
 			switch(conversion){
 			case "CSV_UPDATE":
-				convertQuery("CSV", "INSERT");
-				startFormatQuery();
-				setNameTable();
-				convertQuery("INSERT", "UPDATE");
+				replaceBuffer("\\t", " = ", "r");
+				replaceBuffer("(FIELD = VALUE\\n)((.*\\n.*)+)", "_2.replaceAll(\"(?m)^\", \"\\t, \")", "br");
+				replaceBuffer("(\\A" + REGEXP_SQL_OBJECT + "\\n)(\\t, )", "UPDATE $1SET ", "r");
 				break;
 			case "INSERT_SELECT": case "UPDATE_SELECT":
 				convertQuery("INSERT", "CSV");
@@ -725,6 +696,7 @@ public class Query extends Text{
 			case "SELECT_INSERT": case "UPDATE_INSERT":
 				convertQuery("UPDATE", "CSV");
 				replaceBuffer(csvPrefix, "", "");
+				tableName += "\n";
 				convertQuery("CSV", "INSERT");
 				if(conversion.equals("SELECT_INSERT")){
 					replaceBuffer("(SELECT", "(", "");
@@ -747,19 +719,17 @@ public class Query extends Text{
 				textArea.goToBufferEnd(false);
 				textArea.insertEnterAndIndent();
 				textArea.setSelectedText(fowardQuery);
-				
-				replaceBuffer("(SET.*\\n)((.*\\n)+)", "_1 + _2.replaceAll(\"(?m)^,\", \"\\t,\")", "br");
 			}
+			
+			replaceBuffer("(^SET|SELECT.*\\n)((.*\\n.*)+)", "_1 + _2.replaceAll(\"(?m)^,\", \"\\t,\")", "br");
 			replaceBuffer(TRIM_RIGHT, "", "r");
 			//put semicolon to end of query if had it
 			if(!query2.equals("CSV") && lastSemiColon > 0){
 				replaceBuffer("\\z", ";", "r");
 			}
 			
-//			if(!query1.equals("CSV") && !query2.equals("CSV")){
-//				//TODO:EVITAR EN LO POSIBLE SI NO SE DEBE INVOCAR beautyQuery
-//				new BeautyQuery().beautyQuery("ui");
-//			}
+			replaceBuffer("(\\p{Graph})(,)(\\p{Graph})", "$1, $3", "r");
+			
 			String convertedQuery = bfTmp.getText();
 			closeTempBuffer(bfTmp);
 
@@ -806,8 +776,7 @@ public class Query extends Text{
 				break;
 			}
 
-			switch(conversion){
-			case "CSV_SELECT":
+			if(conversion.equals("CSV_SELECT")){
 				int numLines = countOccurrences(view.getTextArea().getText(), "\n", "r") + 1;
 				boolean hasTwoCols = findBuffer("\\A.*\\t", "ar");
 
@@ -859,7 +828,8 @@ public class Query extends Text{
 
 			switch(query2){
 			case "INSERT":
-				sp.transposeMatrix();
+				if(!sp.transposeMatrix()) return;
+				
 				replaceBuffer("\\t", ", ", "r");
 				textArea.goToBufferStart(false);
 				textArea.goToEndOfWhiteSpace(true);

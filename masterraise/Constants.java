@@ -9,18 +9,42 @@ import org.gjt.sp.jedit.GUIUtilities;
 import org.gjt.sp.jedit.jEdit;
 
 public abstract class Constants {
-	public static String TRIM_UP = "\\A[\\n$ \\t]*";
-	public static String TRIM_DOWN = "[\\n$ \\t]*\\z";
-	public static String TRIM_LEFT = "^[ \\t]+";
-	public static String TRIM_RIGHT = "[ \\t]+$";
-	public static String BLANK_LINE = "(" + TRIM_UP + ")|(" + TRIM_DOWN + ")|(^[ \\t]*\\n)";
-	public static String BLANK_SPACE = "(^[ \\t]+)|([ \\t]+$)";
-	public static String SEP = File.separator;
-	public static String LOW_ENIE = "ñ";
-	
-	public static String NOT_MATCH_COLUMN = "The number columns is not Match";
+	public final static String TRIM_UP = "\\A[\\n$ \\t]*";
+	public final static String TRIM_DOWN = "[\\n$ \\t]*\\z";
+	public final static String TRIM_LEFT = "^[ \\t]+";
+	public final static String TRIM_RIGHT = "[ \\t]+$";
+	public final static String BLANK_LINE = "(" + TRIM_UP + ")|(" + TRIM_DOWN + ")|(^[ \\t]*\\n)";
+	public final static String BLANK_SPACE = "(^[ \\t]+)|([ \\t]+$)";
+	public final static String SEP = File.separator;
+	public final static String LOW_ENIE = "ñ";
 
-	public static String[][] ARR_CHARS = {
+	public final static String ERR_NOT_MATCH_COLUMN = "The number columns is not Match";
+	public final static String ERR_INVALID_CSV = "Text must have Tabs";
+	
+	public final static String ROUND_BRACKET_LEFT  = "___";
+	public final static String ROUND_BRACKET_RIGHT = "_____";
+	public final static String COMA                = "__";
+	public final static String SHARP               = "____";
+	public final static String DOT                 = "_______";
+	public final static String TRIM_COMA           = "[ \\t]*,[ \\t]*";
+
+	public final static String REGEXP_SQL_OBJECT = "(\\w+\\.){0,}+\\w+";
+	public final static String REGEXP_SQL_FUNC_VALUES = "\\w+\\(([' \\t]*[\\w/]+[' \\t,.]*)+\\)";
+	public final static String REGEXP_SQL_QUOTES_VALUES = "'([ \\t,]*\\w+)+'";
+	public final static String REGEXP_SQL_ALIAS = "([a-z] )((AS ){0,1}\\w+)";
+	public final static String REGEXP_SQL_RESERVED = "\\b(insert|into|values|update|set|as|not|like|in|inner|right|left|join|on|select|distinct|convert|case|when|then|else|end|sum|count|max|min|datetime|smallint|int|varchar|dateadd|isnull|null|from|where|and|or|with|nolock|union|group by|order by|having|desc|cast|concat|substr|declare|numeric)\\b";
+	public final static String REGEXP_SQL_COMMENT = "[ \\t]*--.*|/\\*([\\n\\t ]*([#\\w Ã¡Ã©Ã­Ã³Ãº]+\\n*)+[\\n\\t ]*)+\\*/";
+	public final static String REGEXP_SQL_DOUBLE_SPACES = "[ ]{2,}";
+	public final static String REGEXP_SQL_RESERVED_LINE = "\\b(SET|FROM|WHERE|AND|OR|ORDER|INNER|RIGHT|LEFT)\\b";
+	public final static String REGEXP_SQL_LAST_SEMICOLON = "[\\t ]*;+[\\t ]*$(\\n)*\\z";
+	public final static String REGEXP_SQL_FUNCTION = REGEXP_SQL_OBJECT + "[ \\t]*\\([ \\t]*[ \\(:\\d\\w',\\./-]+\\)+";
+	public final static String REGEXP_SQL_RESERVED_VALUES = "\\b(SYSDATE)\\b";
+	public final static String REGEXP_SQL_SET = "[ \\t]*SET[ \\t]*";
+	public final static String REGEXP_SQL_NUMBER = "\\d+,\\d+";
+	public final static String REGEXP_SQL_IN_VALUES = "([\\('])([ ]*\\w+)([, ]+)";
+	public final static String REGEXP_CSV_PREFIX = "Structure table: %s\nFIELD	VALUE\n";
+
+	public final static String[][] ARR_CHARS = {
 	{"Á","capital a, acute accent","&Aacute;","&#193;","A"}
 	,{"á","small a, acute accent","&aacute;","&#225;","a"}
 	,{"É","capital e, acute accent","&Eacute;","&#201;","E"}
@@ -220,7 +244,7 @@ public abstract class Constants {
 	,{"˝","","&dblac;"}
 	};
 	
-	public static void enclosesMenu(JMenu menu) {
+	public final static void enclosesMenu(JMenu menu) {
 		menu.add(createSubMenu("enc-admiration"));
 		menu.add(createSubMenu("enc-curly-bracket"));
 		menu.add(createSubMenu("enc-double-quote"));
@@ -233,7 +257,7 @@ public abstract class Constants {
 		menu.add(createSubMenu("enc-square-bracket"));
 	}
 	
-	public static void textObjectMenu(JMenu menu) {
+	public final static void textObjectMenu(JMenu menu) {
 		menu.add(createSubMenu("textobjects.select-a-word"));
 		menu.add(createSubMenu("textobjects.select-in-word"));
 		menu.add(createSubMenu("textobjects.select-a-brace"));
