@@ -1,0 +1,3 @@
+String firsUpperCase(text,separator){
+	return new masterraise.Text().firsUpperCase(text,separator);
+}

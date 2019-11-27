@@ -36,10 +36,10 @@
 		<jar jarfile="${install.dir}/${jar.name}">
 			<fileset dir="${build.dir}">   
 				<exclude name="build*"/>
-				<exclude name="test*"/>
+				<exclude name="test"/>
 				<exclude name="\.*"/>
 				<exclude name="\.*/"/>
-				<exclude name="**/*Test.class" />
+				<exclude name="**/*Test*.class" />
 			</fileset>
 		</jar>
 	</target>

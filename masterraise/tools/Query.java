@@ -46,7 +46,6 @@ public class Query extends Text{
 	private JPanel buttonPanel = new JPanel();
 	private JButton btnOk = new JButton("Convert");
 	private JButton btnCancel = new JButton("Cancel");
-	private String selectedText = "";
 	private String msgSyntaxError = "Syntax Error in %s Query";
 
 	public BeautyQuery getBeautyQuery(){
@@ -63,7 +62,7 @@ public class Query extends Text{
 	 */
 	private boolean hasSyntaxError(){
 		boolean syntaxError = false;
-		if(queryType.indexOf("CSV_") < 0) {
+		if(queryType.indexOf("CSV") < 0) {
 			if(queryType.equals("")){
 				syntaxError = true;
 			}
@@ -91,7 +90,7 @@ public class Query extends Text{
 				return true;
 			}
 
-			if(queryType.equals("CSV_SELECT")){
+			if(queryType.equals("CSV_SELECT JOIN")){
 				int numLinesWithTabs = countOccurrences(selectedText, "[^\\t]\\t.*", "r");
 				if(numLinesWithTabs != 0 && countOccurrences(selectedText, "\\A" + REGEXP_SQL_OBJECT + "[ \\t]*$", "ir") > 0){
 					msgSyntaxError = "Please Quit the table name, only must have data";
@@ -408,8 +407,8 @@ public class Query extends Text{
 		
 		private String query1 = "";
 		private String query2 = "";
-		private String conversion = "";
-		private String tableName = "";
+		private String convertion = "";
+		private String nameTable = "";
 		private String csvPrefix = "";
 		private JRadioButton rbFromInsert = new JRadioButton("INSERT");
 		private JRadioButton rbToInsert = new JRadioButton("INSERT");
@@ -437,7 +436,7 @@ public class Query extends Text{
 		public ConvertQuery() { }
 
 		public String getResult(){
-			return conversion;
+			return convertion;
 		}
 
 		/**
@@ -460,16 +459,18 @@ public class Query extends Text{
 				deleteRegExpToReplace = "^\\w+ ";
 				break;
 			case "CSV":
-				if(!query2.equals("SELECT")){
+				if(!query2.equals("SELECT JOIN")){
 					regExQuery = "\\A" + REGEXP_SQL_OBJECT + "\\n";
 					deleteRegExpToReplace = "";
 				}
 				break;
 			}
 
-			findBuffer(regExQuery, "air");
-			tableName = textArea.getSelectedText().replaceAll(deleteRegExpToReplace, "");
-			textArea.delete();
+			if(!query2.equals("SELECT JOIN")){
+				findBuffer(regExQuery, "air");
+				nameTable = textArea.getSelectedText().replaceAll(deleteRegExpToReplace, "");
+				textArea.delete();
+			}
 		}
 
 		private void startFormatQuery(){	
@@ -650,15 +651,8 @@ public class Query extends Text{
 			String fowardQuery = "";
 			int lastSemiColon = replaceBuffer(REGEXP_SQL_LAST_SEMICOLON, "", "ar");
 
-			conversion = query1 + "_" + query2;
-			queryType = query1;
-
-			if(conversion.equals("CSV_SELECT")){
-				queryType = conversion;
-			}
-			else if(query1.equals("CSV") && !query2.equals("CSV_SELECT")){
-				queryType = "CSV_";
-			}
+			convertion = query1 + "_" + query2;
+			queryType = query2.equals("SELECT JOIN") ? convertion : query1;
 
 			startFormatQuery();
 
@@ -680,25 +674,25 @@ public class Query extends Text{
 
 			setNameTable();
 			
-			switch(conversion){
+			switch(convertion){
 			case "CSV_UPDATE":
 				replaceBuffer("\\t", " = ", "r");
-				replaceBuffer("(FIELD = VALUE\\n)((.*\\n.*)+)", "_2.replaceAll(\"(?m)^\", \"\\t, \")", "br");
-				replaceBuffer("(\\A" + REGEXP_SQL_OBJECT + "\\n)(\\t, )", "UPDATE $1SET ", "r");
+				replaceBuffer("^", "\\t, ", "r");
+				replaceBuffer("\\A\\t,", "UPDATE " + nameTable + "SET", "r");
 				break;
 			case "INSERT_SELECT": case "UPDATE_SELECT":
 				convertQuery("INSERT", "CSV");
 				replaceBuffer(csvPrefix, "", "r");
 				replaceBuffer("\t|^", ", ", "r");
 				replaceBuffer("\\A,", "SELECT", "r");
-				replaceBuffer("\\z", "\nFROM " + tableName, "r");
+				replaceBuffer("\\z", "\nFROM " + nameTable, "r");
 				break;
 			case "SELECT_INSERT": case "UPDATE_INSERT":
 				convertQuery("UPDATE", "CSV");
 				replaceBuffer(csvPrefix, "", "");
-				tableName += "\n";
+				nameTable += "\n";
 				convertQuery("CSV", "INSERT");
-				if(conversion.equals("SELECT_INSERT")){
+				if(convertion.equals("SELECT_INSERT")){
 					replaceBuffer("(SELECT", "(", "");
 				}
 				break;
@@ -751,7 +745,7 @@ public class Query extends Text{
 					replaceBuffer(TRIM_COMA, ",", "r");
 					replaceBuffer("\\)" + TRIM_DOWN, "", "r");
 					formatSpecialValues(true, false);
-					if(!conversion.equals("UPDATE_SELECT")){
+					if(!convertion.equals("UPDATE_SELECT")){
 						sp.transposeMatrix();
 					}
 					formatSpecialValues(false, true);
@@ -769,14 +763,14 @@ public class Query extends Text{
 				formatSpecialValues(true, true);
 				break;
 			case "CSV":
-				replaceBuffer("\"", "", "");
-				//				//remove spaces like trim
-				//				replaceBuffer(TRIM_UP, "", "r");
-				//				replaceBuffer(TRIM_DOWN, "", "r");
+//				replaceBuffer("\"", "", "");
+//				replaceBuffer(TRIM_UP, "", "r");
+//				replaceBuffer(TRIM_DOWN, "", "r");
+				replaceBuffer("\"|" + TRIM_UP + "|" + TRIM_DOWN, "", "");
 				break;
 			}
 
-			if(conversion.equals("CSV_SELECT")){
+			if(query2.equals("SELECT JOIN")){
 				int numLines = countOccurrences(view.getTextArea().getText(), "\n", "r") + 1;
 				boolean hasTwoCols = findBuffer("\\A.*\\t", "ar");
 
@@ -833,17 +827,17 @@ public class Query extends Text{
 				replaceBuffer("\\t", ", ", "r");
 				textArea.goToBufferStart(false);
 				textArea.goToEndOfWhiteSpace(true);
-				replaceSelection(".*", "INSERT INTO " + tableName + "($0)", "r");
+				replaceSelection(".*", "INSERT INTO " + nameTable + "($0)", "r");
 				textArea.goToBufferEnd(false);
 				textArea.goToStartOfWhiteSpace(true);
 				replaceSelection(".*", "VALUES($0)", "r");
 				break;
 			case "UPDATE":
 				replaceBuffer("\\t", " = ", "r");
-				replaceBuffer("\\A, ", "UPDATE " + tableName + "\\nSET ", "r");
+				replaceBuffer("\\A, ", "UPDATE " + nameTable + "\\nSET ", "r");
 				break;
 			case "CSV":
-				csvPrefix = String.format(REGEXP_CSV_PREFIX, new Object[] { tableName });
+				csvPrefix = String.format(REGEXP_CSV_PREFIX, new Object[] { nameTable });
 				replaceBuffer(REGEXP_SQL_SET, "", "ir");
 				replaceBuffer("\\A", csvPrefix, "r");
 				replaceBuffer(BLANK_LINE, "", "r");
@@ -884,13 +878,13 @@ public class Query extends Text{
 	 */
 	public void queryToLanguage(){
 		Buffer bfTmp = openTempBuffer();
-		replaceBuffer("^[ \t]+", "", "r");
-		firsUpperCase();
+		replaceBuffer(TRIM_LEFT, "", "r");
 
-		replaceSelection("_", "", "");
-		replaceSelection("(^)(\\w)(.*.)($)", "\"private String \" + _2.toLowerCase() + _3 + \" = \\\"\\\";\"", "br");
-
-		String selectedText = textArea.getSelectedText() + "\n\n";
+		//TODO: REEMPLAZAR todo textArea.getSelectedText() por selectedText
+		textArea.setText(firsUpperCase(selectedText, '_'));
+		replaceBuffer("_", "", "");
+		replaceBuffer("(^)(\\w)(.*.)($)", "\"private String \" + _2.toLowerCase() + _3 + \" = \\\"\\\";\"", "br");
+		selectedText = textArea.getText() + "\n\n";
 
 		new Java().genGetSet();
 
@@ -1101,52 +1095,60 @@ public class Query extends Text{
 	 * Identify temporal variables into Stored Procedure
 	 */
 	public void sqlServerIdentifyTmpTables(){
-		if(findBuffer("#", "a")){
-			textArea.selectAll();
-			String selectedText = textArea.getSelectedText();
-			jEdit.newFile(view);
-			textArea.setSelectedText(selectedText);
-
-			//Quito todos los comentarios para no usar las tablas que se encuentran en ellos
-			replaceBuffer("[ \\t]*--.*|/\\*([\\n\\t ]*([#\\w αινσϊ]+\\n)+[\\n\\t ]*)+\\*/", "", "ir");
-
-			//no toma las llaves primarias de la tabla temporal como si fuera tabla, ejemplo: xll#SPDI
-			replaceBuffer("\\w+#\\b\\w+\\b", "\\n$0\\n", "ir");
-			replaceBuffer("(\\w+)(#)(\\b\\w+\\b)", "$1__$3", "ir");
-			replaceBuffer("#{1,2}\\b[^ 0-9\\(]+\\w+\\b", "\\n$0\\n", "ir");
-			replaceBuffer("^.*#[!\"$%&'\\(\\)*+,-./:;=>?@\\[\\\\\\]^_`{|}~].*\\n", "", "ir");
-			// replace all lines that doesn't begin for temp table (#temporal)
-			replaceBuffer("^[^#].*(\\n|\\z)", "", "ir");
-			// remove possibles extrange chars
-			replaceBuffer("[!\"$%&'\\(\\)*+,-./:;=>?@\\[\\\\\\]^`{|}~]", "", "r");
-			replaceBuffer("(^[ \\t]+|[ \\t]+$)", "", "r");
-
-			textArea.selectAll();
-			selectedText = textArea.getSelectedText();
-
-			textArea.selectAll();
-			textArea.toUpperCase();
-			deleteDuplicates(textArea);
-
-			replaceBuffer("^", "DROP TABLE ", "ir");
-			replaceBuffer("^DROP TABLE ##", "--DROP TABLE ##", "r");
-			sortLines(textArea);
-			textArea.goToBufferEnd(false);
-			textArea.insertEnterAndIndent();
-			textArea.insertEnterAndIndent();
-			replaceBuffer("\\A^\\n", "", "r");
-
-			closeTempBuffer(bfTmp);
-
-			textArea.goToBufferStart(false);
-			EditBus.send(new PositionChanging(editPane));
-			Registers.paste(textArea,'$',false);
-			textArea.goToBufferStart(true);
-			replaceSelection("DROP TABLE", "SELECT * FROM", "i");
-		}
-		else{
+//		if(findBuffer("#", "a")){
+		if(!findBuffer("#", "a")){
 			Macros.message(view, "Not found temp tables");
+			return;
 		}
+//			textArea.selectAll();
+//			String selectedText = textArea.getSelectedText();
+//			jEdit.newFile(view);
+//			textArea.setSelectedText(selectedText);
+		Buffer bfTmp = openTempBuffer();
+
+		//Quito todos los comentarios para no usar las tablas que se encuentran en ellos
+//		replaceBuffer("[ \\t]*--.*|/\\*([\\n\\t ]*([#\\w αινσϊ]+\\n)+[\\n\\t ]*)+\\*/", "", "ir");
+		replaceBuffer(REGEXP_SQL_COMMENT, "", "ir"); 
+
+		//don't take primary keys from temp table like if this would a normal table, example: xll#SPDI
+		replaceBuffer("\\w+#\\b\\w+\\b", "\\n$0\\n", "ir");
+		replaceBuffer("(\\w+)(#)(\\b\\w+\\b)", "$1__$3", "ir");
+		replaceBuffer("#{1,2}\\b[^ 0-9\\(]+\\w+\\b", "\\n$0\\n", "ir");
+		replaceBuffer("^.*#[!\"$%&'\\(\\)*+,-./:;=>?@\\[\\\\\\]^_`{|}~].*\\n", "", "ir");
+		// replace all lines that doesn't begin for temp table (#temporal)
+		replaceBuffer("^[^#].*(\\n|\\z)", "", "ir");
+		// remove possibles extrange chars
+		replaceBuffer("[!\"$%&'\\(\\)*+,-./:;=>?@\\[\\\\\\]^`{|}~]", "", "r");
+		replaceBuffer("(^[ \\t]+|[ \\t]+$)", "", "r");
+
+		textArea.selectAll();
+		selectedText = textArea.getSelectedText();
+
+		textArea.selectAll();
+		textArea.toUpperCase();
+		deleteDuplicates(textArea);
+
+		replaceBuffer("^", "DROP TABLE ", "ir");
+		replaceBuffer("^DROP TABLE ##", "--DROP TABLE ##", "r");
+		sortLines(textArea);
+		textArea.goToBufferEnd(false);
+		textArea.insertEnterAndIndent();
+		textArea.insertEnterAndIndent();
+		replaceBuffer("\\A^\\n", "", "r");
+
+//		closeTempBuffer(bfTmp);
+
+		textArea.goToBufferStart(false);
+		EditBus.send(new PositionChanging(editPane));
+		Registers.paste(textArea,'$',false);
+		textArea.goToBufferStart(true);
+		replaceSelection("DROP TABLE", "SELECT * FROM", "i");
+
+		closeTempBuffer(bfTmp);
+//		}
+//		else{
+//			Macros.message(view, "Not found temp tables");
+//		}
 	}
 
 	/**
@@ -1175,7 +1177,7 @@ public class Query extends Text{
 	 */
 	public void oracleLdrToBatRenameImages(){
 		final String LDR_FILE = "\\TABLE_EXPORT_DATA.ldr";
-		String selectedText = textArea.getSelectedText();
+		selectedText = textArea.getSelectedText();
 		if(selectedText=="" || selectedText==null){
 			Macros.message(view, "Must Select a Text");
 			return;
