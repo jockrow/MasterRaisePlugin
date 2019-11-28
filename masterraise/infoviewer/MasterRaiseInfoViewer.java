@@ -1,9 +1,3 @@
-/**********************************************/
-/*      Develop by Richard Martinez 2012      */
-/**********************************************/
-/**
- * Show the infoViewer under word from caret if search by searcher or api
- */
 package masterraise.infoviewer;
 
 import java.util.Vector;
@@ -14,14 +8,20 @@ import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.util.Log;
 
-public class MasterRaiseInfoViewer {
-	/***
-	* Open all valid urls from a selected text
-	* if select unique one line you can browser url
-	* if the unique one line is not valid url this find the selected prhase or word
-	***/
+/**
+ * Show the infoViewer under word from caret if search by searcher or api
+ * @author Richard Martinez 2012
+ */
+public class MasterRaiseInfoViewer{
+	private static View view = jEdit.getActiveView();
+	
+	/**
+	 * Open browser with valid url from a selected text
+	 * @param url
+	 * if select unique one line you can browser url
+	 * if the unique one line is not valid url this find the selected prhase or word
+	 */
 	public static void showBrowser(String url) {
-		View view = jEdit.getActiveView();
 		String[] arrLines = url.split("\\n");
 		Pattern p = Pattern.compile("((https?|ftp)://)?(\\w+\\.\\w+)+(\\p{Graph})*");
 		
@@ -48,7 +48,6 @@ public class MasterRaiseInfoViewer {
 	}
 	
 	private static void goPage(String url){
-		View view = jEdit.getActiveView();
 		String cmd = jEdit.getProperty("infoviewer.otherBrowser");
 		String[] args = convertCommandString(cmd, url);
 		

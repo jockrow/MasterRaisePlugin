@@ -4,16 +4,12 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ConcurrentModificationException;
 
-import org.gjt.sp.jedit.Macros;
-import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
-import org.junit.Before;
 import org.junit.Test;
 
 import masterraise.files.MrFile;
 import masterraise.tools.Query;
 import masterraise.tools.Query.ConvertQuery;
-
 /*
 	SELECT_UPDATE	SELECT_INSERT	INSERT_SELECT	INSERT_UPDATE	INSERT_CSV	UPDATE_INSERT	UPDATE_SELECT	UPDATE_CSV	CSV_INSERT	CSV_SELECT	CSV_UPDATE
 convert	ok	ok	ok	ok	ok	ok	ok	ok	ok	ok	ok
@@ -55,107 +51,133 @@ SET CODIGO_SICA = '1700100378'
 WHERE CODIGO_SICA = '2529300114';
 */
 public class QueryTest extends Tester{
-	private View view = jEdit.getActiveView();
+	private static final String PATH = TEST_PATH + "convert/";
+	String convertion = "";
 
-	@Before
-	public void setUp() throws Exception {
-//		view = jEdit.getActiveView();
-//		textArea = view.getTextArea();
-		
-//		System.out.println("...setUp.isMainThread:" + jEdit.isMainThread());
-//		System.out.println("...setUp.length:" + jEdit.getViews().length);
-//		System.out.println("...setUp.view:" + view);
-//		System.out.println("...setUp.Count:" + jEdit.getViewCount());
-//		System.out.println("...setUp.lastView:" + jEdit.getLastView());
-//		System.out.println(String.format("file.encoding: %s", System.getProperty("file.encoding")));
-	}
-
-//	@After
-//	public void tearDown() throws Exception {
-//		System.out.println("...tearDown");
-//	}
-
-	@Test //DONE
+	@Test
 	public void convertSelectToUpdate() {
 		setVars("SELECT", "UPDATE");
 		assertEquals(contentTo.trim(), convertedQuery.trim());
 	}
 
-//	@Test //TODO
-//	public void convertSelectToInsert() {
-//		setVars("SELECT", "INSERT");
-//		assertEquals(contentTo.trim(), convertedQuery.trim());
-//	}
-//
-//	@Test //TODO
-//	public void convertInsertToSelect() {
-//		setVars("INSERT", "SELECT");
-//		assertEquals(contentTo.trim(), convertedQuery.trim());
-//	}
-//
-//	@Test //TODO
-//	public void convertInsertToUpdate() {
-//		setVars("INSERT", "UPDATE");
-//		assertEquals(contentTo.trim(), convertedQuery.trim());
-//	}
-//
-//	@Test //TODO
-//	public void convertInsertToCsv() {
-//		setVars("INSERT", "CSV");
-//		assertEquals(contentTo.trim(), convertedQuery.trim());
-//	}
-//
-//	@Test //TODO
-//	public void convertUpdateToInsert() {
-//		setVars("UPDATE", "INSERT");
-//		assertEquals(contentTo.trim(), convertedQuery.trim());
-//	}
+	@Test
+	public void convertSelectToInsert() {
+		setVars("SELECT", "INSERT");
+		assertEquals(contentTo.trim(), convertedQuery.trim());
+	}
 
-	@Test //DONE
+	@Test
+	public void convertInsertToSelect() {
+		setVars("INSERT", "SELECT");
+		assertEquals(contentTo.trim(), convertedQuery.trim());
+	}
+
+	@Test
+	public void convertInsertToUpdate() {
+		setVars("INSERT", "UPDATE");
+		assertEquals(contentTo.trim(), convertedQuery.trim());
+	}
+
+	@Test
+	public void convertInsertToCsv() {
+		setVars("INSERT", "CSV");
+		assertEquals(contentTo.trim(), convertedQuery.trim());
+	}
+
+	@Test
+	public void convertUpdateToInsert() {
+		setVars("UPDATE", "INSERT");
+		assertEquals(contentTo.trim(), convertedQuery.trim());
+	}
+
+	@Test
 	public void convertUpdateToSelect() {
 		setVars("UPDATE", "SELECT");
 		assertEquals(contentTo.trim(), convertedQuery.trim());
 	}
-	
-//	@Test //TODO
-//	public void convertUpdateToCsv() {
-//		setVars("UPDATE", "CSV");
-//		assertEquals(contentTo.trim(), convertedQuery.trim());
-//	}
-//
-//	@Test //TODO
-//	public void convertCsvToInsert() {
-//		setVars("CSV", "INSERT");
-//		assertEquals(contentTo.trim(), convertedQuery.trim());
-//	}
-//
-//	@Test //TODO
-//	public void convertCsvToSelect() {
-//		setVars("CSV", "SELECT");
-//		assertEquals(contentTo.trim(), convertedQuery.trim());
-//	}
-//
-//	@Test //TODO
-//	public void convertCsvToUpdate() {
-//		setVars("CSV", "UPDATE");
-//		assertEquals(contentTo.trim(), convertedQuery.trim());
-//	}
+
+	@Test
+	public void convertUpdateToCsv() {
+		setVars("UPDATE", "CSV");
+		assertEquals(contentTo.trim(), convertedQuery.trim());
+	}
+
+	@Test
+	public void convertCsvToInsert() {
+		setVars("CSV", "INSERT");
+		assertEquals(contentTo.trim(), convertedQuery.trim());
+	}
+
+	@Test
+	public void convertCsvToSelect() {
+		setVars("CSV", "SELECT JOIN");
+		assertEquals(contentTo.trim(), convertedQuery.trim());
+	}
+
+	@Test
+	public void convertCsvToUpdate() {
+		setVars("CSV", "UPDATE");
+		assertEquals(contentTo.trim(), convertedQuery.trim());
+	}
+
+	private void executeAgain(String query1, String query2) {
+		switch(convertion) {
+		case "SELECT_UPDATE":
+			convertSelectToUpdate();
+			break;
+		case "SELECT_INSERT":
+			convertSelectToInsert();
+			break;
+		case "INSERT_SELECT":
+			convertInsertToSelect();
+			break;
+		case "INSERT_UPDATE":
+			convertInsertToUpdate();
+			break;
+		case "INSERT_CSV":
+			convertInsertToCsv();
+			break;
+		case "UPDATE_INSERT":
+			convertUpdateToInsert();
+			break;
+		case "UPDATE_SELECT":
+			convertUpdateToSelect();
+			break;
+		case "UPDATE_CSV":
+			convertUpdateToCsv();
+			break;
+		case "CSV_INSERT":
+			convertCsvToInsert();
+			break;
+		case "CSV_SELECT":
+			convertCsvToSelect();
+			break;
+		case "CSV_UPDATE":
+			convertCsvToUpdate();
+			break;
+		}
+	}
 
 	private void setVars(String query1, String query2) {
 		String fromFolder = PATH + "from/" + query1 + ".sql";
 		String convertedFolder = PATH + "converted/" + query1 + "_" + query2 + ".sql";
 		contentTo = new MrFile().readFile(convertedFolder);
-		
+		convertion = query1 + "_" + query2;
+
+		if(convertion.equals("CSV_SELECT JOIN")) {
+			fromFolder = PATH + "from/CSV_SELECT_JOIN.sql";
+		}
+
 		try {
-			view.setFocusable(true);
-			view.getMousePosition(true);
 			jEdit.openFile(view, fromFolder);
 			ConvertQuery cq = new Query().new ConvertQuery(query1, query2);
-			view.repaint();
 			convertedQuery = cq.processText();
 		} catch (ConcurrentModificationException e) {
 			e.printStackTrace();
-			Macros.error(view, MSG_ERROR);
+			executeAgain(query1, query2); 
+		} catch (Exception e) {
+			e.printStackTrace();
+			executeAgain(query1, query2);
 		}
 	}
 }

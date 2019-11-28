@@ -10,23 +10,16 @@ import java.lang.reflect.Method;
 import javax.swing.JDialog;
 import javax.swing.JMenuBar;
 
+import org.gjt.sp.jedit.Buffer;
+
 import masterraise.Text;
 
-import org.gjt.sp.jedit.Buffer;
-import org.gjt.sp.jedit.View;
-import org.gjt.sp.jedit.jEdit;
-import org.gjt.sp.jedit.textarea.TextArea;
-
 public class Java extends Text{
-	private final View view = jEdit.getActiveView();
-	private final TextArea textArea = view.getTextArea();
-	
 	/**
-	 * Method genGetSet()
 	 * Create get and set Methods from Class fields
-	 *
-	 * Example:
+	 * @example
 	 * private String variable = "";
+	 * <pre>
 	 * To:
 	 * public String getVariable(){
 	 * 	return variable;
@@ -56,10 +49,10 @@ public class Java extends Text{
 	}
 	
 	/**
-	 * Method fields2javaProperties()
 	 * convert the fields from sql columns to java properties, get and set
 	 * @example
 	 * convert from:
+	 * <pre>
 	 * "ID_PERSONAL_APOYO" NUMBER,
 	 * "PRIMER_NOMBRE" VARCHAR2(30 BYTE),
 	 * "FECHA_CREACION" DATE,

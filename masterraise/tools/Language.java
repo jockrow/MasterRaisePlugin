@@ -16,56 +16,53 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import org.gjt.sp.jedit.Buffer;
-import org.gjt.sp.jedit.View;
-import org.gjt.sp.jedit.jEdit;
-import org.gjt.sp.jedit.textarea.TextArea;
 
 import masterraise.Text;
-
 /**
+ * 
+ * @author Richard Martinez
+ *
  * language-print-debug-variables
  * prepara unas variables para imprimir en pantalla
  * @example
  * pasa de:
-	uno dos tres
+ * uno dos tres
  *
  * a (en javascript):
-	alert("uno:" + uno + "\n dos:" + dos + "\n tres:" + tres);
+ * alert("uno:" + uno + "\n dos:" + dos + "\n tres:" + tres);
  *---------------------
  * language-generate-url-string
  * Genera una url string
  *
  * @example (javascript):
-uno
-dos
-tres
+ * uno
+ * dos
+ * tres
  * a:
-var url = "?uno=" + uno + "&dos=" + dos + "&tres=" + tres;
+ * var url = "?uno=" + uno + "&dos=" + dos + "&tres=" + tres;
  *---------------------
- *language-code-to-string
- ** prepara unas variables para imprimir en pantalla
+ * language-code-to-string
+ * prepara unas variables para imprimir en pantalla
  * @example
  * pasa de:
-		View view = jEdit.getActiveView();
-		JMenuBar menuBar = view.getJMenuBar();
-		//un comentario
-		JMenu menu = menuBar.getMenu(8);
-		menu.init();
-		//Imprime el mensaje
-		System.out.println("Hello World");
-
+ * 		View view = jEdit.getActiveView();
+ * 		JMenuBar menuBar = view.getJMenuBar();
+ * 		//un comentario
+ * 		JMenu menu = menuBar.getMenu(8);
+ * 		menu.init();
+ * 		//Imprime el mensaje
+ * 		System.out.println("Hello World");
+ * 	
  * 	a (java):
-	String strCode = "View view = jEdit.getActiveView();"
-		+ "\nJMenuBar menuBar = view.getJMenuBar();"
-		//un comentario
-		+ "\nJMenu menu = menuBar.getMenu(8);"
-		+ "\nmenu.init();"
-		//Imprime el mensaje
-		+ "\nSystem.out.println(\"Hello World\");";
+ * 	String strCode = "View view = jEdit.getActiveView();"
+ * 		+ "\nJMenuBar menuBar = view.getJMenuBar();"
+ * 		//un comentario
+ * 		+ "\nJMenu menu = menuBar.getMenu(8);"
+ * 		+ "\nmenu.init();"
+ * 		//Imprime el mensaje
+ * 		+ "\nSystem.out.println(\"Hello World\");";
  */
 public class Language extends Text{
-	private final View view = jEdit.getActiveView();
-	private final TextArea textArea = view.getTextArea();
 	private JDialog dialog  = new JDialog(view, "Print Debug Variables", true);
 	private JPanel content = new JPanel(new BorderLayout());
 	private JComboBox<?> cmbLanguages = null;
@@ -307,6 +304,7 @@ public class Language extends Text{
 	/**
 	 * Convert String to Vars
 	 * @example
+	 * <pre>
 	 * CANT. CAFÉ PERGAMINO SECO
 	 * UNIDAD DE MEDIDA CAFÉ PERGAMINO SECO
 	 * to:

@@ -25,16 +25,15 @@ import javax.swing.text.InternationalFormatter;
 
 import org.gjt.sp.jedit.Macros;
 import org.gjt.sp.jedit.Registers;
-import org.gjt.sp.jedit.View;
-import org.gjt.sp.jedit.jEdit;
-import org.gjt.sp.jedit.textarea.TextArea;
 
 import masterraise.Text;
 
+/**
+ * Tools for Spread Sheets
+ * @author Richard Martinez
+ *
+ */
 public class SpreadSheet extends Text{
-	private final View view = jEdit.getActiveView();
-	private final TextArea textArea = view.getTextArea();
-
 	private String LBL_NUMBERS = "Number to Char";
 	private String COPY_NUMBER = "Copy Number Column";
 	private String COPY_LETTER = "Copy Letter Column";
@@ -154,16 +153,16 @@ public class SpreadSheet extends Text{
 	/**
 	* Transpose the grid for this way:
 	* @example
-	11	12	13
-	21	22	23
-	31	32	33
-	41	42	43
-
-	To:
-
-	11	21	31	41
-	12	22	32	42
-	13	23	33	43
+	* <pre>
+	* 11	12	13
+	* 21	22	23
+	* 31	32	33
+	* 41	42	43
+	* 
+	* To:
+	* 11	21	31	41
+	* 12	22	32	42
+	* 13	23	33	43
 	*/
 	public boolean transposeMatrix(){
 		String notMatchColumn = ERR_NOT_MATCH_COLUMN;

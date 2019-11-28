@@ -1,23 +1,18 @@
-/************************************************
-*			@author Richard Martínez 2011/05/13	*
-*************************************************/
 package masterraise.tools;
-
-import masterraise.Text;
 
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.Macros;
-import org.gjt.sp.jedit.View;
-import org.gjt.sp.jedit.jEdit;
-import org.gjt.sp.jedit.textarea.TextArea;
 
+import masterraise.Text;
+
+/**
+ * Tools for php files
+ * @author Richard Martínez 2011/05/13
+ *
+ */
 public class Php extends Text{
-	private final View view = jEdit.getActiveView();
-	private final TextArea textArea = view.getTextArea();
-	
 	/**
-	 * Method getPhpVarsFields()
-	 * Saca una lista de todos los campos de un archivo html, para transformarlos en variables php
+	 * get list for all fields from html file, to transform in php variables
 	 */
 	public void getVarsFromHtml(){
 		if(!findBuffer("<[ \\t]*(select|input|textarea)[ \\t].*>", "air")){

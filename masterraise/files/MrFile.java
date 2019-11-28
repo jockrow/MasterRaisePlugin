@@ -26,23 +26,16 @@ import javax.swing.JOptionPane;
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.EditPane;
 import org.gjt.sp.jedit.Macros;
-import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.browser.VFSBrowser;
 import org.gjt.sp.jedit.browser.VFSFileChooserDialog;
 import org.gjt.sp.jedit.gui.DockableWindowManager;
 import org.gjt.sp.jedit.gui.StatusBar;
-import org.gjt.sp.jedit.textarea.TextArea;
 
 import masterraise.Text;
 import masterraise.tools.Bulk;
 
 public class MrFile extends Text{
-	private View view = jEdit.getActiveView();
-	private Buffer buffer = view.getBuffer();
-	private TextArea textArea = view.getTextArea();
-	private String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
-
 	public boolean moveFile(String oldPathFile, String newPathFile){
 		File oldFile = new File(oldPathFile);
 		File newFile = new File(newPathFile);
@@ -315,7 +308,6 @@ tres
 	 * Copy all opened buffers in new buffer
 	 */
 	public void joinBuffers(){
-		EditPane editPane = view.getEditPane(); 
 		Buffer[] bf = jEdit.getBuffers();
 		String strCurrentBuffer = "";
 		int current = buffer.getIndex();

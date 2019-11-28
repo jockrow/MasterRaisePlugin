@@ -19,18 +19,12 @@ import javax.swing.JWindow;
 import javax.swing.Timer;
 
 import org.gjt.sp.jedit.Registers;
-import org.gjt.sp.jedit.View;
-import org.gjt.sp.jedit.jEdit;
-import org.gjt.sp.jedit.textarea.TextArea;
 import org.gjt.sp.util.SyntaxUtilities;
 
 import masterraise.MrPopup;
+import masterraise.Text;
 
-public class Color {
-	private View view = jEdit.getActiveView();
-	private TextArea textArea = view.getTextArea();
-	private String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
-	
+public class Color extends Text{
 	java.awt.Color lastColor = null;
 	java.awt.Color c = null;
 	Robot robbie = null;

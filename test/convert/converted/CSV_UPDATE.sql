@@ -3,5 +3,5 @@ SET CODIGO_SICA = '1700100378'
 	, ESTADO_FINCA = 'ACT'
 	, CN_USUARIO_MODIFICACION = 'SICA_USER'
 	, FECHA_MODIFICACION = SYSDATE
-	, Fecha_Inactivacion = TO_DATE('31/01/2016','dd/mm/yyyy')
+	, Fecha_Inactivacion = TO_DATE('31/01/2016', 'dd/mm/yyyy')
 	, Area_Cultivo = 6.24

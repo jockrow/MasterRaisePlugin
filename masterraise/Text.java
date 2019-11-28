@@ -32,9 +32,11 @@ import console.Shell;
  *
  */
 public class Text extends Constants{
-	private View view = jEdit.getActiveView();
-	private TextArea textArea = view.getTextArea();
-	private String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
+	public View view = jEdit.getActiveView();
+	public Buffer buffer = view.getBuffer();
+	public TextArea textArea = view.getTextArea();
+	public EditPane editPane = view.getEditPane();
+	public String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
 	private Console console = (Console) view.getDockableWindowManager().getDockable("console");
 	private Selection[] prevSelection = null;
 
@@ -237,8 +239,6 @@ public class Text extends Constants{
 	}
 
 	public Buffer openTempBuffer(){
-		final EditPane editPane = view.getEditPane();
-
 		//if is not selection take all textArea
 		if(selectedText.trim().equals("")){
 			textArea.selectAll();
@@ -341,28 +341,31 @@ public class Text extends Constants{
 
 	/**
 	 * Toggle the first Case to upperCase for each word
+	 * @param text to convert
+	 * @param separator previous character to convert next first char to Upper Case
+	 * @return text with first case
+	 * 
 	 * @example
 	 * IGEC_GESTOR_PROYECTO or IGEC GESTOR PROYECTO
 	 * for:
 	 * Igec Gestor Proyecto
 	 */
-	public void firsUpperCase(){
-		String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
-		if(selectedText.trim().equals("")){
-			textArea.selectAll();
-			selectedText = textArea.getSelectedText();
+	public String firsUpperCase(String text, char separator){
+	    String nameCapitalized = "";
+	    String[] arrText = text.split("\n");
+	    for (int l = 0; l < arrText.length; l++) {
+	    	String[] arrLine = arrText[l].split(String.valueOf(separator));
+	    	String line = "";
+	    	
+	    	for (int i = 0; i < arrLine.length; i++) {
+	    		line += separator + StringUtils.capitalize(arrLine[i].toLowerCase());
+			}
+	    	nameCapitalized += line.replaceAll("^" + separator, "") + "\n";
 		}
-
-		int numUnderscore = replaceSelection("_", " ", "");
-
-		replaceSelection("([ _\\t]+)(\\p{L})(\\p{L}+)", "_1 + _2.toUpperCase() + _3.toLowerCase()", "bir");
-		replaceSelection("(^\\p{L})(\\p{L}+)", "_1.toUpperCase() + _2.toLowerCase()", "bir");
-
-		if(numUnderscore > 0){
-			replaceSelection(" ", "_", "");
-		}
+	    
+		return nameCapitalized.replaceAll("\n$", "");
 	}
-
+	
 	/**
 	 * Join coherence lines
 	 */
