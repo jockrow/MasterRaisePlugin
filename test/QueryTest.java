@@ -2,8 +2,6 @@ package test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ConcurrentModificationException;
-
 import org.gjt.sp.jedit.jEdit;
 import org.junit.Test;
 
@@ -50,134 +48,108 @@ SET CODIGO_SICA = '1700100378'
 , Area_Cultivo = 6,24
 WHERE CODIGO_SICA = '2529300114';
 */
-public class QueryTest extends Tester{
-	private static final String PATH = TEST_PATH + "convert/";
+public class QueryTest extends Tester {
 	String convertion = "";
 
 	@Test
 	public void convertSelectToUpdate() {
-		setVars("SELECT", "UPDATE");
-		assertEquals(contentTo.trim(), convertedQuery.trim());
+		setVars(CONVERT, "SELECT", "UPDATE");
+		assertEquals(expected.trim(), actual.trim());
 	}
 
 	@Test
 	public void convertSelectToInsert() {
-		setVars("SELECT", "INSERT");
-		assertEquals(contentTo.trim(), convertedQuery.trim());
+		setVars(CONVERT, "SELECT", "INSERT");
+		assertEquals(expected.trim(), actual.trim());
 	}
 
 	@Test
 	public void convertInsertToSelect() {
-		setVars("INSERT", "SELECT");
-		assertEquals(contentTo.trim(), convertedQuery.trim());
+		//TODO:REEMPLAZAR POR setVars("INSERT", "SELECT");
+		setVars(CONVERT, "INSERT", "SELECT");
+		assertEquals(expected.trim(), actual.trim());
 	}
 
 	@Test
 	public void convertInsertToUpdate() {
-		setVars("INSERT", "UPDATE");
-		assertEquals(contentTo.trim(), convertedQuery.trim());
+		setVars(CONVERT, "INSERT", "UPDATE");
+		assertEquals(expected.trim(), actual.trim());
 	}
 
 	@Test
 	public void convertInsertToCsv() {
-		setVars("INSERT", "CSV");
-		assertEquals(contentTo.trim(), convertedQuery.trim());
+		setVars(CONVERT, "INSERT", "CSV");
+		assertEquals(expected.trim(), actual.trim());
 	}
 
 	@Test
 	public void convertUpdateToInsert() {
-		setVars("UPDATE", "INSERT");
-		assertEquals(contentTo.trim(), convertedQuery.trim());
+		setVars(CONVERT, "UPDATE", "INSERT");
+		assertEquals(expected.trim(), actual.trim());
 	}
 
 	@Test
 	public void convertUpdateToSelect() {
-		setVars("UPDATE", "SELECT");
-		assertEquals(contentTo.trim(), convertedQuery.trim());
+		setVars(CONVERT, "UPDATE", "SELECT");
+		assertEquals(expected.trim(), actual.trim());
 	}
 
 	@Test
 	public void convertUpdateToCsv() {
-		setVars("UPDATE", "CSV");
-		assertEquals(contentTo.trim(), convertedQuery.trim());
+		setVars(CONVERT, "UPDATE", "CSV");
+		assertEquals(expected.trim(), actual.trim());
 	}
 
 	@Test
 	public void convertCsvToInsert() {
-		setVars("CSV", "INSERT");
-		assertEquals(contentTo.trim(), convertedQuery.trim());
+		setVars(CONVERT, "CSV", "INSERT");
+		assertEquals(expected.trim(), actual.trim());
 	}
 
 	@Test
 	public void convertCsvToSelect() {
-		setVars("CSV", "SELECT JOIN");
-		assertEquals(contentTo.trim(), convertedQuery.trim());
+		setVars(CONVERT, "CSV", "SELECT JOIN");
+		assertEquals(expected.trim(), actual.trim());
 	}
 
 	@Test
 	public void convertCsvToUpdate() {
-		setVars("CSV", "UPDATE");
-		assertEquals(contentTo.trim(), convertedQuery.trim());
+		setVars(CONVERT, "CSV", "UPDATE");
+		assertEquals(expected.trim(), actual.trim());
 	}
 
-	private void executeAgain(String query1, String query2) {
-		switch(convertion) {
-		case "SELECT_UPDATE":
-			convertSelectToUpdate();
-			break;
-		case "SELECT_INSERT":
-			convertSelectToInsert();
-			break;
-		case "INSERT_SELECT":
-			convertInsertToSelect();
-			break;
-		case "INSERT_UPDATE":
-			convertInsertToUpdate();
-			break;
-		case "INSERT_CSV":
-			convertInsertToCsv();
-			break;
-		case "UPDATE_INSERT":
-			convertUpdateToInsert();
-			break;
-		case "UPDATE_SELECT":
-			convertUpdateToSelect();
-			break;
-		case "UPDATE_CSV":
-			convertUpdateToCsv();
-			break;
-		case "CSV_INSERT":
-			convertCsvToInsert();
-			break;
-		case "CSV_SELECT":
-			convertCsvToSelect();
-			break;
-		case "CSV_UPDATE":
-			convertCsvToUpdate();
-			break;
-		}
+	@Test
+	public void sqlServerGetTmpTables() {
+		setVars(NO_PARAMS, "sqlServerGetTmpTables");
+		actual = new Query().sqlServerGetTmpTables();
+		assertEquals(expected.trim(), actual.trim());
 	}
 
-	private void setVars(String query1, String query2) {
-		String fromFolder = PATH + "from/" + query1 + ".sql";
-		String convertedFolder = PATH + "converted/" + query1 + "_" + query2 + ".sql";
-		contentTo = new MrFile().readFile(convertedFolder);
+	@Test
+	public void sqlServerSetVariablesSp() {
+		setVars(NO_PARAMS, "sqlServerSetVariablesSp");
+		actual = new Query().sqlServerSetVariablesSp();
+		assertEquals(expected.trim(), actual.trim());
+	}
+
+	private void setVars(String convertType, String query1, String query2) {
+		String path = TEST_PATH + convertType + "/";
+		String fileOriginal = path + "from/" + query1 + ".sql";
+		String fileConverted = path + "converted/" + query1 + "_" + query2 + ".sql";
+		expected = new MrFile().readFile(fileConverted);
 		convertion = query1 + "_" + query2;
 
 		if(convertion.equals("CSV_SELECT JOIN")) {
-			fromFolder = PATH + "from/CSV_SELECT_JOIN.sql";
+			fileOriginal = path + "from/CSV_SELECT_JOIN.sql";
 		}
 
 		try {
-			jEdit.openFile(view, fromFolder);
+			jEdit.openFile(view, fileOriginal);
 			ConvertQuery cq = new Query().new ConvertQuery(query1, query2);
-			convertedQuery = cq.processText();
-		} catch (ConcurrentModificationException e) {
-			e.printStackTrace();
-			executeAgain(query1, query2); 
+			actual = cq.processText();
 		} catch (Exception e) {
 			e.printStackTrace();
-			executeAgain(query1, query2);
+			setVars(convertType, query1, query2);
 		}
 	}
 }

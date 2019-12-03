@@ -11,10 +11,11 @@ import org.gjt.sp.jedit.jEdit;
 public abstract class Constants {
 	public final static String TRIM_UP = "\\A[\\n$ \\t]*";
 	public final static String TRIM_DOWN = "[\\n$ \\t]*\\z";
+	public final static String TRIM = TRIM_UP + "|" + TRIM_DOWN;
 	public final static String TRIM_LEFT = "^[ \\t]+";
 	public final static String TRIM_RIGHT = "[ \\t]+$";
 	public final static String BLANK_LINE = "(" + TRIM_UP + ")|(" + TRIM_DOWN + ")|(^[ \\t]*\\n)";
-	public final static String BLANK_SPACE = "(^[ \\t]+)|([ \\t]+$)";
+	public final static String BLANK_SPACE = "(" + TRIM_LEFT + ")|(" + TRIM_RIGHT + ")";
 	public final static String SEP = File.separator;
 	public final static String LOW_ENIE = "ñ";
 
@@ -33,7 +34,7 @@ public abstract class Constants {
 	public final static String REGEXP_SQL_QUOTES_VALUES = "'([ \\t,]*\\w+)+'";
 	public final static String REGEXP_SQL_ALIAS = "([a-z] )((AS ){0,1}\\w+)";
 	public final static String REGEXP_SQL_RESERVED = "\\b(insert|into|values|update|set|as|not|like|in|inner|right|left|join|on|select|distinct|convert|case|when|then|else|end|sum|count|max|min|datetime|smallint|int|varchar|dateadd|isnull|null|from|where|and|or|with|nolock|union|group by|order by|having|desc|cast|concat|substr|declare|numeric)\\b";
-	public final static String REGEXP_SQL_COMMENT = "[ \\t]*--.*|/\\*([\\n\\t ]*([#\\w Ã¡Ã©Ã­Ã³Ãº]+\\n*)+[\\n\\t ]*)+\\*/";
+	public final static String REGEXP_SQL_COMMENT = "[ \\t]*--.*|/\\*([\\n\\t ]*([#\\w áéíóú]+\\n*)+[\\n\\t ]*)+\\*/";
 	public final static String REGEXP_SQL_DOUBLE_SPACES = "[ ]{2,}";
 	public final static String REGEXP_SQL_RESERVED_LINE = "\\b(SET|FROM|WHERE|AND|OR|ORDER|INNER|RIGHT|LEFT)\\b";
 	public final static String REGEXP_SQL_LAST_SEMICOLON = "[\\t ]*;+[\\t ]*$(\\n)*\\z";

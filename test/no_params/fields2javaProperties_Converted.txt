@@ -1,0 +1,11 @@
+private Integer IdPersonalApoyo;
+private String PrimerNombre;
+private Date FechaCreacion;
+
+object.getIdPersonalApoyo(),
+object.getPrimerNombre(),
+object.getFechaCreacion(),
+
+object.setIdPersonalApoyo(resultSet.getInteger("ID_PERSONAL_APOYO"));
+object.setPrimerNombre(resultSet.getString("PRIMER_NOMBRE"));
+object.setFechaCreacion(resultSet.getDate("FECHA_CREACION"));

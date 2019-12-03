@@ -1,0 +1,17 @@
+DECLARE @LINKEO AS VARCHAR(50)
+, @strconvenio AS VARCHAR(5)
+, @strRegional AS VARCHAR(50)
+, @strCadenaPermisos AS VARCHAR (50)
+, @strFIni AS VARCHAR (10)
+, @PageSize AS NUMERIC (18,2)
+, @i_RegInicial INT
+, @i_maxRegistros INT
+
+SET @LINKEO = 'PRESTAR.DBO.'
+SET @strconvenio = '96'
+SET @strRegional = '3, 4'
+SET @strCadenaPermisos = '(1,2)'
+SET @strFIni = NULL
+SET @PageSize = function(1, 2)
+SET @i_RegInicial = 1
+SET @i_maxRegistros = 30

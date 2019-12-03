@@ -1,0 +1,24 @@
+<input id="myform:hidTipoDocArrendador" type="text" name="myform:hidTipoDocArrendador" style="visibility:hidden;">
+<input id="myform:hidNroDocArrendador" type="text" name="myform:hidNroDocArrendador" style="visibility:hidden;">
+<select id="myform:tipoDocArrendador" name="myform:tipoDocArrendador" size="1">
+<input id="myform:nroDocArrendador" type="text" name="myform:nroDocArrendador" onkeypress="return solonumeros(event);" style="text-transform:uppercase">
+<select id="myform:idListaCobertura" name="myform:idListaCobertura" size="1" onchange="document.forms['myform']['myform:submitList'].click();">
+<select id="myform:idMunicipio" name="myform:idMunicipio" size="1" onchange="document.forms['myform']['myform:submitList'].click();" disabled="disabled">
+<select id="myform:idVereda" name="myform:idVereda" size="1" onchange="document.forms['myform']['myform:submitList'].click(); this.form.submit();">
+<input id="myform:idCaficultor" type="text" name="myform:idCaficultor" value="MARTHA BALLESTEROS QUINTERO" readonly="readonly">
+<input id="myform:hidControlArriendo" type="hidden" name="myform:hidControlArriendo" value="false">
+<input id="myform:hidFechaFinContrato" type="hidden" name="myform:hidFechaFinContrato">
+<input id="myform:hidFechaActual" type="hidden" name="myform:hidFechaActual" value="10/04/2019">
+<input id="myform:nombreFinca" type="text" name="myform:nombreFinca" value="EL CAIMAN" maxlength="50">
+<input id="myform:codigoSica" type="text" name="myform:codigoSica" value="7387001502" maxlength="20" disabled="disabled">
+<input id="myform:areaTotal" type="text" name="myform:areaTotal" value="3.0" onblur="validaAreaFinca('El Área Total de la Finca no puede ser menor al Área Café Estimada.');" onkeyup="validateDoublePositivoCustom(this,8,2,'Use punto para separar decimales.','La información digitada no es correcta, por favor ingrese números.','Número invalido.','El área ingresada no es válida. Máximo 8 dígitos enteros y 2 decimales.')">
+<select id="myform:idAerofoto" name="myform:idAerofoto" size="1">
+<select id="myform:idEcotopo" name="myform:idEcotopo" size="1">
+<select id="myform:idTenencia" name="myform:idTenencia" size="1">
+<input id="myform:areaCafeCalculada" type="text" name="myform:areaCafeCalculada" value="1.15" onkeyup="validateDoublePositivoCustom(this,8,2,'Use punto para separar decimales.','La información digitada no es correcta, por favor ingrese números.','Número invalido.','El área ingresada no es válida. Máximo 8 dígitos enteros y 2 decimales.')" disabled="disabled">
+<select id="myform:indResidente" name="myform:indResidente" size="1">
+<input type="hidden" name="myform" value="myform">
+<input type="hidden" name="autoScroll">
+<input type="hidden" name="myform:_idcl">
+<input type="hidden" name="myform:_link_hidden_">
+<input type="hidden" name="jsf_sequence" value="1">

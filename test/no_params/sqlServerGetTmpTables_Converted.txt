@@ -1,0 +1,27 @@
+--DROP TABLE ##NO_MUESTRA
+DROP TABLE #BOOKS
+DROP TABLE #LIBROS
+
+CREATE FUNCTION BooksByPrimaryAuthor
+(
+  @PrimaryAuthor nvarchar(100)
+)
+RETURNS TABLE
+AS
+RETURN
+  SELECT
+    *
+  FROM
+    #books
+  WHERE
+    primary_author = @PrimaryAuthor;
+    
+    
+  SELECT *
+  FROM #libros
+  
+  SELECT *
+  FROM ##no_muestra
+GO
+
+

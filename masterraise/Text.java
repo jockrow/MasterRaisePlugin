@@ -37,6 +37,7 @@ public class Text extends Constants{
 	public TextArea textArea = view.getTextArea();
 	public EditPane editPane = view.getEditPane();
 	public String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
+	public String previousText = "";
 	private Console console = (Console) view.getDockableWindowManager().getDockable("console");
 	private Selection[] prevSelection = null;
 
@@ -228,7 +229,7 @@ public class Text extends Constants{
 		SearchAndReplace.setRegexp(opts.indexOf('r') >= 0);
 		SearchAndReplace.setSearchFileSet(new CurrentBufferSet());
 		boolean result = SearchAndReplace.find(view);
-
+		
 		SearchAndReplace.setAutoWrapAround(aw);
 		SearchAndReplace.setSearchString(oldSearch);
 		SearchAndReplace.setIgnoreCase(ic);
@@ -237,14 +238,14 @@ public class Text extends Constants{
 		SearchAndReplace.setBeanShellReplace(bs);
 		return result;
 	}
-
+	
 	public Buffer openTempBuffer(){
 		//if is not selection take all textArea
 		if(selectedText.trim().equals("")){
-			textArea.selectAll();
-			selectedText = textArea.getSelectedText();
+			selectedText = textArea.getText();
 		}
 		Buffer bfTmp = BufferSetManager.createUntitledBuffer();
+		previousText = selectedText;
 		bfTmp.insert(0, selectedText);
 		editPane.setBuffer(bfTmp);
 		return bfTmp;
@@ -252,12 +253,10 @@ public class Text extends Constants{
 
 	public void closeTempBuffer(Buffer bfTmp){
 		if(!isJUnitTest()) {
-			//TODO: se puede poner textArea.setBuffer(bfTmp) en vez de esto:
-			textArea.selectAll();
-			selectedText = textArea.getSelectedText();
+			selectedText = textArea.getText();
 
 			jEdit._closeBuffer(view, bfTmp);
-			textArea.setSelectedText(selectedText);
+			textArea.setText(selectedText);
 			Registers.setRegister('$', selectedText);
 		}
 	}
@@ -270,14 +269,17 @@ public class Text extends Constants{
 			t=textArea.getSelectedText();
 		}
 		prevSelection = textArea.getSelection();
+		previousText = t;
 
 		return t;
 	}
 
 	public void endSelectedText(String t){
-		textArea.setSelection(prevSelection);
-		textArea.setSelectedText(t);
-		Registers.setRegister('$', t);
+		if(!isJUnitTest()) {
+			textArea.setSelection(prevSelection);
+			textArea.setSelectedText(t);
+			Registers.setRegister('$', t);
+		}
 	}
 
 	protected void deleteDuplicates(TextArea textArea){
@@ -349,6 +351,7 @@ public class Text extends Constants{
 	 * IGEC_GESTOR_PROYECTO or IGEC GESTOR PROYECTO
 	 * for:
 	 * Igec Gestor Proyecto
+	 * TODO:PONER POR DEFECTO QUE TOME RETORNO DE LÍNEA O ESPACIO
 	 */
 	public String firsUpperCase(String text, char separator){
 	    String nameCapitalized = "";
@@ -444,6 +447,7 @@ public class Text extends Constants{
 	private boolean isJUnitTest() {
 	    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 	    List<StackTraceElement> list = Arrays.asList(stackTrace);
+	    //TODO: SE PUEDE REEMPLAZAR POR INDEXOF PARA RENDIMIENTO
 	    for (StackTraceElement element : list) {
 	        if (element.getClassName().startsWith("org.junit.")) {
 	            return true;

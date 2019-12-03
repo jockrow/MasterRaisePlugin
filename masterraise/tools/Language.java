@@ -1,6 +1,3 @@
-/********************************************
- *			@author Richard Martínez 2010			*
- *********************************************/
 package masterraise.tools;
 
 import java.awt.BorderLayout;
@@ -18,55 +15,18 @@ import javax.swing.border.EmptyBorder;
 import org.gjt.sp.jedit.Buffer;
 
 import masterraise.Text;
+
 /**
- * 
- * @author Richard Martinez
+ * Tools for any Language
+ * @author Richard Martinez 2010
  *
- * language-print-debug-variables
- * prepara unas variables para imprimir en pantalla
- * @example
- * pasa de:
- * uno dos tres
- *
- * a (en javascript):
- * alert("uno:" + uno + "\n dos:" + dos + "\n tres:" + tres);
- *---------------------
- * language-generate-url-string
- * Genera una url string
- *
- * @example (javascript):
- * uno
- * dos
- * tres
- * a:
- * var url = "?uno=" + uno + "&dos=" + dos + "&tres=" + tres;
- *---------------------
- * language-code-to-string
- * prepara unas variables para imprimir en pantalla
- * @example
- * pasa de:
- * 		View view = jEdit.getActiveView();
- * 		JMenuBar menuBar = view.getJMenuBar();
- * 		//un comentario
- * 		JMenu menu = menuBar.getMenu(8);
- * 		menu.init();
- * 		//Imprime el mensaje
- * 		System.out.println("Hello World");
- * 	
- * 	a (java):
- * 	String strCode = "View view = jEdit.getActiveView();"
- * 		+ "\nJMenuBar menuBar = view.getJMenuBar();"
- * 		//un comentario
- * 		+ "\nJMenu menu = menuBar.getMenu(8);"
- * 		+ "\nmenu.init();"
- * 		//Imprime el mensaje
- * 		+ "\nSystem.out.println(\"Hello World\");";
  */
 public class Language extends Text{
+	private final static String DEFAULT_LANGUAGE = "javaScript";
 	private JDialog dialog  = new JDialog(view, "Print Debug Variables", true);
 	private JPanel content = new JPanel(new BorderLayout());
 	private JComboBox<?> cmbLanguages = null;
-	private String language = "";
+	private String language = DEFAULT_LANGUAGE;
 	private String[] lista = new String[]{"- Languages -"
 			, "batchScript"
 			, "beanShell"
@@ -75,9 +35,8 @@ public class Language extends Text{
 			, "javaScript"
 			, "php"
 			, "python"
-			, "System"
 			, "Oracle PRINT"
-			, "sql SELECT"
+			, "SqlServer SELECT"
 			, "SqlServer PRINT"
 			, "VB "
 	};
@@ -142,8 +101,11 @@ public class Language extends Text{
 		language = cmbLanguages.getSelectedItem().toString();
 	}
 
-	public void processText(String type){
+	public String processText(String type){
 		Buffer bfTmp = openTempBuffer();
+
+		replaceBuffer(BLANK_LINE, "", "r");
+
 		if(!type.equals("language-code-to-string")){
 			replaceBuffer("[!\"#$%&'()*+,-/:;=>?@\\[\\\\\\]^`{|}~]", " ", "ir");
 			replaceBuffer("^(\\t|[ ])+|(\\t|[ ])+$.*", "", "ir");
@@ -157,12 +119,12 @@ public class Language extends Text{
 		switch(type){
 		case "language-code-to-string":
 			replaceBuffer("\"", "\\\"", "");
-			replaceBuffer("(^[ \\t]*)(.*)", "$1+ \"\\\\n$2\"", "r");
+			replaceBuffer("(^[ \\t]*)(.*)", "\t$1+ \"\\\\n$2\"", "r");
 			replaceBuffer("(\\+ \"\\\\n//)(.*)(\")", "//$2", "r");
-			replaceBuffer(TRIM_UP + "(\\+ \"\\\\n)", "String strCode = \"", "r");
-			replaceBuffer(TRIM_DOWN, ";", "r");
+			replaceBuffer("\\A", "String strCode = \"", "r");
+			replaceBuffer("\\z", ";", "r");
 
-			//Inicia cada l�nea seteando correctamente los comentarios
+			//Settings comments for each line
 			switch(getResult()){
 			case "javaScript":
 				replaceBuffer("String strCode", "var strCode", "");
@@ -182,64 +144,39 @@ public class Language extends Text{
 			break;
 
 		case "language-generate-url-string":
-			textArea.selectAll();
-			smartJoin();
-			replaceBuffer("\\w+", "\"&$0=\" + $0 +", "r");
-			replaceBuffer("^\"&", "var url = \"?", "r");
-			replaceBuffer(" \\+$", ";", "r");
-
+			replaceBuffer("\\w+", "\\t+ \"&$0=\" + $0", "r");
+			replaceBuffer("\\A\\t\\+ \"&", "var url = \"?", "r");
+			replaceBuffer("\\z", ";", "r");
+			
 			switch(language.toString()){
 			case "c#": case "java":
 				replaceBuffer("var url = ", "String url = ", "i");
 				break;
 			case "php":
 				replaceBuffer("var url = ", "$url = ", "i");
-				replaceBuffer("(\\+ )(\\w)", ". \\$$2", "ir");
-				replaceBuffer("+ \"", ". \"", "wi");
+				replaceBuffer("\" + ", "\" . $", "");
 				break;
 			case "vb":
-				replaceBuffer("var url = ", "Dim url As String = ", "wi");
-				replaceBuffer("=\" + ", "=\" & ", "i");
-				replaceBuffer("+ \"", "& \"", "i");
-				replaceBuffer(";$", "", "ir");
+				replaceBuffer("var url = ", "Dim url As String = ", "");
+				replaceBuffer("(\\+ )(\\w+)(.*)", "& $2 _", "r");
+				replaceBuffer(" _\\z", "", "r");
 				break;
 			}
 			break;
 
-		/*
-		 TODO: formatear 
-		 System.out.println("...conversion:" + conversion + ", queryType:" + queryType + ", query2:" + query2 + ", tableName:" + tableName + ", lastSemiColon:" + lastSemiColon);
-		 como:
-		 		System.out.println("...conversion:" + conversion 
-				+ ", queryType:" + queryType 
-				+ ", query2:" + query2 
-				+ ", tableName:" + tableName 
-				+ ", lastSemiColon:" + lastSemiColon
-				);
-		*/
 		case "language-print-debug-variables":
-			if(language.substring(0, 3).equals("sql") && textArea.getSelectedText().equals("@")){
-				replaceBuffer("@", "", "wi");
-			}
-
-			if(findBuffer("\\n^[, \\t]*\\w+", "air")){
-				replaceBuffer("\\n", " ", "ir");
-			}
+			replaceBuffer("@", "", "");
 			replaceBuffer("[ \\t,]+", "\\n", "ir");
+			deleteDuplicates(textArea);
 
-			textArea.selectAll();
-			replaceBuffer("\\w+", "\", $0:\" + $0 +", "r");
-			smartJoin();
-			replaceBuffer("^\", ", "alert(\"", "r");
-			replaceBuffer(" \\+$", ");", "r");
+			replaceBuffer("\\w+", "\\t\\+ \", $0:\" + $0", "r");
+			replaceBuffer("\\A\\t\\+ \", ", "alert(\"", "r");
+			replaceBuffer("\\z", ");", "r");
 
 			switch(language.toString()){
 			case "batchScript":
-				replaceBuffer("alert(", "echo ", "");
-				replaceBuffer(":\" + ", ":%", "");
-				replaceBuffer(" + \", ", "%, ", "");
-				replaceBuffer("\"", "", "");
-				replaceBuffer(");", "%", "");
+				replaceBuffer("^(alert\\(\"|\\t\\+ \", )", "echo ", "r");
+				replaceBuffer("(\" \\+ )(\\w+)(.*)", "%$2%", "r");
 				break;
 			case "beanShell":
 				replaceBuffer("alert(\"", "Log.log(Log.NOTICE,this,\"...", "");
@@ -251,39 +188,32 @@ public class Language extends Text{
 				replaceBuffer("alert", "System.out.println", "");
 				break;
 			case "php":
-				replaceBuffer("alert", "echo ", "");
-				replaceBuffer("\\(|\\)", "", "r");
-				replaceBuffer("(\\+ )(\\w)", ". \\$$2", "ir");
-				replaceBuffer("+ \", ", ". \", <br>", "");
-				break;
-			case "System":
 				replaceBuffer("alert(", "echo ", "");
-				replaceBuffer(":\" + ", ":\" + %", "");
-				replaceBuffer(" + \", ", "% + \", ", "");
-				replaceBuffer(");", "%", "");
+				replaceBuffer("+", ".", "");
+				replaceBuffer(");", "", "");
 				break;
 			case "Oracle PRINT":
 				replaceBuffer("alert", "dbms_output.put_line", "");
 				replaceBuffer("\"", "'", "");
 				replaceBuffer("+", "||", "");
 				break;
-			case "sql SELECT":
+			case "SqlServer SELECT":
 				replaceBuffer("alert(\"", "SELECT @", "");
+				replaceBuffer("+ \", ", ", @", "");
 				replaceBuffer(":\" + ", " AS ", "");
-				replaceBuffer(" + \", ", ", @", "");
 				replaceBuffer(");", "", "");
 				break;
 			case "SqlServer PRINT":
 				replaceBuffer("alert(\"", "PRINT '", "");
-				replaceBuffer(":\" + ", ":' + CAST(ISNULL(@", "");
-				replaceBuffer(" + \", ", ", '') as varchar(255)) + ', ", "");
-				replaceBuffer(");", ", '') as varchar(255))", "");
+				replaceBuffer(");", "", "");
+				replaceBuffer("\"", "'", "");
+				replaceBuffer("(:' \\+ )(\\w+)", "$1CAST(ISNULL(@$2) as varchar(255))", "r");
 				break;
 			case "VB ":
-				replaceBuffer("alert(\"", "Response.Write \"<br>", "");
-				replaceBuffer(":\" + ", ":\" & ", "");
-				replaceBuffer(" + \", ", " & \"<br>", "");
-				replaceBuffer(");", "", "");
+				replaceBuffer("alert(", "MsgBox ", "");
+				replaceBuffer("+", "&", "");
+				replaceBuffer("$", " _", "r");
+				replaceBuffer("); _", "", "");
 				break;
 			case "python":
 				replaceBuffer("alert", "print", "");
@@ -291,14 +221,76 @@ public class Language extends Text{
 				replaceBuffer("(\\+ )(\\w+)", "+ str($2)", "r");
 				break;
 			}
-			replaceBuffer("\\p{Cntrl}", "", "ir");
-			if(!language.equals("beanShell")){
-				replaceBuffer(" \", ", " \"\\\\n ", "ir");
-			}
 			break;
 		}
 
+		String result = bfTmp.getText();
 		closeTempBuffer(bfTmp);
+		return result;
+	}
+
+	/**
+	 * Create 
+	 * prepare variables to print with function according selected language
+	 * @return function depend from choose language 
+	 * @example
+	 * <pre>
+	 * {@code
+	 * one 
+	 * two 
+	 * three
+	 * 
+	 * to (javascript):
+	 * alert("one:" + one + "\n two:" + two + "\n three:" + three);
+	 */
+	public String printDebugVariables() {
+		return processText("language-print-debug-variables");
+	}
+
+	/**
+	 * Generate a url string from text
+	 * @return url string
+	 * @example
+	 * <pre>
+	 * {@code
+	 * one
+	 * two
+	 * three
+	 *
+	 * to (javascript):
+	 * var url = "?one=" + one + "&two=" + two + "&three=" + three;
+	 * }
+	 */
+	public String generateUrlString() {
+		return processText("language-generate-url-string");
+	}
+
+	/**
+	 * convert a text to String
+	 * @return string into variable
+	 * @example
+	 * <pre>
+	 * {@code
+	 * View view = jEdit.getActiveView();
+	 * JMenuBar menuBar = view.getJMenuBar();
+	 * //comment
+	 * JMenu menu = menuBar.getMenu(8);
+	 * menu.init();
+	 * //print message
+	 * System.out.println("Hello World");
+	 *
+	 * to (javascript):
+	 * var strCode = "View view = jEdit.getActiveView();"
+	 *	+ "\nJMenuBar menuBar = view.getJMenuBar();"
+	 *	//comment
+	 *	+ "\nJMenu menu = menuBar.getMenu(8);"
+	 *	+ "\nmenu.init();"
+	 *	//print message
+	 *	+ "\nSystem.out.println(\"Hello World\");";
+	 * }
+	 */
+	public String codeToString() {
+		return processText("language-code-to-string");
 	}
 
 	/**
@@ -311,12 +303,13 @@ public class Language extends Text{
 	 * CANT_CAFE_PERGAMINO_SECO
 	 * UNIDAD_MEDIDA_CAFE_PERGAMINO_SECO
 	 */
-	public void stringToVars(){
+	public String stringToVars(){
 		String t = iniSelectedText();
 		t=replaceAccent(t);
 		t=t.replaceAll("[\\.]|\\b(DE|DEL|OF)\\b", "");
 		t=t.replaceAll("[ ]+", "_");
 
 		endSelectedText(t);
+		return t;
 	}
 }

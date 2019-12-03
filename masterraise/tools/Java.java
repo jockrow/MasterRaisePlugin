@@ -29,7 +29,7 @@ public class Java extends Text{
 	 * 	this.variable = variable;
 	 * }
 	 */
-	public void genGetSet(){
+	public String genGetSet(){
 		Buffer bfTmp = openTempBuffer();
 
 		replaceBuffer("^[ \\t]+", "", "r");
@@ -46,6 +46,8 @@ public class Java extends Text{
 						, "bir");
 
 		closeTempBuffer(bfTmp);
+		
+		return textArea.getText();
 	}
 	
 	/**
@@ -71,28 +73,28 @@ public class Java extends Text{
 	 * object.setFechaCreacion(resultSet.getDate("FECHA_CREACION"));
 	 *
 	 */
-	public void fields2javaProperties(){
+	public String fields2javaProperties(){
 		String REPLACE = "(object)(\\.set)(\\w+)(.*)(get)(\\w+)(.*)";
 		Buffer bfTmp = openTempBuffer();
-		textArea.selectAll();
 
-		replaceSelection("^[  \\t]+|\"", "", "r");
+		replaceBuffer(TRIM_LEFT + "|\"", "", "r");
 
 		//set
-		replaceSelection("(\\w+)([ \\t]+)(\\w+)(.*)"
-			, "\"object.set\" "
-			+ "+ _1.toLowerCase()"
-			+ "+ \"(resultSet.get\" "
-			+ "+ _3 + \"(\\\"\" + _1.toUpperCase() + \"\\\"));\"", "br");
+		replaceBuffer("(\\w+)([ \\t]+)(\\w+)(.*)"
+				, "\"object.set\" "
+						+ "+ _1.toLowerCase()"
+						+ "+ \"(resultSet.get\" "
+						+ "+ _3 + \"(\\\"\" + _1.toUpperCase() + \"\\\"));\"", "br");
 
-		replaceSelection("getNumber", "getInteger", "ir");
-		replaceSelection("getDate", "getDate", "ir");
-		replaceSelection("(getVarchar.*)(\\()", "getString(", "ir");
+		replaceBuffer("getNumber", "getInteger", "ir");
+		replaceBuffer("getDate", "getDate", "ir");
+		replaceBuffer("(getVarchar.*)(\\()", "getString(", "ir");
 
-		replaceSelection("(\\.set)(\\w)", "_1 + _2.toUpperCase()", "br");
-		replaceSelection("(_)([a-z])", "_2.toUpperCase()", "br");
+		replaceBuffer("(\\.set)(\\w)", "_1 + _2.toUpperCase()", "br");
+		replaceBuffer("(_)([a-z])", "_2.toUpperCase()", "br");
 
 		//get
+		textArea.selectAll();
 		String text = textArea.getSelectedText();
 		duplicate(text);
 		replaceSelection(REPLACE, "$1.get$3(),", "r");
@@ -101,11 +103,12 @@ public class Java extends Text{
 		duplicate(text);
 		replaceSelection(REPLACE, "private $6 $3;", "r");
 		closeTempBuffer(bfTmp);
+
+		return textArea.getText();
 	}
 
 	private void duplicate(String text){
 		textArea.goToStartOfWhiteSpace(false);
-		textArea.insertEnterAndIndent();
 		textArea.insertEnterAndIndent();
 		textArea.goToBufferStart(false);
 		textArea.setSelectedText(text);

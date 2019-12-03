@@ -1,0 +1,10 @@
+(@LINKEO AS VARCHAR(50) ,
+ @strconvenio AS VARCHAR(5) ,
+ @strRegional AS VARCHAR(50) ,
+ @strCadenaPermisos as varchar (50),
+ @strFIni as varchar (10) = NULL ,
+ @PageSize as numeric (18,2)  ,
+ @i_RegInicial int,
+ @i_maxRegistros int
+  )
+ values('PRESTAR.DBO.', '96' ,  '3, 4' ,  '(1,2)' , null,  function(1, 2) ,1 , 30)

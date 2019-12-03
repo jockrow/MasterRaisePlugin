@@ -5,20 +5,17 @@ import java.util.Arrays;
 
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.Macros;
-import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.io.VFSManager;
-import org.gjt.sp.jedit.textarea.TextArea;
 
-public class Bulk {
-	private View view = jEdit.getActiveView();
-	private TextArea textArea = view.getTextArea();
-	
+import masterraise.Text;
+
+public class Bulk extends Text{
 	private ArrayList<String> filesNotFound = new ArrayList<String>();
 	private Buffer[] bf = jEdit.getBuffers();
 
 	public void insertFileSelection(){
-		String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText().replaceAll("(?m)^[\t ]*\n", "").trim();
+//		String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText().replaceAll("(?m)^[\t ]*\n", "").trim();
 		if(selectedText.length() == 0){
 			Macros.message(view, "Must select a valid text");
 			return;

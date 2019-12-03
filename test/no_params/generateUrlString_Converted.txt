@@ -1,0 +1,3 @@
+var url = "?one=" + one
+	+ "&two=" + two
+	+ "&three=" + three;

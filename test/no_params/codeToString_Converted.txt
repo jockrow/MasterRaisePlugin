@@ -1,0 +1,7 @@
+var strCode = "View view = jEdit.getActiveView();"
+	+ "\nJMenuBar menuBar = view.getJMenuBar();"
+	//comment
+	+ "\nJMenu menu = menuBar.getMenu(8);"
+	+ "\nmenu.init();"
+	//print message
+	+ "\nSystem.out.println(\"Hello World\");";

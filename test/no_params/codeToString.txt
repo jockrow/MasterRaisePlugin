@@ -1,0 +1,7 @@
+View view = jEdit.getActiveView();
+JMenuBar menuBar = view.getJMenuBar();
+//comment
+JMenu menu = menuBar.getMenu(8);
+menu.init();
+//print message
+System.out.println("Hello World");

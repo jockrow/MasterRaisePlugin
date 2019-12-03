@@ -1,6 +1,3 @@
-/************************************************
-*			@author Richard Martínez 2011/05/13 *
-*************************************************/
 package masterraise.tools;
 
 import java.awt.BorderLayout;
@@ -29,20 +26,21 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import masterraise.Text;
-
+import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.Macros;
 import org.gjt.sp.jedit.Registers;
 import org.gjt.sp.jedit.Registers.Register;
-import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.textarea.JEditTextArea;
-import org.gjt.sp.jedit.textarea.TextArea;
 
+import masterraise.Text;
+
+/**
+ * Tools for Html
+ * @author Richard Martínez 2011/05/13
+ *
+ */
 public class Html extends Text{
-	private final View view = jEdit.getActiveView();
-	private final TextArea textArea = view.getTextArea();
-	
 	private JDialog dialog = new JDialog(view, "Convert Query", true);
 	int i = 0;
 	
@@ -52,7 +50,7 @@ public class Html extends Text{
 	
 	/**
 	 * Method htmlNamedEntities()
-	 * Replace all charecters like as accent for html Entities
+	 * Replace all chars like as accent for html Entities
 	 */
 	public class Entities{
 		String result = "";
@@ -62,7 +60,7 @@ public class Html extends Text{
 		String ENTITY_ACCENT = "&aacute; -> á";
 		String ACCENT_ENTITY = "á -> &aacute;";
 		
-		public void showNamedEntities(){
+		public void showGui(){
 			KeyListener ka = new KeyListener(){
 				public void keyReleased(KeyEvent ke){
 					if (ke.getKeyCode() == KeyEvent.VK_ESCAPE){
@@ -128,10 +126,7 @@ public class Html extends Text{
 		}
 		
 		public void processText(){
-			if(textArea.getSelectedText() == null){
-				textArea.selectAll();
-			}
-			String t = textArea.getSelectedText();
+			String t = iniSelectedText();
 
 			if(chkInvert.isSelected()){
 				for(int i=0; i<ARR_CHARS.length; i++){
@@ -223,70 +218,69 @@ public class Html extends Text{
 		dialog.setVisible(true);
 	}
 	
-	/**
-	 * Method getFieldsList()
-	 * Saca una lista de todos los campos de un archivo html
-	 */
-	//TODO:VERIFICAR QUE AL DAR DESHACER SE DEVUELVA AL TEXTO ORIGINAL
-	public void getFieldsList(){
-		String typeFields = "(select|input|textarea|datalist)";
 
-		if(!findBuffer("<[ \\t]*" + typeFields + "[ \\t].*>", "air")){
+	/**
+	 * Extract a list for all fields from html file 
+	 */
+	public String getFieldsList(){
+	//TODO:VERIFICAR QUE AL DAR DESHACER SE DEVUELVA AL TEXTO ORIGINAL
+		final String TYPE_FIELDS = "(select|input|textarea|datalist)";
+		Buffer bfTmp = openTempBuffer();
+		String fields = "";
+
+		if(!findBuffer("<[ \\t]*" + TYPE_FIELDS + "[ \\t].*>", "air")){
 			Macros.message(view, "Fields not found");
-			return;
+			return "";
 		}
 		
-		String fields = "";
 		textArea.goToBufferStart(false);
+		
 		//TODO:hay que revisar que no pregunte a cada momento el reemplazo
-		while(findBuffer("<[ \\t]*" + typeFields + "[ \\t].*>", "ir")){
+		while(findBuffer("<[ \\t]*" + TYPE_FIELDS + "[ \\t].*>", "ir")){
 			fields += textArea.getSelectedText() + "\n";
 		}
 
-		textArea.selectAll();
-		textArea.setSelectedText(fields);
-		String t = iniSelectedText();
+		textArea.setText(fields);
 		
-		t=t.replaceAll("(?m)<[ \t]*" + typeFields, "\n$0");
-		t=t.replaceAll("(?m)(^\n)|(^.*type[ \t]*=[ \t\"\']*(submit|reset|button).*\n)", "");
-		t=t.replaceAll("(?m)>.*", ">");
+		replaceBuffer("<[ \t]*" + TYPE_FIELDS, "\n$0", "ir");
+		replaceBuffer("(^\n)|(^.*type[ \t]*=[ \t\"\']*(submit|reset|button).*\n)", "", "ir");
+		replaceBuffer(">.*", ">", "r");
 
-//		System.out.println("...processText.isMethodInvoker:" + isMethodInvoker("getFieldsList"));
-//		if(isMethodInvoker("getFieldsList")){
-		//TODO: revisar que no vaya e invokar cuando se llama desde otro método
-		endSelectedText(t);
-//		}
+		fields = bfTmp.getText();
+		closeTempBuffer(bfTmp);
+		return fields;
 	}
 	
 	/**
-	* Quita los tags de options de html, dejando sólo el título que ve el usuario en el combo
-	*
-	* @example
-	<OPTION value=-1>Seleccione</OPTION><OPTION value=127>Bogot&#225; D.C.-Aero Ambulancias 24 Ltda
-	</OPTION><OPTION value=298>Bogot&aacute; D.C.-Aga Fano Fabrica Nacional De Oxigeno S A Cundi</OPTION><OPTION value=324>Bogot&#225; D.C.-Ambulancias Abc Ltda</OPTION>
-	<OPTION value=371>Bogot&#225; D.C.-Ambulancias auxilios y emergencias</OPTION><OPTION value=346>Bogot&#225; D.C.-Ambulancias Meyday Ltda</OPTION><OPTION value=326>Bogot&#225; D.C.-Ambulancias Urgencia Vital</OPTION>
-	<OPTION value=327>Ni&#241;o</OPTION>
-	<OPTION value=328>NI&#209;O Jes&uacute;s</OPTION>
-
-	* A:
-	*
-	-1	Seleccione
-	127	Bogotá D.C.-Aero Ambulancias 24 Ltda
-	298	Bogotá D.C.-Aga Fano Fabrica Nacional De Oxigeno S A Cundi
-	324	Bogotá D.C.-Ambulancias Abc Ltda
-	371	Bogotá D.C.-Ambulancias auxilios y emergencias
-	346	Bogotá D.C.-Ambulancias Meyday Ltda
-	326	Bogotá D.C.-Ambulancias Urgencia Vital
-	327	Niño
-	328	NIÑO Jesús
-	*/
-	public void options2Csv(){
+	 * remove tag from Html options, showing only title that user see at combo
+	 * <pre>
+	 * @example
+	 * {@code
+	 * <OPTION value=-1>Seleccione</OPTION><OPTION value=127>Bogot&#225; D.C.-Aero Ambulancias 24 Ltda
+	 * </OPTION><OPTION value=298>Bogot&aacute; D.C.-Aga Fano Fabrica Nacional De Oxigeno S A Cundi</OPTION><OPTION value=324>Bogot&#225; D.C.-Ambulancias Abc Ltda</OPTION>
+	 * <OPTION value=371>Bogot&#225; D.C.-Ambulancias auxilios y emergencias</OPTION><OPTION value=346>Bogot&#225; D.C.-Ambulancias Meyday Ltda</OPTION><OPTION value=326>Bogot&#225; D.C.-Ambulancias Urgencia Vital</OPTION>
+	 * <OPTION value=327>Ni&#241;o</OPTION>
+	 * <OPTION value=328>NI&#209;O Jes&uacute;s</OPTION>
+	 * } 
+	 *
+	 * To:
+	 * -1	Seleccione
+	 * 127	Bogotá D.C.-Aero Ambulancias 24 Ltda
+	 * 298	Bogotá D.C.-Aga Fano Fabrica Nacional De Oxigeno S A Cundi
+	 * 324	Bogotá D.C.-Ambulancias Abc Ltda
+	 * 371	Bogotá D.C.-Ambulancias auxilios y emergencias
+	 * 346	Bogotá D.C.-Ambulancias Meyday Ltda
+	 * 326	Bogotá D.C.-Ambulancias Urgencia Vital
+	 * 327	Niño
+	 * 328	NIÑO Jesús
+	 */
+	public String options2Csv(){
 		String strSyntaxError = "Syntax Error Html Options";
 		String t=iniSelectedText();
 
 		if(!Pattern.compile("(?m)<option[ ]+.*</option>").matcher(t.toLowerCase()).find()){
 			Macros.message(view, strSyntaxError);
-			return;
+			return "";
 		}
 
 		t=t.replaceAll("(?mi)<[ \t]*option", "\n<option");
@@ -301,5 +295,6 @@ public class Html extends Text{
 			}
 		}
 		endSelectedText(t);
+		return t;
 	}
 }
