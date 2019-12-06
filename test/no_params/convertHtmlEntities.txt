@@ -1,0 +1,208 @@
+<html>
+	<head>
+	<script type="text/javascript" src="AjaxScript">
+	</script> 
+	<form id="myform" name="myform" method="post" action="fincaUpdate.jsp">
+		<input id="myform:submitList" type="submit" name="myform:submitList" value="invButton" style="visibility:hidden;">
+		<input id="myform:btnHidInfoArriendo" type="submit" name="myform:btnHidInfoArriendo" value style="visibility:hidden;">
+		<input id="myform:hidTipoDocArrendador" type="text" name="myform:hidTipoDocArrendador" style="visibility:hidden;">
+		<input id="myform:hidNroDocArrendador" type="text" name="myform:hidNroDocArrendador" style="visibility:hidden;">
+		<table class="tMsgTitle01">
+			<tbody>
+			<tr>
+				<td>
+					Actualización datos de la finca
+				</td> 
+			</tr> 
+			</tbody> 
+		</table> 
+		<table id="myform:divPopup" class="forms" style="display:none">
+			<tbody>
+			<tr>
+				<td class="fTdRight">
+					<label>Tipo de documento:</label> 
+				</td> 
+				<td class="fTdLeft">
+					<table>
+						<tbody>
+						<tr>
+							<td>
+								<select id="myform:tipoDocArrendador" name="myform:tipoDocArrendador" size="1">
+									<option value="0"></option> 
+									<option value="1">CÉDULA DE CIUDADANÍA</option> 
+									<option value="2">CÉDULA DE EXTRANJERÍA</option> 
+									<option value="3">NIT</option> 
+									<option value="5">TARJETA DE IDENTIDAD</option> 
+									<option value="6">PASAPORTE</option> 
+								</select> 
+							</td> 
+						</tr> 
+						</tbody> 
+					</table> 
+				</td> 
+			</tr> 
+			<tr>
+				<td class="fTdRight">
+					<label>Número de documento*:</label> 
+				</td> 
+				<td class="fTdLeft">
+					<table>
+						<tbody>
+						<tr>
+							<td>
+								<input id="myform:nroDocArrendador" type="text" name="myform:nroDocArrendador" onkeypress="return solonumeros(event);" style="text-transform:uppercase">
+							</td> 
+						</tr> 
+						</tbody> 
+					</table> 
+				</td> 
+			</tr> 
+			</tbody> 
+		</table> 
+		<table class="forms">
+			<tbody>
+			<tr>
+				<td class="fTdRight">
+					<label>Nombre Caficultor*:</label> 
+				</td> 
+				<td class="fTdLeft">
+					<table>
+						<tbody>
+						<tr>
+							<td>
+								<input id="myform:idCaficultor" type="text" name="myform:idCaficultor" value="MARTHA BALLESTEROS QUINTERO" readonly="readonly">
+							</td> 
+							<td>
+								<a id="myform:linkFlashLightCaficultores" href="#" onclick="document.forms['myform']['myform:_idcl'].value='myform:linkFlashLightCaficultores'; document.forms['myform'].submit(); return false;"><img id="myform:graphButtonLupa02" src="/sica/content/core/resources/images/lupa-of.jpg" alt="Seleccione Caficultor" height="30" onclick="validateArriendoVigente('myform:idTenencia');" onmouseout="this.src='/sica/faces/content/core/resources/images/lupa-of.jpg';" onmouseover="this.src='/sica/faces/content/core/resources/images/lupa-on.jpg';" width="30"></a>
+							</td> 
+						</tr> 
+						</tbody> 
+					</table> 
+				</td> 
+			</tr> 
+			<tr>
+				<td class="fTdRight">
+					<label>Nombre de la Finca*:</label> 
+				</td> 
+				<td class="fTdLeft">
+					<table>
+						<tbody>
+						<tr>
+							<td>
+								<input id="myform:nombreFinca" type="text" name="myform:nombreFinca" value="EL CAIMAN" maxlength="50">
+							</td> 
+						</tr> 
+						</tbody> 
+					</table> 
+				</td> 
+			</tr> 
+			<tr>
+				<td class="fTdRight">
+					<label>Código SICA:</label> 
+				</td> 
+				<td class="fTdLeft">
+					<table>
+						<tbody>
+						<tr>
+							<td>
+								<input id="myform:codigoSica" type="text" name="myform:codigoSica" value="7387001502" maxlength="20" disabled="disabled">
+							</td> 
+						</tr> 
+						</tbody> 
+					</table> 
+				</td> 
+			</tr> 
+			<tr>
+				<td class="fTdRight">
+					<label>Área Total Finca:</label> 
+				</td> 
+				<td class="fTdLeft">
+					<table>
+						<tbody>
+						<tr>
+							<td>
+								<input id="myform:areaTotal" type="text" name="myform:areaTotal" value="3.0" onblur="validaAreaFinca('El Área Total de la Finca no puede ser menor al Área Café Estimada.');" onkeyup="validateDoublePositivoCustom(this,8,2,'Use punto para separar decimales.','La información digitada no es correcta, por favor ingrese números.','Número invalido.','El área ingresada no es válida. Máximo 8 dígitos enteros y 2 decimales.')">
+							</td> 
+							<td>
+								<label>Hectáreas</label> 
+							</td> 
+						</tr> 
+						</tbody> 
+					</table> 
+				</td> 
+			</tr> 
+			<tr>
+				<td class="fTdRight">
+					<label>Tenencia*:</label> 
+				</td> 
+				<td class="fTdLeft">
+					<table>
+						<tbody>
+						<tr>
+							<td>
+								<select id="myform:idTenencia" name="myform:idTenencia" size="1">
+									<option value="0"></option> 
+									<option value="10">COMUNIDAD NEGRA</option> 
+									<option value="2">ARRENDATARIO</option> 
+									<option value="1" selected="selected">POSEEDOR/OCUPANTE</option> 
+									<option value="3">PROPIETARIO</option> 
+									<option value="5">RESGUARDO INDÍGENA</option> 
+									<option value="7">USUFRUCTO</option> 
+									<option value="17">SUCESIÓN ILIQUIDA</option> 
+									<option value="16">COMODATO</option> 
+									<option value="18">SOCIEDAD DE HECHO</option> 
+								</select> 
+							</td> 
+						</tr> 
+						</tbody> 
+					</table> 
+				</td> 
+			</tr> 
+			<tr>
+				<td class="fTdRight">
+					<label>Área Café Calculada :</label> 
+				</td> 
+				<td class="fTdLeft">
+					<table>
+						<tbody>
+						<tr>
+							<td>
+								<input id="myform:areaCafeCalculada" type="text" name="myform:areaCafeCalculada" value="1.15" onkeyup="validateDoublePositivoCustom(this,8,2,'Use punto para separar decimales.','La información digitada no es correcta, por favor ingrese números.','Número invalido.','El área ingresada no es válida. Máximo 8 dígitos enteros y 2 decimales.')" disabled="disabled">
+							</td> 
+							<td>
+								<label>Hectáreas</label> 
+							</td> 
+						</tr> 
+						</tbody> 
+					</table> 
+				</td> 
+			</tr> 
+			</tbody> 
+		</table> 
+		<table>
+			<tbody>
+			<tr>
+				<td>
+					<input type="submit" name="myform:_id69" value="Modificar" onclick="showModalLoading();">
+				</td> 
+				<td>
+					<input type="submit" name="myform:_id71" value="Regresar" onclick="showModalLoading();">
+				</td> 
+			</tr> 
+			</tbody> 
+		</table> 
+			<input type="hidden" name="myform" value="myform">
+			<input type="hidden" name="autoScroll">
+			<input type="hidden" name="myform:_idcl">
+			<input type="hidden" name="myform:_link_hidden_">
+		<script type="text/javascript">
+			function alerta() {
+			alert(123);
+			}
+		</script>
+		<input type="hidden" name="jsf_sequence" value="1">
+	</form> 
+	<div id="modalLoading" class="modalLoading">
+	</div> 
+	</body> 
+</html> 

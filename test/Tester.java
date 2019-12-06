@@ -25,21 +25,6 @@ public class Tester extends Constants{
 		return new String(text.getBytes(ISO),UTF_8);
 	}
 
-	//TODO:QUITAR
-	public void setVars(String convertType, String fileTesting) {
-		String path = TEST_PATH + convertType + "/";
-		String fileOriginal = path + fileTesting + ".txt";
-		String fileConverted = path + fileTesting + "_Converted.txt";
-		expected = new MrFile().readFile(fileConverted);
-
-		try {
-			jEdit.openFile(view, fileOriginal);
-		} catch (Exception e) {
-			e.printStackTrace();
-			setVars(convertType, fileTesting);
-		}
-	}
-	
 	public void setVars(String fileTesting) {
 		String path = TEST_PATH + NO_PARAMS + "/";
 		String fileOriginal = path + fileTesting + ".txt";
@@ -50,7 +35,7 @@ public class Tester extends Constants{
 			jEdit.openFile(view, fileOriginal);
 		} catch (Exception e) {
 			e.printStackTrace();
-			setVars(NO_PARAMS, fileTesting);
+			setVars(fileTesting);
 		}
 	}
 }

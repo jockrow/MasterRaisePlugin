@@ -68,10 +68,10 @@ public class Query extends Text{
 			else if(queryType.equals("SELECT") && countOccurrences(selectedText, "\\bSELECT\\b.*\\bFROM\\b[ ]+\\w", "ir") == 0){
 				syntaxError = true;
 			}
-			else if(queryType.equals("INSERT") && countOccurrences(selectedText, "\\bINSERT\\b[ \\t]+\\bINTO\\b[ \\t]+" + REGEXP_SQL_OBJECT + "[ \\t]+\\(.*\\)[ \\t]+VALUES[ \\t]*\\(.*\\)", "ir") == 0){
+			else if(queryType.equals("INSERT") && countOccurrences(selectedText, "\\bINSERT\\b[ \\t]+\\bINTO\\b[ \\t]+" + SQL_OBJECT + "[ \\t]+\\(.*\\)[ \\t]+VALUES[ \\t]*\\(.*\\)", "ir") == 0){
 				syntaxError = true;
 			}
-			else if(queryType.equals("UPDATE") && countOccurrences(selectedText, "\\bUPDATE\\b[ \\t]+" + REGEXP_SQL_OBJECT + "[ \\t]+\\bSET[ \\t]+" + REGEXP_SQL_OBJECT + ".*=\\p{Print}", "ir") == 0){
+			else if(queryType.equals("UPDATE") && countOccurrences(selectedText, "\\bUPDATE\\b[ \\t]+" + SQL_OBJECT + "[ \\t]+\\bSET[ \\t]+" + SQL_OBJECT + ".*=\\p{Print}", "ir") == 0){
 				syntaxError = true;
 			}
 			if(syntaxError){
@@ -91,7 +91,7 @@ public class Query extends Text{
 
 			if(queryType.equals("CSV_SELECT JOIN")){
 				int numLinesWithTabs = countOccurrences(selectedText, "[^\\t]\\t.*", "r");
-				if(numLinesWithTabs != 0 && countOccurrences(selectedText, "\\A" + REGEXP_SQL_OBJECT + "[ \\t]*$", "ir") > 0){
+				if(numLinesWithTabs != 0 && countOccurrences(selectedText, "\\A" + SQL_OBJECT + "[ \\t]*$", "ir") > 0){
 					msgSyntaxError = "Please Quit the table name, only must have data";
 					return true;
 				}
@@ -101,7 +101,7 @@ public class Query extends Text{
 					msgSyntaxError = ERR_INVALID_CSV;
 					return true;
 				}
-				if(countOccurrences(selectedText, "\\A" + REGEXP_SQL_OBJECT + "[ \\t]*\\n", "ir") == 0){
+				if(countOccurrences(selectedText, "\\A" + SQL_OBJECT + "[ \\t]*\\n", "ir") == 0){
 					msgSyntaxError = String.format(msgSyntaxError, new Object[] {"CSV"}) + ", \nMust have table Name in first line";
 					return true;
 				}
@@ -120,8 +120,8 @@ public class Query extends Text{
 		replaceBuffer("([()])([()])", "$1 $2", "r");
 
 		if(ini){
-			replaceBuffer(REGEXP_SQL_FUNCTION, "_0.replaceAll(\",\", \"" + COMA + "\")", "br");
-			replaceBuffer(REGEXP_SQL_QUOTES_VALUES, "_0.replaceAll(\",\", \"" + COMA + "\")", "br");
+			replaceBuffer(SQL_FUNCTION, "_0.replaceAll(\",\", \"" + COMA + "\")", "br");
+			replaceBuffer(SQL_QUOTES_VALUES, "_0.replaceAll(\",\", \"" + COMA + "\")", "br");
 			replaceBuffer(".", DOT, "");
 			replaceBuffer(")", ROUND_BRACKET_RIGHT, "");
 			replaceBuffer("(", ROUND_BRACKET_LEFT, "");
@@ -132,8 +132,8 @@ public class Query extends Text{
 				textArea.goToNextWord(false,false);
 				textArea.goToEndOfWhiteSpace(true);
 
-				replaceBuffer(REGEXP_SQL_RESERVED.replaceAll("(as|select)\\|", ""), "-$1-", "ir");
-				replaceSelection(REGEXP_SQL_ALIAS, "$1", "ir");
+				replaceBuffer(SQL_RESERVED.replaceAll("(as|select)\\|", ""), "-$1-", "ir");
+				replaceSelection(SQL_ALIAS, "$1", "ir");
 				replaceSelection("AS", "", "iw");
 				replaceSelection(TRIM_COMA, "\\t", "r");
 			}
@@ -147,12 +147,12 @@ public class Query extends Text{
 		if(end){
 			//apply assignment directly from fields to values like = 1 or = 'one' o = FUNCION(PARAM1, 'PARAM2')
 			replaceBuffer("\\t", "\\n", "r");
-			replaceBuffer("(" + REGEXP_SQL_OBJECT + ")(\\n.*).*", "_0.replaceAll(\"\\n\", \"	\")", "bir");
+			replaceBuffer("(" + SQL_OBJECT + ")(\\n.*).*", "_0.replaceAll(\"\\n\", \"	\")", "bir");
 			replaceBuffer(DOT, ".", "");
 			replaceBuffer(ROUND_BRACKET_RIGHT, ")", "");
 			replaceBuffer(ROUND_BRACKET_LEFT, "(", "");
 			replaceBuffer(COMA, ",", "");
-			replaceBuffer("-" + REGEXP_SQL_RESERVED + "-", "$1", "ir");
+			replaceBuffer("-" + SQL_RESERVED + "-", "$1", "ir");
 		}
 
 		replaceBuffer("([()])( +)([()])", "$1$3", "r");
@@ -287,10 +287,10 @@ public class Query extends Text{
 		 */
 		public void beautyQuery(String opts){
 			//quita todos los comentarios y tabulador
-			replaceBuffer(REGEXP_SQL_COMMENT, "", "ir");
+			replaceBuffer(COMMENTS, "", "ir");
 
 			//format decimal
-			replaceBuffer(REGEXP_SQL_NUMBER, "_0.replaceAll(\",\", \".\")", "br");
+			replaceBuffer(SQL_NUMBER, "_0.replaceAll(\",\", \".\")", "br");
 
 			textArea.selectAll();
 			textArea.joinLines();
@@ -314,13 +314,13 @@ public class Query extends Text{
 				return;
 			}
 
-			replaceBuffer(REGEXP_SQL_RESERVED_LINE, "\\n$1", "ir");
+			replaceBuffer(SQL_RESERVED_LINE, "\\n$1", "ir");
 			replaceBuffer("([^\\(])('[ \\t]*)(\\d{2}/\\d{2}/\\d{4})('[ \\t]*)", "TO_DATE('$3', 'dd/MM/yyyy')", "r");
 			replaceBuffer("([^\\(])('[ \\t]*)(\\d{4}/\\d{2}/\\d{2})('[ \\t]*)", "TO_DATE('$3', 'yyyy/MM/dd')", "r");
 
 			//set reserved word to Uppercase
 			if(opts.indexOf('u') >= 0){
-				replaceBuffer(REGEXP_SQL_RESERVED, "_1.toUpperCase()", "br");
+				replaceBuffer(SQL_RESERVED, "_1.toUpperCase()", "br");
 				if(opts.equals("u")){
 					return;
 				}
@@ -336,14 +336,10 @@ public class Query extends Text{
 				if(!queryType.equals("CSV")){
 					replaceBuffer("\\[|\\]", "", "r");
 
-					// quita los espacios al principio y al final
-					replaceBuffer(TRIM_UP, "", "r");
-					replaceBuffer(TRIM_DOWN, "", "r");
-
 					//modify the temp tables, for recovery later
 					replaceBuffer("#", SHARP, "");
 					if(queryType.equals("INSERT")){
-						replaceBuffer("(\\bINSERT\\b \\bINTO\\b " + REGEXP_SQL_OBJECT + ")(\\()", "$1\\n$3", "ir");
+						replaceBuffer("(\\bINSERT\\b \\bINTO\\b " + SQL_OBJECT + ")(\\()", "$1\\n$3", "ir");
 						replaceBuffer("\\bVALUES\\b", "\\n$0", "ir");
 					}
 					else{
@@ -368,7 +364,7 @@ public class Query extends Text{
 						replaceBuffer("(\\)[ \\t])(SELECT)", ")\\n$2", "ir");
 						findBuffer("(SELECT.*\\n)(^.*\\n)+(FROM)", "air");
 						replaceSelection("^", ", ", "r");
-						replaceSelection("(, )(" + REGEXP_SQL_RESERVED + ")", "$2", "ir");
+						replaceSelection("(, )(" + SQL_RESERVED + ")", "$2", "ir");
 					}
 
 					//recupera las tablas temporales
@@ -379,7 +375,7 @@ public class Query extends Text{
 			replaceBuffer("([ \\t]+$|^" + TRIM_COMA + "\\n)", "", "r");
 			replaceBuffer("(\\w)( )(, \\w)", "$1$3", "r");
 			replaceBuffer("\\b(AND|OR)\\b", "\\t$0", "ir");
-			replaceBuffer(REGEXP_SQL_DOUBLE_SPACES, " ", "r");
+			replaceBuffer(SQL_DOUBLE_SPACES, " ", "r");
 			replaceBuffer("^,", "\\t,", "r");
 			replaceBuffer("[ \\t]*;[ \\t]*", ";", "r");
 		}
@@ -403,7 +399,6 @@ public class Query extends Text{
 	public class ConvertQuery{
 		private static final String SELECT = "SELECT";
 		private static final String SELECT_JOIN = "SELECT JOIN";
-		
 		private String query1 = "";
 		private String query2 = "";
 		private String convertion = "";
@@ -417,8 +412,7 @@ public class Query extends Text{
 		private JRadioButton rbToUpdate = new JRadioButton("UPDATE");
 		private JRadioButton rbFromCsv = new JRadioButton("CSV");
 		private JRadioButton rbToCsv = new JRadioButton("CSV");
-		
-		
+
 		/**
 		 * Constructor for test or bulk process use
 		 * @param query1 first query query to convert
@@ -428,7 +422,7 @@ public class Query extends Text{
 			this.query1 = query1;
 			this.query2 = query2;
 		}
-		
+
 		/**
 		 * Constructor only for jEdit use 
 		 */
@@ -446,20 +440,20 @@ public class Query extends Text{
 			String deleteRegExpToReplace = "";
 			switch(query1){
 			case "INSERT":
-				regExQuery = "\\bINSERT\\b[ \\t]\\bINTO\\b " + REGEXP_SQL_OBJECT;
+				regExQuery = "\\bINSERT\\b[ \\t]\\bINTO\\b " + SQL_OBJECT;
 				deleteRegExpToReplace = "^\\w+ \\w+ ";
 				break;
 			case "SELECT":
-				regExQuery = "\\bFROM\\b[ \\t]+" + REGEXP_SQL_OBJECT;
+				regExQuery = "\\bFROM\\b[ \\t]+" + SQL_OBJECT;
 				deleteRegExpToReplace = "^\\w+[ \\t]+";
 				break;
 			case "UPDATE":
-				regExQuery = "UPDATE " + REGEXP_SQL_OBJECT;
+				regExQuery = "UPDATE " + SQL_OBJECT;
 				deleteRegExpToReplace = "^\\w+ ";
 				break;
 			case "CSV":
 				if(!query2.equals("SELECT JOIN")){
-					regExQuery = "\\A" + REGEXP_SQL_OBJECT + "\\n";
+					regExQuery = "\\A" + SQL_OBJECT + "\\n";
 					deleteRegExpToReplace = "";
 				}
 				break;
@@ -474,13 +468,9 @@ public class Query extends Text{
 
 		private void startFormatQuery(){	
 			//format decimal
-			replaceBuffer(REGEXP_SQL_NUMBER, "_0.replaceAll(\",\", \".\")", "br");
+			replaceBuffer(SQL_NUMBER, "_0.replaceAll(\",\", \".\")", "br");
 
-			//remove all possible comments
-			replaceBuffer(REGEXP_SQL_COMMENT, "", "ir");
-
-			replaceBuffer(TRIM_UP, "", "r");
-			replaceBuffer(TRIM_DOWN, "", "r");
+			replaceBuffer(COMMENTS, "", "ir");
 
 			if(!query1.equals("CSV")){
 				textArea.selectAll();
@@ -648,10 +638,7 @@ public class Query extends Text{
 		public String processText(){
 			bfTmp = openTempBuffer();
 			String fowardQuery = "";
-
-			//TODO:replace to TRIM
-			replaceBuffer(TRIM_UP + "|" + TRIM_DOWN, "", "r");
-			int lastSemiColon = replaceBuffer(REGEXP_SQL_LAST_SEMICOLON, "", "ar");
+			int lastSemiColon = replaceBuffer(SQL_LAST_SEMICOLON, "", "ar");
 
 			convertion = query1 + "_" + query2;
 			queryType = query2.equals("SELECT JOIN") ? convertion : query1;
@@ -781,7 +768,7 @@ public class Query extends Text{
 				textArea.goToBufferEnd(true);
 				replaceSelection("\\p{Print}+", "'$0'", "r");
 				replaceSelection("'{2,}", "'", "r");
-				replaceBuffer("(')(" + REGEXP_SQL_FUNC_VALUES  + ")(')", "$2", "r");
+				replaceBuffer("(')(" + SQL_FUNC_VALUES  + ")(')", "$2", "r");
 
 				//format two first lines for "value AS alias"
 				if(numLines == 2){
@@ -809,14 +796,14 @@ public class Query extends Text{
 				tmpQuery = tmpQuery.replaceAll("(?m)^", "UNION SELECT ");
 				replaceBuffer("\\z", "\\n" + tmpQuery, "r");
 				replaceBuffer("$", " FROM DUAL", "r");
-				replaceBuffer("'+[ \\t]*(" + REGEXP_SQL_FUNC_VALUES + "|" + REGEXP_SQL_RESERVED_VALUES + ")+[ \\t]*'", "$1", "r");
+				replaceBuffer("'+[ \\t]*(" + SQL_FUNC_VALUES + "|" + SQL_RESERVED_VALUES + ")+[ \\t]*'", "$1", "r");
 				return;
 			}
 
 			switch(query2){
 			case "INSERT":
 				if(!sp.transposeMatrix()) return;
-				
+
 				replaceBuffer("\\t", ", ", "r");
 				textArea.goToBufferStart(false);
 				textArea.selectLine();
@@ -830,8 +817,8 @@ public class Query extends Text{
 				replaceBuffer("\\A, ", "UPDATE " + nameTable + "\\nSET ", "r");
 				break;
 			case "CSV":
-				csvPrefix = String.format(REGEXP_CSV_PREFIX, new Object[] { nameTable });
-				replaceBuffer(REGEXP_SQL_SET, "", "ir");
+				csvPrefix = String.format(CSV_PREFIX, new Object[] { nameTable });
+				replaceBuffer(SQL_SET, "", "ir");
 				replaceBuffer("\\A", csvPrefix, "r");
 				replaceBuffer(BLANK_LINE, "", "r");
 				replaceBuffer("^" + TRIM_COMA, "", "r");
@@ -872,7 +859,6 @@ public class Query extends Text{
 	 */
 	public void queryToLanguage(){
 		Buffer bfTmp = openTempBuffer();
-		replaceBuffer(TRIM_LEFT, "", "r");
 
 		//TODO: REEMPLAZAR todo textArea.getSelectedText() por selectedText
 		textArea.setText(firsUpperCase(selectedText, '_'));
@@ -987,12 +973,8 @@ public class Query extends Text{
 		Buffer bfTmp = openTempBuffer();
 
 		//format query
-		replaceBuffer(REGEXP_SQL_COMMENT, "", "ir");
+		replaceBuffer(COMMENTS, "", "ir");
 		replaceBuffer("values[\\( ]+", "values(", "ir");
-
-		// remove spaces in start and end
-		replaceBuffer(TRIM_UP, "", "r");
-		replaceBuffer(TRIM_DOWN, "", "r");
 
 		textArea.selectAll();
 		textArea.joinLines();
@@ -1017,7 +999,7 @@ public class Query extends Text{
 		textArea.selectLine();
 		replaceSelection("=[ ]*([ ]{0,}\\w+|'')", "", "ir");
 
-		replaceBuffer(REGEXP_SQL_IN_VALUES, "_1 + _2 + _3.replace(\",\", \"" + COMA + "\")", "abr");
+		replaceBuffer(SQL_IN_VALUES, "_1 + _2 + _3.replace(\",\", \"" + COMA + "\")", "abr");
 
 		//check number assigments and values is match
 		textArea.goToBufferStart(false);
@@ -1050,7 +1032,7 @@ public class Query extends Text{
 			textArea.goToBufferStart(false);
 			textArea.selectLine();
 			String firstLine = textArea.getSelectedText().replaceAll("(^\\(|\\)$)", "") + "\n\n";
-			replaceSelection(REGEXP_SQL_ALIAS, "$1", "ir");
+			replaceSelection(SQL_ALIAS, "$1", "ir");
 			replaceSelection("[ \\t]+\\(\\w+\\)", "", "r");
 
 			replaceBuffer("\\A", "INSERT INTO garbage", "r");
@@ -1072,14 +1054,14 @@ public class Query extends Text{
 		//revove default variables
 		replaceBuffer("^set.*default[ ]*\\n*", "", "ir");
 
-		replaceBuffer(TRIM_LEFT + "|" + TRIM_RIGHT, "", "r");
-		replaceBuffer(REGEXP_SQL_RESERVED, "_1.toUpperCase()", "br");
+		replaceBuffer(TRIM, "", "r");
+		replaceBuffer(SQL_RESERVED, "_1.toUpperCase()", "br");
 
 		//remove unused reserved words
 		replaceBuffer("[ ]*\\bOUTPUT\\b[ ]*", "", "ir");
 
 		closeTempBuffer(bfTmp);
-		
+
 		return textArea.getText();
 	}
 
@@ -1094,7 +1076,7 @@ public class Query extends Text{
 
 		Buffer bfTmp = openTempBuffer();
 
-		replaceBuffer(REGEXP_SQL_COMMENT, "", "ir"); 
+		replaceBuffer(COMMENTS, "", "ir"); 
 
 		//don't take primary keys from temp table like if this would a normal table, example: xll#SPDI
 		replaceBuffer("\\w+#\\b\\w+\\b", "\\n$0\\n", "ir");
@@ -1114,12 +1096,10 @@ public class Query extends Text{
 		replaceBuffer("^", "DROP TABLE ", "ir");
 		replaceBuffer("^DROP TABLE ##", "--DROP TABLE ##", "r");
 		sortLines(textArea);
-		//TODO:replace to TRIM
-		replaceBuffer(TRIM_UP + "|" + TRIM_DOWN, "", "r");
-		
+
 		replaceBuffer("\\z", "\n\n" + previousText, "r");
 		closeTempBuffer(bfTmp);
-		
+
 		return textArea.getText();
 	}
 

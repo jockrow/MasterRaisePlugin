@@ -238,7 +238,7 @@ public class Text extends Constants{
 		SearchAndReplace.setBeanShellReplace(bs);
 		return result;
 	}
-	
+
 	public Buffer openTempBuffer(){
 		//if is not selection take all textArea
 		if(selectedText.trim().equals("")){
@@ -248,6 +248,7 @@ public class Text extends Constants{
 		previousText = selectedText;
 		bfTmp.insert(0, selectedText);
 		editPane.setBuffer(bfTmp);
+		replaceBuffer(TRIM_BORDER, "", "r");
 		return bfTmp;
 	}
 
@@ -275,6 +276,7 @@ public class Text extends Constants{
 	}
 
 	public void endSelectedText(String t){
+		//TODO: si lo quito funciona QueryTest y no funcionan los demás, y si lo pongo pasa lo contrario
 		if(!isJUnitTest()) {
 			textArea.setSelection(prevSelection);
 			textArea.setSelectedText(t);
@@ -443,16 +445,11 @@ public class Text extends Constants{
 			textArea.goToPrevCharacter(false);
 		}
 	}
-	
+
 	private boolean isJUnitTest() {
-	    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-	    List<StackTraceElement> list = Arrays.asList(stackTrace);
-	    //TODO: SE PUEDE REEMPLAZAR POR INDEXOF PARA RENDIMIENTO
-	    for (StackTraceElement element : list) {
-	        if (element.getClassName().startsWith("org.junit.")) {
-	            return true;
-	        }           
-	    }
-	    return false;
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		List<StackTraceElement> list = Arrays.asList(stackTrace);
+		StackTraceElement junit = new StackTraceElement("org.junit.runners.model.FrameworkMethod$1", "runReflectiveCall", "FrameworkMethod.java", 45);
+		return list.indexOf(junit) >= 0;
 	}
 }

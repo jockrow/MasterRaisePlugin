@@ -1,6 +1,3 @@
-/************************************************/
-/*      @author Richard Martínez 2016/02/18     */
-/************************************************/
 package masterraise.tools;
 
 import java.awt.Component;
@@ -14,6 +11,11 @@ import org.gjt.sp.jedit.Buffer;
 
 import masterraise.Text;
 
+/**
+ * Tools for Java Language
+ * @author Richard Martínez 2016/02/18
+ *
+ */
 public class Java extends Text{
 	/**
 	 * Create get and set Methods from Class fields
@@ -46,10 +48,10 @@ public class Java extends Text{
 						, "bir");
 
 		closeTempBuffer(bfTmp);
-		
+
 		return textArea.getText();
 	}
-	
+
 	/**
 	 * convert the fields from sql columns to java properties, get and set
 	 * @example
@@ -94,8 +96,7 @@ public class Java extends Text{
 		replaceBuffer("(_)([a-z])", "_2.toUpperCase()", "br");
 
 		//get
-		textArea.selectAll();
-		String text = textArea.getSelectedText();
+		String text = textArea.getText();
 		duplicate(text);
 		replaceSelection(REPLACE, "$1.get$3(),", "r");
 
@@ -110,11 +111,12 @@ public class Java extends Text{
 	private void duplicate(String text){
 		textArea.goToStartOfWhiteSpace(false);
 		textArea.insertEnterAndIndent();
+		textArea.insertEnterAndIndent();
 		textArea.goToBufferStart(false);
 		textArea.setSelectedText(text);
 		textArea.goToBufferStart(true);
 	}
-	
+
 	/**
 	 * Method javaDefaultIcons()
 	 * get List Defaults Icons and Inteface for Java
@@ -127,7 +129,7 @@ public class Java extends Text{
 			Method getMenuBar = UIManagerDefaults.getDeclaredMethod("getMenuBar", new Class[0]);
 			Method getContentPane = UIManagerDefaults.getDeclaredMethod("getContentPane", new Class[0]);
 			JMenuBar menuBar = (JMenuBar) getMenuBar.invoke(umd, new Object[0]);
-			
+
 			menuBar.getMenu(0).setVisible(false);
 			ed.setJMenuBar(menuBar);
 			ed.getContentPane().add((Component) getContentPane.invoke(umd, new Object[0]));

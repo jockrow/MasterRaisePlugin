@@ -63,7 +63,6 @@ public class Language extends Text{
 			break;
 		}
 
-
 		content.setBorder(new EmptyBorder(8, 8, 8, 8));
 		content.setPreferredSize(new Dimension(200, 40));
 		content.add(cmbLanguages);
@@ -103,29 +102,25 @@ public class Language extends Text{
 
 	public String processText(String type){
 		Buffer bfTmp = openTempBuffer();
-
 		replaceBuffer(BLANK_LINE, "", "r");
 
 		if(!type.equals("language-code-to-string")){
-			replaceBuffer("[!\"#$%&'()*+,-/:;=>?@\\[\\\\\\]^`{|}~]", " ", "ir");
-			replaceBuffer("^(\\t|[ ])+|(\\t|[ ])+$.*", "", "ir");
-			textArea.goToBufferStart(false);
-			textArea.goToNextCharacter(true);
-			if(language.toString().equals("php") && textArea.getSelectedText().equals("$")){
-				replaceBuffer("$", "", "wi");
-			}
+			replaceBuffer("\\$|@", "", "r");
+			replaceBuffer("[ \\t,]+", "\\n", "ir");
+			deleteDuplicates(textArea);
 		}
 
 		switch(type){
 		case "language-code-to-string":
 			replaceBuffer("\"", "\\\"", "");
 			replaceBuffer("(^[ \\t]*)(.*)", "\t$1+ \"\\\\n$2\"", "r");
-			replaceBuffer("(\\+ \"\\\\n//)(.*)(\")", "//$2", "r");
-			replaceBuffer("\\A", "String strCode = \"", "r");
+			replaceBuffer("(\\+ \"\\\\n)(" + COMMENTS + ")", "$2", "r");
+			replaceBuffer("(//.*)(\")", "$1", "r");
+			replaceBuffer("\\A\\t\\+ \"\\\\n", "String strCode = \"", "r");
 			replaceBuffer("\\z", ";", "r");
 
 			//Settings comments for each line
-			switch(getResult()){
+			switch(language){
 			case "javaScript":
 				replaceBuffer("String strCode", "var strCode", "");
 				break;
@@ -137,7 +132,7 @@ public class Language extends Text{
 				replaceBuffer("(.*)(\\+ \"\\\\n)(.*)", "$1& Chr(10) & \\\"$3 _", "r");
 				replaceBuffer("\"; _", "\"", "");
 				replaceBuffer("\\\"", "\"\"", "");
-				replaceBuffer("//", "'", "");
+				replaceBuffer(COMMENTS, "", "r");
 				replaceBuffer("(String strCode)(.*)", "Dim strCode As String$2 _", "r");
 				break;
 			}
@@ -147,8 +142,8 @@ public class Language extends Text{
 			replaceBuffer("\\w+", "\\t+ \"&$0=\" + $0", "r");
 			replaceBuffer("\\A\\t\\+ \"&", "var url = \"?", "r");
 			replaceBuffer("\\z", ";", "r");
-			
-			switch(language.toString()){
+
+			switch(language){
 			case "c#": case "java":
 				replaceBuffer("var url = ", "String url = ", "i");
 				break;
@@ -165,15 +160,11 @@ public class Language extends Text{
 			break;
 
 		case "language-print-debug-variables":
-			replaceBuffer("@", "", "");
-			replaceBuffer("[ \\t,]+", "\\n", "ir");
-			deleteDuplicates(textArea);
-
 			replaceBuffer("\\w+", "\\t\\+ \", $0:\" + $0", "r");
 			replaceBuffer("\\A\\t\\+ \", ", "alert(\"", "r");
 			replaceBuffer("\\z", ");", "r");
 
-			switch(language.toString()){
+			switch(language){
 			case "batchScript":
 				replaceBuffer("^(alert\\(\"|\\t\\+ \", )", "echo ", "r");
 				replaceBuffer("(\" \\+ )(\\w+)(.*)", "%$2%", "r");

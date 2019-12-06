@@ -43,23 +43,29 @@ import masterraise.Text;
 public class Html extends Text{
 	private JDialog dialog = new JDialog(view, "Convert Query", true);
 	int i = 0;
-	
+
 	public Entities getEntities(){
 		return new Entities();
 	}
-	
+
 	/**
 	 * Method htmlNamedEntities()
 	 * Replace all chars like as accent for html Entities
 	 */
 	public class Entities{
-		String result = "";
+		boolean accent = false;
 		JCheckBox chkInvert = new JCheckBox("Inverse Conversion", false);
 		JButton ok = new JButton("OK");
 
 		String ENTITY_ACCENT = "&aacute; -> á";
 		String ACCENT_ENTITY = "á -> &aacute;";
-		
+
+		public Entities() { }
+
+		public Entities(boolean accent) {
+			this.accent = accent;
+		}
+
 		public void showGui(){
 			KeyListener ka = new KeyListener(){
 				public void keyReleased(KeyEvent ke){
@@ -75,13 +81,13 @@ public class Html extends Text{
 			ActionListener al = new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					switch(e.getActionCommand()){
-						case "OK":
-							dialog.dispose();
-							setResult();
-							processText();
+					case "OK":
+						dialog.dispose();
+						accent = !chkInvert.isSelected();
+						processText();
 						break;
-						case "Cancel":
-							dialog.dispose();
+					case "Cancel":
+						dialog.dispose();
 						break;
 					}
 				}
@@ -97,7 +103,7 @@ public class Html extends Text{
 			chkInvert.addKeyListener(ka);
 			chkInvert.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e){
-					lblInvert.setText(lblInvert.getText().equals(ENTITY_ACCENT) ? ACCENT_ENTITY : ENTITY_ACCENT);
+					lblInvert.setText(lblInvert.getText().equals(ACCENT_ENTITY) ? ENTITY_ACCENT : ACCENT_ENTITY);
 				}
 			});
 
@@ -124,42 +130,39 @@ public class Html extends Text{
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		}
-		
-		public void processText(){
+
+		public String processText(){
 			String t = iniSelectedText();
 
-			if(chkInvert.isSelected()){
-				for(int i=0; i<ARR_CHARS.length; i++){
-					t = t.replaceAll(ARR_CHARS[i][2], ARR_CHARS[i][0]);
-				}
-			}
-			else{
+			if(accent){
 				for(int i=0; i<ARR_CHARS.length; i++){
 					if(!ARR_CHARS[i][0].equals("&")){
 						t = t.replaceAll(ARR_CHARS[i][0], ARR_CHARS[i][2]);
 					}
 				}
 			}
+			else{
+				for(int i=0; i<ARR_CHARS.length; i++){
+					t = t.replaceAll(ARR_CHARS[i][2], ARR_CHARS[i][0]);
+				}
+			}
 
 			endSelectedText(t);
+			return t;
 		}
 
-		public void setResult(){
-			result = String.valueOf(chkInvert.isSelected());
-		}
-
-		public String getResult(){
-			return result;
+		public boolean isAccent(){
+			return accent;
 		}
 	}
-	
+
 	/**
 	 * Show table Html Entities Table
 	 */
 	public void showEntitiesTable(){
 		int[]arr = new int[3];
 		JTable table = new JTable();
-		
+
 		KeyListener kl = new KeyListener(){
 			@Override
 			public void keyTyped(KeyEvent e) { }
@@ -217,40 +220,34 @@ public class Html extends Text{
 		dialog.setLocationRelativeTo(view);
 		dialog.setVisible(true);
 	}
-	
+
+	public String convertHtmlEntities(boolean chkInvert){
+		Entities e = new Entities(chkInvert);
+		return e.processText();
+	}
 
 	/**
 	 * Extract a list for all fields from html file 
 	 */
 	public String getFieldsList(){
-	//TODO:VERIFICAR QUE AL DAR DESHACER SE DEVUELVA AL TEXTO ORIGINAL
-		final String TYPE_FIELDS = "(select|input|textarea|datalist)";
+		//TODO:VERIFICAR QUE AL DAR DESHACER SE DEVUELVA AL TEXTO ORIGINAL
 		Buffer bfTmp = openTempBuffer();
 		String fields = "";
 
-		if(!findBuffer("<[ \\t]*" + TYPE_FIELDS + "[ \\t].*>", "air")){
-			Macros.message(view, "Fields not found");
+		if(!findBuffer(HTML_FILTER_FIELDS, "air")){
+			Macros.error(view, "Fields not found");
 			return "";
 		}
-		
-		textArea.goToBufferStart(false);
-		
-		//TODO:hay que revisar que no pregunte a cada momento el reemplazo
-		while(findBuffer("<[ \\t]*" + TYPE_FIELDS + "[ \\t].*>", "ir")){
-			fields += textArea.getSelectedText() + "\n";
-		}
 
-		textArea.setText(fields);
-		
-		replaceBuffer("<[ \t]*" + TYPE_FIELDS, "\n$0", "ir");
-		replaceBuffer("(^\n)|(^.*type[ \t]*=[ \t\"\']*(submit|reset|button).*\n)", "", "ir");
-		replaceBuffer(">.*", ">", "r");
+		replaceBuffer("<[ \\t]*", "\\n<", "r");
+		replaceBuffer("^((?!" + HTML_FILTER_FIELDS + ").)*$", "", "ir");
+		replaceBuffer("(.*type[ \t]*=[ \t\"\']*" + HTML_NOT_FILTER_FIELDS + ".*)|" + BLANK_LINE, "", "ir");
 
 		fields = bfTmp.getText();
 		closeTempBuffer(bfTmp);
 		return fields;
 	}
-	
+
 	/**
 	 * remove tag from Html options, showing only title that user see at combo
 	 * <pre>
@@ -279,7 +276,7 @@ public class Html extends Text{
 		String t=iniSelectedText();
 
 		if(!Pattern.compile("(?m)<option[ ]+.*</option>").matcher(t.toLowerCase()).find()){
-			Macros.message(view, strSyntaxError);
+			Macros.error(view, strSyntaxError);
 			return "";
 		}
 

@@ -10,12 +10,11 @@ import masterraise.tools.Query;
 import masterraise.tools.Query.ConvertQuery;
 /*
 	SELECT_UPDATE	SELECT_INSERT	INSERT_SELECT	INSERT_UPDATE	INSERT_CSV	UPDATE_INSERT	UPDATE_SELECT	UPDATE_CSV	CSV_INSERT	CSV_SELECT	CSV_UPDATE
+comments	ok	ok	ok	ok	ok	ok	ok	ok	-	-	-
 convert	ok	ok	ok	ok	ok	ok	ok	ok	ok	ok	ok
-putWhere	ok	ok	-	-	-	-	ok		-	-	-
-whereIn	ok	ok	-	-	-				-	-	-
-beauty	ok	ok	ok		-
-return	-	-	ok	ok	ok
-comments	ok	ok
+beauty	ok	ok	ok	ok	-	ok	ok	-	ok	ok	ok
+putWhere	ok		-	-	-	-	ok	-	-	-	-
+whereIn			-	-	-	-	x	-	-	-	-
 
 SELECT ESTADO_FINCA, 'ACT'
 , CN_USUARIO_MODIFICACION, 'SICA_USER'
@@ -49,8 +48,6 @@ SET CODIGO_SICA = '1700100378'
 WHERE CODIGO_SICA = '2529300114';
 */
 public class QueryTest extends Tester {
-	String convertion = "";
-
 	@Test
 	public void convertSelectToUpdate() {
 		setVars(CONVERT, "SELECT", "UPDATE");
@@ -65,7 +62,6 @@ public class QueryTest extends Tester {
 
 	@Test
 	public void convertInsertToSelect() {
-		//TODO:REEMPLAZAR POR setVars("INSERT", "SELECT");
 		setVars(CONVERT, "INSERT", "SELECT");
 		assertEquals(expected.trim(), actual.trim());
 	}
@@ -120,14 +116,14 @@ public class QueryTest extends Tester {
 
 	@Test
 	public void sqlServerGetTmpTables() {
-		setVars(NO_PARAMS, "sqlServerGetTmpTables");
+		setVars("sqlServerGetTmpTables");
 		actual = new Query().sqlServerGetTmpTables();
 		assertEquals(expected.trim(), actual.trim());
 	}
 
 	@Test
 	public void sqlServerSetVariablesSp() {
-		setVars(NO_PARAMS, "sqlServerSetVariablesSp");
+		setVars("sqlServerSetVariablesSp");
 		actual = new Query().sqlServerSetVariablesSp();
 		assertEquals(expected.trim(), actual.trim());
 	}
@@ -137,7 +133,7 @@ public class QueryTest extends Tester {
 		String fileOriginal = path + "from/" + query1 + ".sql";
 		String fileConverted = path + "converted/" + query1 + "_" + query2 + ".sql";
 		expected = new MrFile().readFile(fileConverted);
-		convertion = query1 + "_" + query2;
+		String convertion = query1 + "_" + query2;
 
 		if(convertion.equals("CSV_SELECT JOIN")) {
 			fileOriginal = path + "from/CSV_SELECT_JOIN.sql";
