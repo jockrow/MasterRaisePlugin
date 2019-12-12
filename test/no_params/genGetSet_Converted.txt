@@ -5,3 +5,19 @@ public String getVariable(){
 public void setVariable(String variable){
 	this.variable = variable;
 }
+
+public integer getNumero(){
+	return numero;
+}
+
+public void setNumero(integer numero){
+	this.numero = numero;
+}
+
+public String getTexto(){
+	return texto;
+}
+
+public void setTexto(String texto){
+	this.texto = texto;
+}

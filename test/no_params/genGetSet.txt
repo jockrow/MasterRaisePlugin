@@ -1,1 +1,3 @@
 private String variable = ""; 
+private integer numero = 1;
+private String texto = "dos";

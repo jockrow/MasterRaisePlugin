@@ -27,7 +27,7 @@ import console.Console;
 import console.Shell;
 
 /**
- * 
+ * Main class edit with methods text 
  * @author Richard Martinez
  *
  */
@@ -52,7 +52,6 @@ public class Text extends Constants{
 	 * @param opts Options: i to setIgnoreCase, r to setRegexp, w to Whole word
 	 * @return number of found characters
 	 */
-	//TODO: buscar todo lo que tenga Pattern
 	public Integer countOccurrences(String str, String expression, String opts){
 		int count = 0;
 		opts = opts.toLowerCase().trim();
@@ -353,7 +352,6 @@ public class Text extends Constants{
 	 * IGEC_GESTOR_PROYECTO or IGEC GESTOR PROYECTO
 	 * for:
 	 * Igec Gestor Proyecto
-	 * TODO:PONER POR DEFECTO QUE TOME RETORNO DE LÍNEA O ESPACIO
 	 */
 	public String firsUpperCase(String text, char separator){
 	    String nameCapitalized = "";

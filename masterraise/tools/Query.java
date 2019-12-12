@@ -310,7 +310,7 @@ public class Query extends Text{
 				queryType = "UPDATE";
 			}
 			if(hasSyntaxError()){
-				Macros.message(view, msgSyntaxError);
+				Macros.error(view, msgSyntaxError);
 				return;
 			}
 
@@ -382,7 +382,7 @@ public class Query extends Text{
 
 		public void processText(){
 			if(opts == ""){
-				Macros.message(view, "You have to Check at least one Option");
+				Macros.error(view, "You have to Check at least one Option");
 				return;
 			}
 
@@ -1070,7 +1070,7 @@ public class Query extends Text{
 	 */
 	public String sqlServerGetTmpTables(){
 		if(!findBuffer("#", "a")){
-			Macros.message(view, "Not found temp tables");
+			Macros.error(view, "Not found temp tables");
 			return "";
 		}
 
@@ -1131,7 +1131,7 @@ public class Query extends Text{
 		final String LDR_FILE = "\\TABLE_EXPORT_DATA.ldr";
 		selectedText = textArea.getSelectedText();
 		if(selectedText=="" || selectedText==null){
-			Macros.message(view, "Must Select a Text");
+			Macros.error(view, ERR_SELECT_TEXT);
 			return;
 		}
 		selectedText += LDR_FILE;

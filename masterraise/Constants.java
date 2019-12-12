@@ -12,44 +12,46 @@ import org.gjt.sp.jedit.jEdit;
  * Constants settings for Master Rise Plugin
  */
 public abstract class Constants {
-	public final static String TRIM_UP = "\\A[\\n$ \\t]*";
-	public final static String TRIM_DOWN = "[\\n$ \\t]*\\z";
-	public final static String TRIM_BORDER = TRIM_UP + "|" + TRIM_DOWN;
-	public final static String TRIM_LEFT = "^[ \\t]+";
-	public final static String TRIM_RIGHT = "[ \\t]+$";
-	public final static String TRIM = TRIM_LEFT + "|" + TRIM_RIGHT;
-	public final static String BLANK_LINE = "(" + TRIM_UP + ")|(" + TRIM_DOWN + ")|(^[ \\t]*\\n)";
-	public final static String BLANK_SPACE = "(" + TRIM_LEFT + ")|(" + TRIM_RIGHT + ")";
-	public final static String SEP = File.separator;
-	public final static String LOW_ENIE = "ñ";
-	public final static String ROUND_BRACKET_LEFT  = "___";
-	public final static String ROUND_BRACKET_RIGHT = "_____";
-	public final static String COMA                = "__";
-	public final static String SHARP               = "____";
-	public final static String DOT                 = "_______";
-	public final static String TRIM_COMA           = "[ \\t]*,[ \\t]*";
-	public final static String COMMENTS = "[ \\t]*(--|//).*|/\\*([\\n\\t ]*([#\\w áéíóú]+\\n*)+[\\n\\t ]*)+\\*/";
+	public final static String TRIM_UP				= "\\A[\\n$ \\t]*";
+	public final static String TRIM_DOWN			= "[\\n$ \\t]*\\z";
+	public final static String TRIM_BORDER			= TRIM_UP + "|" + TRIM_DOWN;
+	public final static String TRIM_LEFT			= "^[ \\t]+";
+	public final static String TRIM_RIGHT			= "[ \\t]+$";
+	public final static String TRIM					= TRIM_LEFT + "|" + TRIM_RIGHT;
+	public final static String BLANK_LINE			= "(" + TRIM_UP + ")|(" + TRIM_DOWN + ")|(^[ \\t]*\\n)";
+	public final static String BLANK_SPACE			= "(" + TRIM_LEFT + ")|(" + TRIM_RIGHT + ")";
+	public final static String SEP 					= File.separator;
+	public final static String LOW_ENIE				= "ñ";
+	public final static String ROUND_BRACKET_LEFT	= "___";
+	public final static String ROUND_BRACKET_RIGHT	= "_____";
+	public final static String COMA					= "__";
+	public final static String SHARP				= "____";
+	public final static String DOT					= "_______";
+	public final static String TRIM_COMA			= "[ \\t]*,[ \\t]*";
+	public final static String COMMENTS				= "[ \\t]*(--|//).*|/\\*([\\n\\t ]*([#\\w áéíóú]+\\n*)+[\\n\\t ]*)+\\*/";
+	public final static String URL					= "((https?|ftp)://)?(\\w+\\.\\w+)+(\\p{Graph})*";
 
-	public final static String ERR_NOT_MATCH_COLUMN = "The number columns is not Match";
-	public final static String ERR_INVALID_CSV = "Text must have Tabs";
+	public final static String ERR_NOT_MATCH_COLUMN	= "The number columns is not Match";
+	public final static String ERR_INVALID_CSV		= "Text must have Tabs";
+	public final static String ERR_SELECT_TEXT		= "Must Select a Text";
 
-	public final static String HTML_FILTER_FIELDS = "<(select|input|textarea|datalist)";
-	public final static String HTML_NOT_FILTER_FIELDS = "(submit|reset|button)";
+	public final static String HTML_FILTER_FIELDS		= "<(select|input|textarea|datalist)";
+	public final static String HTML_NOT_FILTER_FIELDS	= "(submit|reset|button)";
 
-	public final static String SQL_OBJECT = "(\\w+\\.){0,}+\\w+";
-	public final static String SQL_FUNC_VALUES = "\\w+\\(([' \\t]*[\\w/]+[' \\t,.]*)+\\)";
-	public final static String SQL_QUOTES_VALUES = "'([ \\t,]*\\w+)+'";
-	public final static String SQL_ALIAS = "([a-z] )((AS ){0,1}\\w+)";
-	public final static String SQL_RESERVED = "\\b(insert|into|values|update|set|as|not|like|in|inner|right|left|join|on|select|distinct|convert|case|when|then|else|end|sum|count|max|min|datetime|smallint|int|varchar|dateadd|isnull|null|from|where|and|or|with|nolock|union|group by|order by|having|desc|cast|concat|substr|declare|numeric)\\b";
-	public final static String SQL_DOUBLE_SPACES = "[ ]{2,}";
-	public final static String SQL_RESERVED_LINE = "\\b(SET|FROM|WHERE|AND|OR|ORDER|INNER|RIGHT|LEFT)\\b";
-	public final static String SQL_LAST_SEMICOLON = "[\\t ]*;+[\\t ]*$(\\n)*\\z";
-	public final static String SQL_FUNCTION = SQL_OBJECT + "[ \\t]*\\([ \\t]*[ \\(:\\d\\w',\\./-]+\\)+";
-	public final static String SQL_RESERVED_VALUES = "\\b(SYSDATE)\\b";
-	public final static String SQL_SET = "[ \\t]*SET[ \\t]*";
-	public final static String SQL_NUMBER = "\\d+,\\d+";
-	public final static String SQL_IN_VALUES = "([\\('])([ ]*\\w+)([, ]+)";
-	public final static String CSV_PREFIX = "Structure table: %s\nFIELD	VALUE\n";
+	public final static String SQL_OBJECT			= "(\\w+\\.){0,}+\\w+";
+	public final static String SQL_FUNC_VALUES		= "\\w+\\(([' \\t]*[\\w/]+[' \\t,.]*)+\\)";
+	public final static String SQL_QUOTES_VALUES	= "'([ \\t,]*\\w+)+'";
+	public final static String SQL_ALIAS			= "([a-z] )((AS ){0,1}\\w+)";
+	public final static String SQL_RESERVED			= "\\b(insert|into|values|update|set|as|not|like|in|inner|right|left|join|on|select|distinct|convert|case|when|then|else|end|sum|count|max|min|datetime|smallint|int|varchar|dateadd|isnull|null|from|where|and|or|with|nolock|union|group by|order by|having|desc|cast|concat|substr|declare|numeric)\\b";
+	public final static String SQL_DOUBLE_SPACES	= "[ ]{2,}";
+	public final static String SQL_RESERVED_LINE	= "\\b(SET|FROM|WHERE|AND|OR|ORDER|INNER|RIGHT|LEFT)\\b";
+	public final static String SQL_LAST_SEMICOLON	= "[\\t ]*;+[\\t ]*$(\\n)*\\z";
+	public final static String SQL_FUNCTION			= SQL_OBJECT + "[ \\t]*\\([ \\t]*[ \\(:\\d\\w',\\./-]+\\)+";
+	public final static String SQL_RESERVED_VALUES	= "\\b(SYSDATE)\\b";
+	public final static String SQL_SET				= "[ \\t]*SET[ \\t]*";
+	public final static String SQL_NUMBER			= "\\d+,\\d+";
+	public final static String SQL_IN_VALUES		= "([\\('])([ ]*\\w+)([, ]+)";
+	public final static String CSV_PREFIX			= "Structure table: %s\nFIELD	VALUE\n";
 
 	public final static String[][] ARR_CHARS = {
 	{"Á","capital a, acute accent","&Aacute;","&#193;","A"}

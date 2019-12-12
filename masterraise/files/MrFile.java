@@ -1,6 +1,3 @@
-/**********************************************/
-/*      Develop by Richard Martínez 2018      */
-/**********************************************/
 package masterraise.files;
 
 import java.io.BufferedReader;
@@ -19,12 +16,10 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
 import org.gjt.sp.jedit.Buffer;
-import org.gjt.sp.jedit.EditPane;
 import org.gjt.sp.jedit.Macros;
 import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.browser.VFSBrowser;
@@ -35,10 +30,21 @@ import org.gjt.sp.jedit.gui.StatusBar;
 import masterraise.Text;
 import masterraise.tools.Bulk;
 
-public class MrFile extends Text{
-	public boolean moveFile(String oldPathFile, String newPathFile){
-		File oldFile = new File(oldPathFile);
-		File newFile = new File(newPathFile);
+/**
+ * Tools for Files
+ * @author Richard Martínez 2018
+ *
+ */
+public class MrFile extends Text {
+	/**
+	 * move a file to another path
+	 * @param currentPath current path for file
+	 * @param newPath new path to move
+	 * @return true if successfully
+	 */
+	public boolean moveFile(String currentPath, String newPath){
+		File oldFile = new File(currentPath);
+		File newFile = new File(newPath);
 
 		try{
 			org.apache.commons.io.FileUtils.moveFile(oldFile, newFile);
@@ -50,25 +56,44 @@ public class MrFile extends Text{
 		return true;
 	}
 
-	public boolean createFile(String pathFile, String body) throws IOException{
+	/**
+	 * create a file
+	 * @param path Path to create the file
+	 * @param body content for file
+	 * @throws IOException
+	 */
+	public void createFile(String path, String body) throws IOException {
 		BufferedWriter writer = null;
-		//		try {
-		writer = new BufferedWriter(new FileWriter(pathFile));
+		File folder = new File(path.replaceAll("/\\*?\\w+(\\.\\w+)?$", ""));
+
+		if(!folder.exists()) {
+			folder.mkdir();
+		}
+
+		if(body.trim().equals("")) {
+			new File(path).createNewFile();
+			return;
+		}
+		writer = new BufferedWriter(new FileWriter(path));
 		writer.write(body);
-		//		} catch(IOException ex) {
-		//			ex.printStackTrace();
-		//			return false;
-		//		} finally {
 		writer.close();
-		//		}
-
-		return true;
 	}
 
-	public void deleteFile(String directory, String fileName){
-		new File(directory, fileName).delete();
+	/**
+	 * Delete a file
+	 * @param path current path for file 
+	 * @param fileName File Name
+	 */
+	public void deleteFile(String path, String fileName){
+		new File(path, fileName).delete();
 	}
 
+	/**
+	 * List a complete content from directory
+	 * @param path full path
+	 * @param filter filter to apply
+	 * @return array content directory, if doesn't set will show completed content
+	 */
 	public File[] dir(String path, String filter){
 		List<File> listDir = new ArrayList<File>();
 		FileVisitor<Path> simpleFileVisitor = new SimpleFileVisitor<Path>() {
@@ -87,7 +112,7 @@ public class MrFile extends Text{
 					throws IOException {
 				String fileName = visitedFile.getFileName().toString();
 
-				if(Pattern.compile("(?i)" + filter.replace(".", "\\.").replace("*", ".*")).matcher(fileName).find()){
+				if(countOccurrences(fileName, filter, "ir") > 0){
 					listDir.add(visitedFile.toFile());
 				}
 
@@ -126,13 +151,12 @@ public class MrFile extends Text{
 		return body;
 	}
 
+	/**
+	 * Open Folder with Explorer
+	 * @param openPath path to open
+	 */
 	public void openFolder(String openPath){
-		boolean isWindows = System.getProperty("os.name").indexOf("Linux") < 0;
-		String fileExplorer = "cmd /c start \"\"";
-
-		if(!isWindows){
-			fileExplorer = "nemo";
-		}
+		String fileExplorer = "cmd /c start explorer";
 
 		try {
 			Runtime.getRuntime().exec(fileExplorer + " \"" + openPath + "\"");
@@ -166,6 +190,9 @@ public class MrFile extends Text{
 		}
 	}
 
+	/*
+	 * delete current buffer in jEdit
+	 */
 	public void deleteCurrentBuffer(){
 		if(buffer.isNewFile()){
 			Macros.error(view, "Buffer doesn't exist on disk." );
@@ -180,33 +207,35 @@ public class MrFile extends Text{
 	}
 
 	/**
-	 * Crea una estructura de directorios y archivos, de un buffer con una estructura de tabulaciones
-uno f
-	*unoF.txt
-	uno1
-	uno2
-	uno3
-dos
-	*dosF1.txt
-	*dosF2.txt
-	dosdos
-		*dosdosF
-		dosdos1
-		dosdos2
-	dos1
-		*dos1F.txt
-tres
-	*tresF.txt
-
-		NOTE: * is file
+	 * Create a directories and files structure, from a structure tabs in textBox
+	 * @example
+	 * <pre>
+	 * {@code
+	 * Note: * is file
+	 *uno f
+	 *	*unoF.txt
+	 *	uno1
+	 *	uno2
+	 *	uno3
+	 *dos
+	 *	*dosF1.txt
+	 *	*dosF2.txt
+	 *	dosdos
+	 *		*dosdosF
+	 *		dosdos1
+	 *		dosdos2
+	 *	dos1
+	 *		*dos1F.txt
+	 *tres
+	 *	*tresF.txt
 	 */
 	public void createFileStructure(){
 		if(!findBuffer("\\p{Alnum}", "air")){
-			Macros.message(view, "The textArea not must be empty");
+			Macros.error(view, "The textArea not must be empty");
 			return;
 		}
 		else if(findBuffer("[\\\\/:\\?\"<>\\|]", "air")){
-			Macros.message(view, "Don't must have this characters:\n \\ / : ? \" < >  |");
+			Macros.error(view, "Don't must have this characters:\n \\ / : ? \" < >  |");
 			return;
 		}
 
@@ -227,13 +256,10 @@ tres
 
 		//trim left with indent
 		while(findBuffer("\\A^\\t+\\w", "ar")){
-			textArea.selectAll();
 			textArea.shiftIndentLeft();
 		}
 
-		textArea.selectAll();
-		String optimizedText = textArea.getSelectedText();
-
+		String optimizedText = textArea.getText();
 		int maxTabs = 0;
 		String tab = "\\t";
 
@@ -258,38 +284,28 @@ tres
 			textArea.goToStartOfWhiteSpace(false);
 			textArea.deleteLine();
 
+			//TODO:siempre aparece el mensaje de confirmación cuando es verdadero
 			if(!findBuffer(tab+"\\t", "ir")){
 				maxTabs--;
 				tab = tab.replaceAll("^..", "");
 			}
 		}
 
-		//Find Files
-		String[] arrFiles = null;
-		//TODO:siempre aparece el mensaje de confirmación
-		if(findBuffer("*", "a")){
-			textArea.selectAll();
-			String tree = textArea.getSelectedText();
-			replaceBuffer("^.*/\\w+$\\n", "", "r");
-			replaceBuffer("*", "", "wi");
-			arrFiles = textArea.getSelectedText().split("\n");
-			textArea.setSelectedText(tree);
-			replaceBuffer("\\*.*", "", "r");
-		}
-
-		//Create Directories
-		textArea.selectAll();
-		String[] arrStructure = textArea.getSelectedText().split("\n");
+		String[] arrStructure = textArea.getText().split("\n");
 		for(int i=0; i<arrStructure.length; i++){
-			new File(parentPath + "/" + arrStructure[i]).mkdirs();
-		}
+			String path = (parentPath + "/" + arrStructure[i]);
 
-		//Create Files
-		for(int i=0; i<arrFiles.length; i++){
-			try {
-				createFile(parentPath + "/" + arrFiles[i], "");
-			} catch (IOException e) {
-				System.out.println("[error] " + e.getMessage());
+			//Create Files
+			if(path.indexOf("*") >= 0) {
+				try {
+					createFile(path.replace("*", ""), "");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}	
+			}
+			//Create Directories
+			else {
+				new File(path).mkdir();
 			}
 		}
 
@@ -297,8 +313,7 @@ tres
 			mgr.toggleDockableWindow("console");
 		}
 
-		textArea.selectAll();
-		textArea.setSelectedText(optimizedText);
+		textArea.setText(optimizedText);
 		VFSBrowser.browseDirectory(view, parentPath);
 
 		openFolder(parentPath);
@@ -331,7 +346,9 @@ tres
 		jEdit.newFile(view);
 		textArea.setText(strCurrentBuffer);
 		sortLines(textArea);
-		textArea.selectAll();
+		
+		//TODO:PROBAR NUEVAMENTE
+//		textArea.selectAll();
 		new Bulk().insertFileSelection();
 	}
 }

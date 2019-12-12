@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.regex.Pattern;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -275,7 +274,7 @@ public class Html extends Text{
 		String strSyntaxError = "Syntax Error Html Options";
 		String t=iniSelectedText();
 
-		if(!Pattern.compile("(?m)<option[ ]+.*</option>").matcher(t.toLowerCase()).find()){
+		if(countOccurrences(t.toLowerCase(), "(?m)<option[ ]+.*</option>", "ir") <= 0){
 			Macros.error(view, strSyntaxError);
 			return "";
 		}

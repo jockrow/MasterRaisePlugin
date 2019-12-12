@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.regex.Pattern;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -173,12 +172,12 @@ public class SpreadSheet extends Text{
 		String t = iniSelectedText();
 
 		if(countOccurrences(t, "\\t", "r") == 0){
-			Macros.message(view, ERR_INVALID_CSV);
+			Macros.error(view, ERR_INVALID_CSV);
 			return false;
 		}
 		
 		if(!isMatchColumns(t)){
-			Macros.message(view, notMatchColumn);
+			Macros.error(view, notMatchColumn);
 			return false;
 		}
 
@@ -339,8 +338,7 @@ public class SpreadSheet extends Text{
 		String NOT_ZERO = "Not less Zero Values";
 
 		try{
-			Pattern p = Pattern.compile(".*[0-9].*");
-			boolean isErrorLetter = txtLetterColumn == null ? false : p.matcher(txtLetterColumn.getText()).find();
+			boolean isErrorLetter = countOccurrences(txtLetterColumn.getText(), ".*\\d.*", "r") > 0;
 
 			if(dialogType.equals("spreadsheet-value-column")){
 				if(rbNumbers.isSelected()){
