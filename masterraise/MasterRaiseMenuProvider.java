@@ -61,7 +61,7 @@ public class MasterRaiseMenuProvider implements DynamicMenuProvider{
 		superMenu.add(menu);
 
 		menu = new JMenu("PHP");
-		createSubMenu("php-get-vars-from-html");
+		createSubMenu("get-php-vars-from-html");
 		superMenu.add(menu);
 
 		menu = new JMenu("Query");

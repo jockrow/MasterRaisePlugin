@@ -221,8 +221,7 @@ public class Html extends Text{
 	}
 
 	public String convertHtmlEntities(boolean chkInvert){
-		Entities e = new Entities(chkInvert);
-		return e.processText();
+		return new Entities(chkInvert).processText();
 	}
 
 	/**
@@ -230,20 +229,19 @@ public class Html extends Text{
 	 */
 	public String getFieldsList(){
 		//TODO:VERIFICAR QUE AL DAR DESHACER SE DEVUELVA AL TEXTO ORIGINAL
-		Buffer bfTmp = openTempBuffer();
-		String fields = "";
+		Buffer bfTmp = openTmpBuffer();
 
-		if(!findBuffer(HTML_FILTER_FIELDS, "air")){
+		if(!findBuffer("<" + HTML_FILTER_FIELDS, "air")){
 			Macros.error(view, "Fields not found");
 			return "";
 		}
 
 		replaceBuffer("<[ \\t]*", "\\n<", "r");
-		replaceBuffer("^((?!" + HTML_FILTER_FIELDS + ").)*$", "", "ir");
+		replaceBuffer("^((?!<" + HTML_FILTER_FIELDS + ").)*$", "", "ir");
 		replaceBuffer("(.*type[ \t]*=[ \t\"\']*" + HTML_NOT_FILTER_FIELDS + ".*)|" + BLANK_LINE, "", "ir");
 
-		fields = bfTmp.getText();
-		closeTempBuffer(bfTmp);
+		String fields = bfTmp.getText();
+		closeTmpBuffer(bfTmp);
 		return fields;
 	}
 

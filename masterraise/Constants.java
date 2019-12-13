@@ -1,7 +1,5 @@
 package masterraise;
 
-import java.io.File;
-
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
@@ -20,7 +18,6 @@ public abstract class Constants {
 	public final static String TRIM					= TRIM_LEFT + "|" + TRIM_RIGHT;
 	public final static String BLANK_LINE			= "(" + TRIM_UP + ")|(" + TRIM_DOWN + ")|(^[ \\t]*\\n)";
 	public final static String BLANK_SPACE			= "(" + TRIM_LEFT + ")|(" + TRIM_RIGHT + ")";
-	public final static String SEP 					= File.separator;
 	public final static String LOW_ENIE				= "ñ";
 	public final static String ROUND_BRACKET_LEFT	= "___";
 	public final static String ROUND_BRACKET_RIGHT	= "_____";
@@ -35,7 +32,7 @@ public abstract class Constants {
 	public final static String ERR_INVALID_CSV		= "Text must have Tabs";
 	public final static String ERR_SELECT_TEXT		= "Must Select a Text";
 
-	public final static String HTML_FILTER_FIELDS		= "<(select|input|textarea|datalist)";
+	public final static String HTML_FILTER_FIELDS		= "(select|input|textarea|datalist)";
 	public final static String HTML_NOT_FILTER_FIELDS	= "(submit|reset|button)";
 
 	public final static String SQL_OBJECT			= "(\\w+\\.){0,}+\\w+";

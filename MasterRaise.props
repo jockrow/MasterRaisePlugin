@@ -49,7 +49,7 @@ notify-file.label=File Changed
 notify-pixel.label=Pixel Changed
 notify-alarm.label=Alarm
 
-php-get-vars-from-html.label=Get Variables from Html
+get-php-vars-from-html.label=Get Variables from Html
 
 query-beauty.label=Beauty Query
 query-convert.label=Convert Query

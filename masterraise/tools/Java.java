@@ -32,7 +32,7 @@ public class Java extends Text{
 	 * }
 	 */
 	public String genGetSet(){
-		Buffer bfTmp = openTempBuffer();
+		Buffer bfTmp = openTmpBuffer();
 
 		replaceBuffer("^[ \\t]+", "", "r");
 		replaceBuffer("([ \\t]*)(=.*|;)", "", "r");
@@ -47,7 +47,7 @@ public class Java extends Text{
 						+ "\\n\""
 						, "bir");
 
-		closeTempBuffer(bfTmp);
+		closeTmpBuffer(bfTmp);
 
 		return textArea.getText();
 	}
@@ -77,7 +77,7 @@ public class Java extends Text{
 	 */
 	public String fields2javaProperties(){
 		String REPLACE = "(object)(\\.set)(\\w+)(.*)(get)(\\w+)(.*)";
-		Buffer bfTmp = openTempBuffer();
+		Buffer bfTmp = openTmpBuffer();
 
 		replaceBuffer(TRIM_LEFT + "|\"", "", "r");
 
@@ -103,7 +103,7 @@ public class Java extends Text{
 		//declare
 		duplicate(text);
 		replaceSelection(REPLACE, "private $6 $3;", "r");
-		closeTempBuffer(bfTmp);
+		closeTmpBuffer(bfTmp);
 
 		return textArea.getText();
 	}

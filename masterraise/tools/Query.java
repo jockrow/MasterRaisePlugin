@@ -386,9 +386,9 @@ public class Query extends Text{
 				return;
 			}
 
-			bfTmp = openTempBuffer();
+			bfTmp = openTmpBuffer();
 			beautyQuery(opts);
-			closeTempBuffer(bfTmp);
+			closeTmpBuffer(bfTmp);
 			dialog.dispose();
 		}
 	}
@@ -636,7 +636,7 @@ public class Query extends Text{
 		}
 
 		public String processText(){
-			bfTmp = openTempBuffer();
+			bfTmp = openTmpBuffer();
 			String fowardQuery = "";
 			int lastSemiColon = replaceBuffer(SQL_LAST_SEMICOLON, "", "ar");
 
@@ -712,7 +712,7 @@ public class Query extends Text{
 			replaceBuffer("(\\p{Graph})(,)(\\p{Graph})", "$1, $3", "r");
 
 			String convertedQuery = bfTmp.getText();
-			closeTempBuffer(bfTmp);
+			closeTmpBuffer(bfTmp);
 			return convertedQuery;
 		}
 
@@ -858,7 +858,7 @@ public class Query extends Text{
 	 * }
 	 */
 	public void queryToLanguage(){
-		Buffer bfTmp = openTempBuffer();
+		Buffer bfTmp = openTmpBuffer();
 
 		//TODO: REEMPLAZAR todo textArea.getSelectedText() por selectedText
 		textArea.setText(firsUpperCase(selectedText, '_'));
@@ -869,7 +869,7 @@ public class Query extends Text{
 		new Java().genGetSet();
 
 		replaceBuffer("\\A", selectedText, "r");
-		closeTempBuffer(bfTmp);
+		closeTmpBuffer(bfTmp);
 	}
 
 	/**
@@ -894,7 +894,7 @@ public class Query extends Text{
 	 * in('one', 'two', '3')
 	 */
 	public void formatIn(){
-		Buffer bfTmp = openTempBuffer();
+		Buffer bfTmp = openTmpBuffer();
 		deleteDuplicates(textArea);
 		boolean isNotNumber = findBuffer("[\\p{Alpha}/\\*\\-\\+,\\(\\)\\\"#\\$&]", "air");
 
@@ -908,7 +908,7 @@ public class Query extends Text{
 			replaceBuffer("'", "", "");
 		}
 
-		closeTempBuffer(bfTmp);
+		closeTmpBuffer(bfTmp);
 	}
 
 	/**
@@ -970,7 +970,7 @@ public class Query extends Text{
 	 * SET @i_maxRegistros = 30
 	 */
 	public String sqlServerSetVariablesSp(){
-		Buffer bfTmp = openTempBuffer();
+		Buffer bfTmp = openTmpBuffer();
 
 		//format query
 		replaceBuffer(COMMENTS, "", "ir");
@@ -1060,7 +1060,7 @@ public class Query extends Text{
 		//remove unused reserved words
 		replaceBuffer("[ ]*\\bOUTPUT\\b[ ]*", "", "ir");
 
-		closeTempBuffer(bfTmp);
+		closeTmpBuffer(bfTmp);
 
 		return textArea.getText();
 	}
@@ -1074,7 +1074,7 @@ public class Query extends Text{
 			return "";
 		}
 
-		Buffer bfTmp = openTempBuffer();
+		Buffer bfTmp = openTmpBuffer();
 
 		replaceBuffer(COMMENTS, "", "ir"); 
 
@@ -1098,7 +1098,7 @@ public class Query extends Text{
 		sortLines(textArea);
 
 		replaceBuffer("\\z", "\n\n" + previousText, "r");
-		closeTempBuffer(bfTmp);
+		closeTmpBuffer(bfTmp);
 
 		return textArea.getText();
 	}

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import masterraise.tools.Html;
+import masterraise.tools.Php;
 
 public class HtmlTest extends Tester{
 	@Test
@@ -27,5 +28,12 @@ public class HtmlTest extends Tester{
 		actual = new Html().options2Csv();
 		expected = decodeUtf8(expected.trim());
 		assertEquals(expected, actual.trim());
+	}
+
+	@Test
+	public void getPhpVarsFromHtml() {
+		setVars("getPhpVarsFromHtml");
+		actual = new Php().getPhpVarsFromHtml();
+		assertEquals(expected.trim(), actual.trim());
 	}
 }

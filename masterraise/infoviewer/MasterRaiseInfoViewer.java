@@ -43,32 +43,26 @@ public class MasterRaiseInfoViewer {
 		}
 	}
 
+	/**
+	 * open browser with page
+	 * @param url with browser open
+	 */
 	private static void goPage(String url){
 		String cmd = jEdit.getProperty("infoviewer.otherBrowser");
-		String[] args = convertCommandString(cmd, url);
-
-		try {
-			Runtime.getRuntime().exec(args);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static String[] convertCommandString(String command, String url) {
 		Vector<String> args = new Vector<String>();
 		StringBuffer arg = new StringBuffer();
 		boolean foundDollarU = false;
 		boolean inQuotes = false;
-		int end = command.length() - 1;
+		int end = cmd.length() - 1;
 
 		for (int i = 0; i <= end; i++) {
-			char c = command.charAt(i);
+			char c = cmd.charAt(i);
 			switch (c ) {
 			case '$':
 				if (i == end) {
 					arg.append(c);
 				} else {
-					char c2 = command.charAt(++i);
+					char c2 = cmd.charAt(++i);
 					if (c2 == 'u') {
 						arg.append(url);
 						foundDollarU = true;
@@ -100,7 +94,7 @@ public class MasterRaiseInfoViewer {
 				if (i == end) {
 					arg.append(c);
 				} else {
-					char c2 = command.charAt(++i);
+					char c2 = cmd.charAt(++i);
 					if (c2 != '\\') {
 						arg.append(c);
 					}
@@ -138,9 +132,13 @@ public class MasterRaiseInfoViewer {
 			args.addElement(url);
 		}
 
-		String[] result = new String[args.size()];
-		args.copyInto(result);
+		String[] openBrowser = new String[args.size()];
+		args.copyInto(openBrowser);
 
-		return result;
+		try {
+			Runtime.getRuntime().exec(openBrowser);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

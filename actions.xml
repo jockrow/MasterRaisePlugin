@@ -160,9 +160,9 @@
 		</CODE>
 	</ACTION>
 	
-	<ACTION NAME="php-get-vars-from-html">
+	<ACTION NAME="get-php-vars-from-html">
 		<CODE>
-			new masterraise.tools.Php().getVarsFromHtml();
+			new masterraise.tools.Php().getPhpVarsFromHtml();
 		</CODE>
 	</ACTION>
 	

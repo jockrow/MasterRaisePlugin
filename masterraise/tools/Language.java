@@ -101,7 +101,7 @@ public class Language extends Text{
 	}
 
 	public String processText(String type){
-		Buffer bfTmp = openTempBuffer();
+		Buffer bfTmp = openTmpBuffer();
 		replaceBuffer(BLANK_LINE, "", "r");
 
 		if(!type.equals("language-code-to-string")){
@@ -216,7 +216,7 @@ public class Language extends Text{
 		}
 
 		String result = bfTmp.getText();
-		closeTempBuffer(bfTmp);
+		closeTmpBuffer(bfTmp);
 		return result;
 	}
 

@@ -202,7 +202,7 @@ public class MrFile extends Text {
 		if(Macros.confirm(view, "Are you sure delete this file?", JOptionPane.YES_NO_OPTION)==0){
 			deleteFile(buffer.getDirectory(), buffer.getName());
 			jEdit.checkBufferStatus(view);
-			view.getStatus().setMessageAndClear("Deleted: " + buffer.getDirectory() + SEP + buffer.getName());
+			view.getStatus().setMessageAndClear("Deleted: " + buffer.getDirectory() + "/" + buffer.getName());
 		}
 	}
 
@@ -230,7 +230,7 @@ public class MrFile extends Text {
 	 *	*tresF.txt
 	 */
 	public void createFileStructure(){
-		if(!findBuffer("\\p{Alnum}", "air")){
+		if(textArea.getText().trim().equals("")){
 			Macros.error(view, "The textArea not must be empty");
 			return;
 		}
@@ -243,6 +243,7 @@ public class MrFile extends Text {
 		boolean isOpenConsole = mgr.isDockableWindowVisible("console");
 		VFSFileChooserDialog fileChooser = new VFSFileChooserDialog(view, null, VFSBrowser.CHOOSE_DIRECTORY_DIALOG, true);
 		String[] arrDirectory = fileChooser.getSelectedFiles();
+		Buffer bfTmp = openTmpBuffer();
 
 		if(arrDirectory == null){
 			return;
@@ -259,7 +260,6 @@ public class MrFile extends Text {
 			textArea.shiftIndentLeft();
 		}
 
-		String optimizedText = textArea.getText();
 		int maxTabs = 0;
 		String tab = "\\t";
 
@@ -313,7 +313,7 @@ public class MrFile extends Text {
 			mgr.toggleDockableWindow("console");
 		}
 
-		textArea.setText(optimizedText);
+		jEdit._closeBuffer(view, bfTmp);
 		VFSBrowser.browseDirectory(view, parentPath);
 
 		openFolder(parentPath);

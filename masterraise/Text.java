@@ -34,6 +34,7 @@ import console.Shell;
 public class Text extends Constants{
 	public View view = jEdit.getActiveView();
 	public Buffer buffer = view.getBuffer();
+	public static Buffer firstEditBuffer = null;
 	public TextArea textArea = view.getTextArea();
 	public EditPane editPane = view.getEditPane();
 	public String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
@@ -55,7 +56,7 @@ public class Text extends Constants{
 	public Integer countOccurrences(String str, String expression, String opts){
 		int count = 0;
 		opts = opts.toLowerCase().trim();
-		
+
 		switch(opts.trim()) {
 		case "":
 			count = StringUtils.countMatches(str, expression);
@@ -73,7 +74,7 @@ public class Text extends Constants{
 				prefix += "i";
 			}
 			prefix += ")";
-			
+
 			expression = prefix + expression;
 
 			Pattern pattern = Pattern.compile(expression);
@@ -197,7 +198,7 @@ public class Text extends Constants{
 		SearchAndReplace.setWholeWord(ww);
 		SearchAndReplace.setBeanShellReplace(bs);
 		SearchAndReplace.setSearchString(oldSearch);
-		
+
 		return numReplaces;
 	}
 
@@ -228,7 +229,7 @@ public class Text extends Constants{
 		SearchAndReplace.setRegexp(opts.indexOf('r') >= 0);
 		SearchAndReplace.setSearchFileSet(new CurrentBufferSet());
 		boolean result = SearchAndReplace.find(view);
-		
+
 		SearchAndReplace.setAutoWrapAround(aw);
 		SearchAndReplace.setSearchString(oldSearch);
 		SearchAndReplace.setIgnoreCase(ic);
@@ -238,12 +239,17 @@ public class Text extends Constants{
 		return result;
 	}
 
-	public Buffer openTempBuffer(){
+	public Buffer openTmpBuffer(){
 		//if is not selection take all textArea
 		if(selectedText.trim().equals("")){
 			selectedText = textArea.getText();
 		}
+
+		if(firstEditBuffer == null) {
+			firstEditBuffer = buffer;
+		}
 		Buffer bfTmp = BufferSetManager.createUntitledBuffer();
+
 		previousText = selectedText;
 		bfTmp.insert(0, selectedText);
 		editPane.setBuffer(bfTmp);
@@ -251,13 +257,17 @@ public class Text extends Constants{
 		return bfTmp;
 	}
 
-	public void closeTempBuffer(Buffer bfTmp){
+	public void closeTmpBuffer(Buffer bfTmp){
 		if(!isJUnitTest()) {
 			selectedText = textArea.getText();
 
-			jEdit._closeBuffer(view, bfTmp);
-			textArea.setText(selectedText);
-			Registers.setRegister('$', selectedText);
+			if(!isInvokingTwoTimes()) {
+				jEdit._closeBuffer(view, bfTmp);
+				editPane.setBuffer(firstEditBuffer);
+				firstEditBuffer = null;
+				textArea.setText(selectedText);
+				Registers.setRegister('$', selectedText);
+			}
 		}
 	}
 
@@ -354,21 +364,21 @@ public class Text extends Constants{
 	 * Igec Gestor Proyecto
 	 */
 	public String firsUpperCase(String text, char separator){
-	    String nameCapitalized = "";
-	    String[] arrText = text.split("\n");
-	    for (int l = 0; l < arrText.length; l++) {
-	    	String[] arrLine = arrText[l].split(String.valueOf(separator));
-	    	String line = "";
-	    	
-	    	for (int i = 0; i < arrLine.length; i++) {
-	    		line += separator + StringUtils.capitalize(arrLine[i].toLowerCase());
+		String nameCapitalized = "";
+		String[] arrText = text.split("\n");
+		for (int l = 0; l < arrText.length; l++) {
+			String[] arrLine = arrText[l].split(String.valueOf(separator));
+			String line = "";
+
+			for (int i = 0; i < arrLine.length; i++) {
+				line += separator + StringUtils.capitalize(arrLine[i].toLowerCase());
 			}
-	    	nameCapitalized += line.replaceAll("^" + separator, "") + "\n";
+			nameCapitalized += line.replaceAll("^" + separator, "") + "\n";
 		}
-	    
+
 		return nameCapitalized.replaceAll("\n$", "");
 	}
-	
+
 	/**
 	 * Join coherence lines
 	 */
@@ -410,7 +420,7 @@ public class Text extends Constants{
 		SearchAndReplace.setSearchFileSet(new CurrentBufferSet());
 		SearchAndReplace.find(view);
 	}
-	
+
 	/**
 	 * Find selection to back in document
 	 */
@@ -449,5 +459,23 @@ public class Text extends Constants{
 		List<StackTraceElement> list = Arrays.asList(stackTrace);
 		StackTraceElement junit = new StackTraceElement("org.junit.runners.model.FrameworkMethod$1", "runReflectiveCall", "FrameworkMethod.java", 45);
 		return list.indexOf(junit) >= 0;
+	}
+
+	private boolean isInvokingTwoTimes() {
+		int numInvoking = 0;
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		List<StackTraceElement> listTrace = Arrays.asList(stackTrace);
+
+		for (StackTraceElement element : listTrace) {
+			if(element.getClassName().startsWith("masterraise.")
+					&& !element.getClassName().startsWith("masterraise.Text")) {
+				numInvoking++;
+				if(numInvoking > 1) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 }
