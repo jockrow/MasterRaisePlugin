@@ -158,61 +158,18 @@ public class Query extends Text{
 
 	/**
 	 * Format a query for easy read
-	 *
-	 * @example
-	select distinct Prestar.dbo.autAutorizacionASP.autIDAutorizacion as AUTORIZACON, commDivision_2.divNom AS REGIONAL_IPS_ORIGEN
-	, dos , '1, 2'
-	--comentario
-	, funcion , funcion(par1, 'par2')
-	from         dbo.commDivision AS commDivision_3 inner join
-								 dbo.commDivision with (nolock) on commDivision_3.divIDDivision = dbo.commDivision.divIDDivisionPadre inner join
-								 dbo.redIPS AS Ips_Transcriptor on dbo.commDivision.divIDDivision = Ips_Transcriptor.ipsIDDivision inner join
-								 Prestar.dbo.autAutorizacionASP 	ON Prestar.dbo.autAutorizacionASP.autIDIPSOrigen <> Prestar.dbo.autDetalleAutorizacionASP.autIDIPS inner join
-								 Prestar.dbo.autDetalleAutorizacionASP with (nolock) on
-								 Prestar.dbo.autAutorizacionASP.autIDAutorizacion = Prestar.dbo.autDetalleAutorizacionASP.autIDAutorizacion AND
-								 Prestar.dbo.autAutorizacionASP.autIDIPSOrigen <> Prestar.dbo.autDetalleAutorizacionASP.autIDIPS inner join
-								 dbo.redIPS AS IPS_Origen with (nolock) ON Prestar.dbo.autAutorizacionASP.autIDIPSOrigen = IPS_Origen.ipsIDIPS inner join
-								 dbo.commTablaTablas with (nolock) ON Prestar.dbo.autDetalleAutorizacionASP.autEstado = dbo.commTablaTablas.tblCodElemento inner join
-								 dbo.commDivision commDivision_2 with (nolock) inner join
-								 dbo.commDivision AS commDivision_1 with (nolock) ON commDivision_2.divIDDivision = commDivision_1.divIDDivisionPadre on and  
-								 IPS_Origen.ipsIDDivision = commDivision_1.divIDDivision and  Ips_Transcriptor.ipsIDIPS = Prestar.dbo.autDetalleAutorizacionASP.autIDIPS 
-								 WHERE Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 1 AND Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 123 OR Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 456
-
-	to:
-	SELECT DISTINCT Prestar.dbo.autAutorizacionASP.autIDAutorizacion, commDivision_2.divNom
-		, dos, '1, 2'
-		, funcion, funcion(par1, 'par2')
-	FROM dbo.commDivision AS commDivision_3
-	INNER JOIN dbo.commDivision WITH(NOLOCK) ON commDivision_3.divIDDivision = dbo.commDivision.divIDDivisionPadre
-	INNER JOIN dbo.redIPS AS Ips_Transcriptor ON dbo.commDivision.divIDDivision = Ips_Transcriptor.ipsIDDivision
-	INNER JOIN Prestar.dbo.autAutorizacionASP ON Prestar.dbo.autAutorizacionASP.autIDIPSOrigen <> Prestar.dbo.autDetalleAutorizacionASP.autIDIPS
-	INNER JOIN Prestar.dbo.autDetalleAutorizacionASP WITH(NOLOCK) ON Prestar.dbo.autAutorizacionASP.autIDAutorizacion = Prestar.dbo.autDetalleAutorizacionASP.autIDAutorizacion
-		AND Prestar.dbo.autAutorizacionASP.autIDIPSOrigen <> Prestar.dbo.autDetalleAutorizacionASP.autIDIPS
-	INNER JOIN dbo.redIPS AS IPS_Origen WITH(NOLOCK) ON Prestar.dbo.autAutorizacionASP.autIDIPSOrigen = IPS_Origen.ipsIDIPS
-	INNER JOIN dbo.commTablaTablas WITH(NOLOCK) ON Prestar.dbo.autDetalleAutorizacionASP.autEstado = dbo.commTablaTablas.tblCodElemento
-	INNER JOIN dbo.commDivision commDivision_2 WITH(NOLOCK)
-	INNER JOIN dbo.commDivision AS commDivision_1 WITH(NOLOCK) ON commDivision_2.divIDDivision = commDivision_1.divIDDivisionPadre ON
-		AND IPS_Origen.ipsIDDivision = commDivision_1.divIDDivision
-		AND Ips_Transcriptor.ipsIDIPS = Prestar.dbo.autDetalleAutorizacionASP.autIDIPS
-	WHERE Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 1
-		AND Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 123
-		OR Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 456
 	 */
 	public class BeautyQuery{
 		private String opts = "";
-		private JCheckBox chkUcase;
 		private JCheckBox chkWithNolock;
-		private JCheckBox chkIndent;
 
 		private BeautyQuery() {
 			selectedText = iniSelectedText();
 		}
 
 		private void setResult(){
-			opts = "";
-			if(chkUcase.isSelected()) opts += "u";
+			opts = "ui";
 			if(chkWithNolock.isSelected()) opts += "l";
-			if(chkIndent.isSelected()) opts += "i";
 		}
 
 		public void setOpcs(String opcs) {
@@ -221,16 +178,7 @@ public class Query extends Text{
 
 		public void showGui(){
 			String bufferText = textArea.getBuffer().getText().toUpperCase();
-			JPanel checkBoxPanel = new JPanel(new BorderLayout());
-			chkUcase = new JCheckBox("UpperCase Reserved", true);	//TODO:QUITAR
-			chkWithNolock = new JCheckBox("set WithNolock", false);	//TODO:PONER
-			chkIndent = new JCheckBox("Indent", true);				//TODO:QUITAR
-
-			checkBoxPanel.add(chkUcase, BorderLayout.NORTH);
-			if(bufferText.indexOf("SELECT") != -1 && bufferText.indexOf("FROM") != -1){
-				checkBoxPanel.add(chkWithNolock, BorderLayout.CENTER);
-			}
-			checkBoxPanel.add(chkIndent, BorderLayout.SOUTH);
+			chkWithNolock = new JCheckBox("set With Nolock", false);
 
 			KeyAdapter ka = new KeyAdapter(){
 				public void keyReleased(KeyEvent evt){
@@ -240,12 +188,13 @@ public class Query extends Text{
 				}
 			};
 
-			chkUcase.addKeyListener(ka);
-			chkWithNolock.addKeyListener(ka);
-			chkIndent.addKeyListener(ka);
+			if(bufferText.indexOf("SELECT") != -1 && bufferText.indexOf("FROM") != -1){
+				content.add(chkWithNolock, BorderLayout.NORTH);
+				chkWithNolock.addKeyListener(ka);
+			}
 
 			btnOk = new JButton("Beautify");
-
+			btnOk.addKeyListener(ka);
 			JPanel buttonPanel = new JPanel();
 			buttonPanel.add(btnOk, BorderLayout.WEST);
 			buttonPanel.add(btnCancel, BorderLayout.EAST);
@@ -266,8 +215,7 @@ public class Query extends Text{
 
 			dialog  = new JDialog(view, "Beauty Query", true);
 			content.setBorder(new EmptyBorder(8, 8, 8, 8));
-			content.setPreferredSize(new Dimension(200, 130));
-			content.add(checkBoxPanel, BorderLayout.NORTH);
+			content.setPreferredSize(new Dimension(200, 75));
 			content.add(buttonPanel, BorderLayout.SOUTH);
 
 			dialog.setContentPane(content);
@@ -281,6 +229,45 @@ public class Query extends Text{
 		/**
 		 * Beauty format query
 		 * @param opts u: set upper case reserved words, l: set WITH(NOLOCK) when query is SELECT, i: Indent query, f:if this function invoked from beauty Query Macro
+		 * @example
+		 * <pre>
+		 *select distinct Prestar.dbo.autAutorizacionASP.autIDAutorizacion as AUTORIZACON, commDivision_2.divNom AS REGIONAL_IPS_ORIGEN
+		 *, dos , '1, 2'
+		 *--comentario
+		 *, funcion , funcion(par1, 'par2')
+		 *from         dbo.commDivision AS commDivision_3 inner join
+		 *	 dbo.commDivision with (nolock) on commDivision_3.divIDDivision = dbo.commDivision.divIDDivisionPadre inner join
+		 *	 dbo.redIPS AS Ips_Transcriptor on dbo.commDivision.divIDDivision = Ips_Transcriptor.ipsIDDivision inner join
+		 *	 Prestar.dbo.autAutorizacionASP 	ON Prestar.dbo.autAutorizacionASP.autIDIPSOrigen <> Prestar.dbo.autDetalleAutorizacionASP.autIDIPS inner join
+		 *	 Prestar.dbo.autDetalleAutorizacionASP with (nolock) on
+		 *	 Prestar.dbo.autAutorizacionASP.autIDAutorizacion = Prestar.dbo.autDetalleAutorizacionASP.autIDAutorizacion AND
+		 *	 Prestar.dbo.autAutorizacionASP.autIDIPSOrigen <> Prestar.dbo.autDetalleAutorizacionASP.autIDIPS inner join
+		 *	 dbo.redIPS AS IPS_Origen with (nolock) ON Prestar.dbo.autAutorizacionASP.autIDIPSOrigen = IPS_Origen.ipsIDIPS inner join
+		 *	 dbo.commTablaTablas with (nolock) ON Prestar.dbo.autDetalleAutorizacionASP.autEstado = dbo.commTablaTablas.tblCodElemento inner join
+		 *	 dbo.commDivision commDivision_2 with (nolock) inner join
+		 *	 dbo.commDivision AS commDivision_1 with (nolock) ON commDivision_2.divIDDivision = commDivision_1.divIDDivisionPadre on and  
+		 *	 IPS_Origen.ipsIDDivision = commDivision_1.divIDDivision and  Ips_Transcriptor.ipsIDIPS = Prestar.dbo.autDetalleAutorizacionASP.autIDIPS 
+		 *	 WHERE Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 1 AND Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 123 OR Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 456
+		 *
+		 *to:
+		 *SELECT DISTINCT Prestar.dbo.autAutorizacionASP.autIDAutorizacion, commDivision_2.divNom
+		 *	, dos, '1, 2'
+		 *	, funcion, funcion(par1, 'par2')
+		 *FROM dbo.commDivision AS commDivision_3
+		 *INNER JOIN dbo.commDivision WITH(NOLOCK) ON commDivision_3.divIDDivision = dbo.commDivision.divIDDivisionPadre
+		 *INNER JOIN dbo.redIPS AS Ips_Transcriptor ON dbo.commDivision.divIDDivision = Ips_Transcriptor.ipsIDDivision
+		 *INNER JOIN Prestar.dbo.autAutorizacionASP ON Prestar.dbo.autAutorizacionASP.autIDIPSOrigen <> Prestar.dbo.autDetalleAutorizacionASP.autIDIPS
+		 *INNER JOIN Prestar.dbo.autDetalleAutorizacionASP WITH(NOLOCK) ON Prestar.dbo.autAutorizacionASP.autIDAutorizacion = Prestar.dbo.autDetalleAutorizacionASP.autIDAutorizacion
+		 *	AND Prestar.dbo.autAutorizacionASP.autIDIPSOrigen <> Prestar.dbo.autDetalleAutorizacionASP.autIDIPS
+		 *INNER JOIN dbo.redIPS AS IPS_Origen WITH(NOLOCK) ON Prestar.dbo.autAutorizacionASP.autIDIPSOrigen = IPS_Origen.ipsIDIPS
+		 *INNER JOIN dbo.commTablaTablas WITH(NOLOCK) ON Prestar.dbo.autDetalleAutorizacionASP.autEstado = dbo.commTablaTablas.tblCodElemento
+		 *INNER JOIN dbo.commDivision commDivision_2 WITH(NOLOCK)
+		 *INNER JOIN dbo.commDivision AS commDivision_1 WITH(NOLOCK) ON commDivision_2.divIDDivision = commDivision_1.divIDDivisionPadre ON
+		 *	AND IPS_Origen.ipsIDDivision = commDivision_1.divIDDivision
+		 *	AND Ips_Transcriptor.ipsIDIPS = Prestar.dbo.autDetalleAutorizacionASP.autIDIPS
+		 *WHERE Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 1
+		 *	AND Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 123
+		 *	OR Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 456
 		 */
 		public void beautyQuery(String opts){
 			//quita todos los comentarios y tabulador
@@ -291,6 +278,7 @@ public class Query extends Text{
 
 			textArea.selectAll();
 			textArea.joinLines();
+			selectedText = textArea.getSelectedText();
 			replaceBuffer("\\t+", " ", "r");
 
 			if(selectedText.toUpperCase().indexOf("FROM") >= 0 && selectedText.toUpperCase().indexOf("INSERT") >= 0){
