@@ -13,7 +13,7 @@ import masterraise.Text;
 
 /**
  * Tools for Java Language
- * @author Richard Martínez 2016/02/18
+ * @author Richard Martinez 2016/02/18
  *
  */
 public class Java extends Text{
@@ -34,9 +34,7 @@ public class Java extends Text{
 	public String genGetSet(){
 		Buffer bfTmp = openTmpBuffer();
 
-		replaceBuffer("^[ \\t]+", "", "r");
-		replaceBuffer("([ \\t]*)(=.*|;)", "", "r");
-
+		replaceBuffer("[ \\t]*=.*|;", "", "r");
 		replaceBuffer("(\\p{Graph}+)([ \\t]+)(\\p{Graph}+)([ \\t]+)(\\w)(\\p{Graph}+)"
 				, "\"public \" + _3 + \" \" + (_3.equals(\"boolean\") ? \"is\" : \"get\") + _5.toUpperCase() + _6 + \"(){"
 						+ "\\n	return \" + _5 + _6 + \";"
@@ -79,7 +77,7 @@ public class Java extends Text{
 		String REPLACE = "(object)(\\.set)(\\w+)(.*)(get)(\\w+)(.*)";
 		Buffer bfTmp = openTmpBuffer();
 
-		replaceBuffer(TRIM_LEFT + "|\"", "", "r");
+		replaceBuffer("\"", "", "");
 
 		//set
 		replaceBuffer("(\\w+)([ \\t]+)(\\w+)(.*)"

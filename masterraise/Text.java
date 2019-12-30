@@ -254,11 +254,12 @@ public class Text extends Constants{
 		bfTmp.insert(0, selectedText);
 		editPane.setBuffer(bfTmp);
 		replaceBuffer(TRIM_BORDER, "", "r");
+		replaceBuffer(TRIM_LEFT, "", "r");
 		return bfTmp;
 	}
 
 	public void closeTmpBuffer(Buffer bfTmp){
-		if(!isJUnitTest()) {
+//		if(!isJUnitTest()) {
 			selectedText = textArea.getText();
 
 			if(!isInvokingTwoTimes()) {
@@ -268,7 +269,7 @@ public class Text extends Constants{
 				textArea.setText(selectedText);
 				Registers.setRegister('$', selectedText);
 			}
-		}
+//		}
 	}
 
 	public String iniSelectedText(){
@@ -286,11 +287,12 @@ public class Text extends Constants{
 
 	public void endSelectedText(String t){
 		//TODO: si lo quito funciona QueryTest y no funcionan los demás, y si lo pongo pasa lo contrario
-		if(!isJUnitTest()) {
+//		if(!isJUnitTest()) {
+//		if(!isInvokingTwoTimes()) {
 			textArea.setSelection(prevSelection);
 			textArea.setSelectedText(t);
 			Registers.setRegister('$', t);
-		}
+//		}
 	}
 
 	protected void deleteDuplicates(TextArea textArea){
@@ -385,7 +387,7 @@ public class Text extends Constants{
 	public void smartJoin(){
 		String t = iniSelectedText();
 
-		t=t.replaceAll("(?m)^[ \t]+|[ \t]+$", "");
+		t=t.replaceAll("(?m)" + TRIM, "");
 		t=t.replaceAll("(?m)\n+", " ");
 		t=t.replaceAll("(?m)[ \t]+,[ \t]+", ", ");
 		t=t.replaceAll("(?m)(\\p{Print})([ \t]+)([\\)\\};])", "$1$3");
@@ -393,7 +395,6 @@ public class Text extends Constants{
 
 		endSelectedText(t);
 	}
-
 
 	/**
 	 * replace all accent
@@ -465,10 +466,17 @@ public class Text extends Constants{
 		int numInvoking = 0;
 		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 		List<StackTraceElement> listTrace = Arrays.asList(stackTrace);
-
+		
 		for (StackTraceElement element : listTrace) {
+			if(element.getClassName().startsWith("org.junit.")) {
+				return true;
+			}
+			
 			if(element.getClassName().startsWith("masterraise.")
-					&& !element.getClassName().startsWith("masterraise.Text")) {
+					&& !element.getClassName().startsWith("masterraise.Text")
+					&& countOccurrences(element.getClassName(), "masterraise\\..*\\.showGui", "r") < 0
+					&& countOccurrences(element.getClassName(), "masterraise\\..*\\.actionPerformed", "r") < 0
+					) {
 				numInvoking++;
 				if(numInvoking > 1) {
 					return true;

@@ -15,9 +15,10 @@ public class Bulk extends Text{
 	private Buffer[] bf = jEdit.getBuffers();
 
 	public void insertFileSelection(){
-//		String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText().replaceAll("(?m)^[\t ]*\n", "").trim();
+		//TODO:PROBAR NUEVAMENTE, INVOCADO DE MrFile
+		String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText().replaceAll("(?m)^[\t ]*\n", "").trim();
 		if(selectedText.length() == 0){
-			Macros.message(view, "Must select a valid text");
+			Macros.error(view, ERR_SELECT_TEXT);
 			return;
 		}
 

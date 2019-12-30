@@ -113,11 +113,11 @@ public class Language extends Text{
 		switch(type){
 		case "language-code-to-string":
 			replaceBuffer("\"", "\\\"", "");
-			replaceBuffer("(^[ \\t]*)(.*)", "\t$1+ \"\\\\n$2\"", "r");
-			replaceBuffer("(\\+ \"\\\\n)(" + COMMENTS + ")", "$2", "r");
+			replaceBuffer("(^)(.*)", "\t$1+ \"\\\\n$2\"", "r");
+			replaceBuffer("(\\+ \"\\\\n)(" + COMMENTS + ")(\"$)", "$2", "ir");
 			replaceBuffer("(//.*)(\")", "$1", "r");
-			replaceBuffer("\\A\\t\\+ \"\\\\n", "String strCode = \"", "r");
-			replaceBuffer("\\z", ";", "r");
+			replaceBuffer(TRIM_UP + "\\+ \"\\\\n", "String strCode = \"", "r");
+			replaceBuffer(TRIM_DOWN, ";", "r");
 
 			//Settings comments for each line
 			switch(language){
@@ -161,7 +161,7 @@ public class Language extends Text{
 
 		case "language-print-debug-variables":
 			replaceBuffer("\\w+", "\\t\\+ \", $0:\" + $0", "r");
-			replaceBuffer("\\A\\t\\+ \", ", "alert(\"", "r");
+			replaceBuffer(TRIM_UP +"\\+ \", ", "alert(\"", "r");
 			replaceBuffer("\\z", ");", "r");
 
 			switch(language){
@@ -217,6 +217,7 @@ public class Language extends Text{
 
 		String result = bfTmp.getText();
 		closeTmpBuffer(bfTmp);
+		//TODO:reemplazar result por selectedText
 		return result;
 	}
 
@@ -227,12 +228,12 @@ public class Language extends Text{
 	 * @example
 	 * <pre>
 	 * {@code
-	 * one 
-	 * two 
-	 * three
+	 * one two three
 	 * 
 	 * to (javascript):
-	 * alert("one:" + one + "\n two:" + two + "\n three:" + three);
+	 * alert("one:" + one
+	 *	+ ", two:" + two
+	 *	+ ", three:" + three);
 	 */
 	public String printDebugVariables() {
 		return processText("language-print-debug-variables");

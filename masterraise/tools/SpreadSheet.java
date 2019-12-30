@@ -89,7 +89,7 @@ public class SpreadSheet extends Text{
 	};
 
 	private String[][] setMatrixText(String selectedText){
-		String[] lines = selectedText.replaceAll("(?m)\\t$", "\t\"\"").replaceAll("(?m)(^[ \\t]*|[ ]*$)", "").split("\\r?\\n");
+		String[] lines = selectedText.replaceAll("(?m)\\t$", "\t\"\"").replaceAll("(?m)(" + TRIM + ")", "").split("\\r?\\n");
 		matrix = new String[lines.length][];
 		for(int l = 0; l < lines.length; l++){
 			matrix[l] = lines[l].split("\\t");
@@ -150,19 +150,19 @@ public class SpreadSheet extends Text{
 	}
 
 	/**
-	* Transpose the grid for this way:
-	* @example
-	* <pre>
-	* 11	12	13
-	* 21	22	23
-	* 31	32	33
-	* 41	42	43
-	* 
-	* To:
-	* 11	21	31	41
-	* 12	22	32	42
-	* 13	23	33	43
-	*/
+	 * Transpose the grid for this way:
+	 * @example
+	 * <pre>
+	 * 11	12	13
+	 * 21	22	23
+	 * 31	32	33
+	 * 41	42	43
+	 * 
+	 * To:
+	 * 11	21	31	41
+	 * 12	22	32	42
+	 * 13	23	33	43
+	 */
 	public boolean transposeMatrix(){
 		String notMatchColumn = ERR_NOT_MATCH_COLUMN;
 		if(textArea.getSelectedText() != null){
@@ -175,7 +175,7 @@ public class SpreadSheet extends Text{
 			Macros.error(view, ERR_INVALID_CSV);
 			return false;
 		}
-		
+
 		if(!isMatchColumns(t)){
 			Macros.error(view, notMatchColumn);
 			return false;
@@ -189,9 +189,9 @@ public class SpreadSheet extends Text{
 			transposeText += "\n";
 		}
 
-		t = transposeText.replaceAll("(?m)(\\n$|[ \\t]*$)", "");
+		t = transposeText.replaceAll("(?m)" + TRIM_TOTAL, "");
 		endSelectedText(t);
-		
+
 		return true;
 	}
 

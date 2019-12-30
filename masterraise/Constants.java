@@ -10,12 +10,17 @@ import org.gjt.sp.jedit.jEdit;
  * Constants settings for Master Rise Plugin
  */
 public abstract class Constants {
+	public final static String ERR_NOT_MATCH_COLUMN	= "The number columns is not Match";
+	public final static String ERR_INVALID_CSV		= "Text must have Tabs";
+	public final static String ERR_SELECT_TEXT		= "Must Select a Text";
+
 	public final static String TRIM_UP				= "\\A[\\n$ \\t]*";
 	public final static String TRIM_DOWN			= "[\\n$ \\t]*\\z";
 	public final static String TRIM_BORDER			= TRIM_UP + "|" + TRIM_DOWN;
-	public final static String TRIM_LEFT			= "^[ \\t]+";
-	public final static String TRIM_RIGHT			= "[ \\t]+$";
+	public final static String TRIM_LEFT			= "^[ \\t]*";
+	public final static String TRIM_RIGHT			= "[ \\t]*$";
 	public final static String TRIM					= TRIM_LEFT + "|" + TRIM_RIGHT;
+	public final static String TRIM_TOTAL			= TRIM_BORDER + "|" + TRIM;
 	public final static String BLANK_LINE			= "(" + TRIM_UP + ")|(" + TRIM_DOWN + ")|(^[ \\t]*\\n)";
 	public final static String BLANK_SPACE			= "(" + TRIM_LEFT + ")|(" + TRIM_RIGHT + ")";
 	public final static String LOW_ENIE				= "ñ";
@@ -26,12 +31,8 @@ public abstract class Constants {
 	public final static String DOT					= "_______";
 	public final static String TRIM_COMA			= "[ \\t]*,[ \\t]*";
 	public final static String COMMENTS				= "[ \\t]*(--|//).*|/\\*([\\n\\t ]*([#\\w áéíóú]+\\n*)+[\\n\\t ]*)+\\*/";
+
 	public final static String URL					= "((https?|ftp)://)?(\\w+\\.\\w+)+(\\p{Graph})*";
-
-	public final static String ERR_NOT_MATCH_COLUMN	= "The number columns is not Match";
-	public final static String ERR_INVALID_CSV		= "Text must have Tabs";
-	public final static String ERR_SELECT_TEXT		= "Must Select a Text";
-
 	public final static String HTML_FILTER_FIELDS		= "(select|input|textarea|datalist)";
 	public final static String HTML_NOT_FILTER_FIELDS	= "(submit|reset|button)";
 

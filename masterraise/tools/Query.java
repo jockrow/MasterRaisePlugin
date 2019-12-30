@@ -26,7 +26,6 @@ import javax.swing.border.EmptyBorder;
 
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.Macros;
-import org.gjt.sp.jedit.Registers;
 import org.gjt.sp.jedit.jEdit;
 
 import masterraise.Text;
@@ -34,7 +33,7 @@ import masterraise.files.MrFile;
 
 /**
  * Tools for Query
- * @author Richard Martínez 2015/04/21
+ * @author Richard Martinez 2015/04/21
  *
  */
 public class Query extends Text{
@@ -90,8 +89,7 @@ public class Query extends Text{
 			}
 
 			if(queryType.equals("CSV_SELECT JOIN")){
-				int numLinesWithTabs = countOccurrences(selectedText, "[^\\t]\\t.*", "r");
-				if(numLinesWithTabs != 0 && countOccurrences(selectedText, "\\A" + SQL_OBJECT + "[ \\t]*$", "ir") > 0){
+				if(countOccurrences(selectedText, "\\A" + SQL_OBJECT + TRIM_RIGHT, "ir") > 0){
 					msgSyntaxError = "Please Quit the table name, only must have data";
 					return true;
 				}
@@ -156,7 +154,6 @@ public class Query extends Text{
 		}
 
 		replaceBuffer("([()])( +)([()])", "$1$3", "r");
-		replaceBuffer("^[ \\t]*\\n", "", "r");
 	}
 
 	/**
@@ -225,9 +222,9 @@ public class Query extends Text{
 		public void showGui(){
 			String bufferText = textArea.getBuffer().getText().toUpperCase();
 			JPanel checkBoxPanel = new JPanel(new BorderLayout());
-			chkUcase = new JCheckBox("UpperCase Reserved", true);
-			chkWithNolock = new JCheckBox("set WithNolock", false);
-			chkIndent = new JCheckBox("Indent", true);
+			chkUcase = new JCheckBox("UpperCase Reserved", true);	//TODO:QUITAR
+			chkWithNolock = new JCheckBox("set WithNolock", false);	//TODO:PONER
+			chkIndent = new JCheckBox("Indent", true);				//TODO:QUITAR
 
 			checkBoxPanel.add(chkUcase, BorderLayout.NORTH);
 			if(bufferText.indexOf("SELECT") != -1 && bufferText.indexOf("FROM") != -1){
@@ -372,12 +369,11 @@ public class Query extends Text{
 				}
 			}
 
-			replaceBuffer("([ \\t]+$|^" + TRIM_COMA + "\\n)", "", "r");
+			replaceBuffer(TRIM_RIGHT + "|^" + TRIM_COMA + "\\n", "", "r");
 			replaceBuffer("(\\w)( )(, \\w)", "$1$3", "r");
 			replaceBuffer("\\b(AND|OR)\\b", "\\t$0", "ir");
 			replaceBuffer(SQL_DOUBLE_SPACES, " ", "r");
 			replaceBuffer("^,", "\\t,", "r");
-			replaceBuffer("[ \\t]*;[ \\t]*", ";", "r");
 		}
 
 		public void processText(){
@@ -440,12 +436,14 @@ public class Query extends Text{
 			String deleteRegExpToReplace = "";
 			switch(query1){
 			case "INSERT":
+				//TODO:reemplazar al principio doble espacio por un espacio, para realizar lo siguiente
+//				regExQuery = "\\bINSERT INTO\\b " + SQL_OBJECT;
 				regExQuery = "\\bINSERT\\b[ \\t]\\bINTO\\b " + SQL_OBJECT;
 				deleteRegExpToReplace = "^\\w+ \\w+ ";
 				break;
 			case "SELECT":
 				regExQuery = "\\bFROM\\b[ \\t]+" + SQL_OBJECT;
-				deleteRegExpToReplace = "^\\w+[ \\t]+";
+				deleteRegExpToReplace = "^\\w+";
 				break;
 			case "UPDATE":
 				regExQuery = "UPDATE " + SQL_OBJECT;
@@ -456,22 +454,21 @@ public class Query extends Text{
 					regExQuery = "\\A" + SQL_OBJECT + "\\n";
 					deleteRegExpToReplace = "";
 				}
+				else {
+					return;
+				}
 				break;
 			}
 
-			if(!query2.equals("SELECT JOIN")){
-				findBuffer(regExQuery, "air");
-				nameTable = textArea.getSelectedText().replaceAll(deleteRegExpToReplace, "");
-				textArea.delete();
-			}
+			findBuffer(regExQuery, "air");
+			nameTable = textArea.getSelectedText().replaceAll(deleteRegExpToReplace, "");
+			textArea.delete();
 		}
 
 		private void startFormatQuery(){	
 			//format decimal
 			replaceBuffer(SQL_NUMBER, "_0.replaceAll(\",\", \".\")", "br");
-
 			replaceBuffer(COMMENTS, "", "ir");
-
 			if(!query1.equals("CSV")){
 				textArea.selectAll();
 				textArea.joinLines();
@@ -645,7 +642,7 @@ public class Query extends Text{
 
 			startFormatQuery();
 
-			selectedText = iniSelectedText();
+			selectedText = textArea.getText();
 			if(hasSyntaxError()){
 				jEdit._closeBuffer(view,(Buffer) bfTmp);
 				Macros.error(view, msgSyntaxError);
@@ -667,12 +664,12 @@ public class Query extends Text{
 			case "CSV_UPDATE":
 				replaceBuffer("\\t", " = ", "r");
 				replaceBuffer("^", "\\t, ", "r");
-				replaceBuffer("\\A\\t,", "UPDATE " + nameTable + "SET", "r");
+				replaceBuffer(TRIM_UP + ",", "UPDATE " + nameTable + "SET", "r");
 				break;
 			case "INSERT_SELECT": case "UPDATE_SELECT":
 				convertQuery("INSERT", "CSV");
 				replaceBuffer(csvPrefix, "", "r");
-				replaceBuffer("\t|^", ", ", "r");
+				replaceBuffer("\\t|" + TRIM_LEFT, ", ", "r");
 				replaceBuffer("\\A,", "SELECT", "r");
 				replaceBuffer("\\z", "\nFROM " + nameTable, "r");
 				break;
@@ -684,6 +681,7 @@ public class Query extends Text{
 				if(convertion.equals("SELECT_INSERT")){
 					replaceBuffer("(SELECT", "(", "");
 				}
+				replaceBuffer(COMA, ",", "");
 				break;
 				/*
 				TODO:VERIFICAR QUE EN LA POSICION EN LA QUE SE ENCUENTRE EL CURSOR SE PUEDA SELECCIONAR SIN DAR VUELTA COMO
@@ -701,15 +699,16 @@ public class Query extends Text{
 			if(!fowardQuery.equals("") && (query2.equals("UPDATE") || query2.equals("SELECT"))){
 				replaceBuffer("\\z", "\\n" + fowardQuery, "r");
 			}
-
 			replaceBuffer("(^SET|SELECT.*\\n)((.*\\n.*)+)", "_1 + _2.replaceAll(\"(?m)^,\", \"\\t,\")", "br");
 			replaceBuffer(TRIM_RIGHT, "", "r");
+			
 			//put semicolon to end of query if had it
 			if(!query2.equals("CSV") && lastSemiColon > 0){
 				replaceBuffer("\\z", ";", "r");
 			}
 
 			replaceBuffer("(\\p{Graph})(,)(\\p{Graph})", "$1, $3", "r");
+			replaceBuffer(SQL_DOUBLE_SPACES, " ", "r");
 
 			String convertedQuery = bfTmp.getText();
 			closeTmpBuffer(bfTmp);
@@ -739,13 +738,12 @@ public class Query extends Text{
 				}
 				break;
 			case "SELECT":
-				replaceBuffer("^[ \\t]*\\b(SELECT|DISTINCT)\\b[ \\t]*", "", "ir");
+				replaceBuffer("\\b(SELECT|DISTINCT)\\b[ \\t]*", "", "ir");
 				formatSpecialValues(true, true);
 				replaceBuffer("^", ", ", "r");
 				break;
 			case "UPDATE":
 				findBuffer("\\bWHERE\\b.*", "air");
-				Registers.cut(textArea,'$');
 				formatSpecialValues(true, true);
 				break;
 			case "CSV":
@@ -754,56 +752,37 @@ public class Query extends Text{
 			}
 
 			if(query2.equals("SELECT JOIN")){
-				int numLines = countOccurrences(view.getTextArea().getText(), "\n", "r") + 1;
-				boolean hasTwoCols = findBuffer("\\A.*\\t", "ar");
-
-				// encloses quote for blank spaces
-				replaceBuffer("^\\t", "''\\t", "ir");
-				replaceBuffer("\\t$", "\\t''", "ir");
-				replaceBuffer("\\t[ ]*\\t", "\\t''\\t", "ir");
-
-				// encloses quote for values except functions
-				textArea.goToBufferStart(false);
-				textArea.goToEndOfWhiteSpace(false);
-				textArea.goToBufferEnd(true);
-				replaceSelection("\\p{Print}+", "'$0'", "r");
-				replaceSelection("'{2,}", "'", "r");
-				replaceBuffer("(')(" + SQL_FUNC_VALUES  + ")(')", "$2", "r");
-
-				//format two first lines for "value AS alias"
-				if(numLines == 2){
-					textArea.goToBufferEnd(false);
-					textArea.insertEnterAndIndent();
+				if(!findBuffer("'", "")) {
+					//TODO:CUANDO INGRESA NO DEBE PREGUNTAR NUEVAMENTE
+					textArea.goToBufferStart(false);
+					textArea.goToNextLine(false);
+					textArea.goToBufferEnd(true);
+					replaceSelection("\\t", "'$0'", "r");
+					replaceSelection(".*", "'$0'", "r");
 				}
+
+				textArea.goToBufferEnd(false);
+				textArea.insertEnterAndIndent();
 				textArea.goToBufferStart(false);
 				transposeLines(textArea);
 				textArea.goToBufferEnd(true);
 				String tmpQuery = textArea.getSelectedText();
 				textArea.delete();
-				if(hasTwoCols){
-					sp.transposeMatrix();
-				}
-				else{
-					replaceBuffer("\\n", "\\t", "r");
-				}
-
-				// format SELECT
-				replaceBuffer("(\\p{Print}+)(\\t)(\\p{Print}+)", "$1 $3", "r");
+				sp.transposeMatrix();
 				replaceBuffer("\\n", ", ", "r");
-				replaceBuffer("\\A", "SELECT ", "r");
-				tmpQuery = tmpQuery.replaceAll("\t", ", ");
-				tmpQuery = tmpQuery.replaceAll("^\n", "");
+				
+				tmpQuery = tmpQuery.trim().replaceAll("\t", ", ");
 				tmpQuery = tmpQuery.replaceAll("(?m)^", "UNION SELECT ");
 				replaceBuffer("\\z", "\\n" + tmpQuery, "r");
+				replaceBuffer("\\A", "SELECT ", "r");
+				replaceBuffer("\\t", " ", "r");
 				replaceBuffer("$", " FROM DUAL", "r");
-				replaceBuffer("'+[ \\t]*(" + SQL_FUNC_VALUES + "|" + SQL_RESERVED_VALUES + ")+[ \\t]*'", "$1", "r");
 				return;
 			}
 
 			switch(query2){
 			case "INSERT":
 				if(!sp.transposeMatrix()) return;
-
 				replaceBuffer("\\t", ", ", "r");
 				textArea.goToBufferStart(false);
 				textArea.selectLine();
@@ -820,9 +799,7 @@ public class Query extends Text{
 				csvPrefix = String.format(CSV_PREFIX, new Object[] { nameTable });
 				replaceBuffer(SQL_SET, "", "ir");
 				replaceBuffer("\\A", csvPrefix, "r");
-				replaceBuffer(BLANK_LINE, "", "r");
-				replaceBuffer("^" + TRIM_COMA, "", "r");
-				replaceBuffer(TRIM_RIGHT, "", "r");
+				replaceBuffer("^" + TRIM_COMA + "|" + BLANK_LINE + "|" + TRIM, "", "r");
 				replaceBuffer("[ \t]*=[ \t]*", "\t", "r");
 				return;
 			}
@@ -971,44 +948,33 @@ public class Query extends Text{
 	 */
 	public String sqlServerSetVariablesSp(){
 		Buffer bfTmp = openTmpBuffer();
-
-		//format query
 		replaceBuffer(COMMENTS, "", "ir");
-		replaceBuffer("values[\\( ]+", "values(", "ir");
 
 		textArea.selectAll();
 		textArea.joinLines();
 
-		if(!findBuffer("^\\(.*\\bvalues\\b[ \\t]*\\(.*\\)$", "air")){
+		//separate in two lines for variables and values
+		replaceBuffer("\\)[ \\t]*values[ \\t]*\\([ \\t]*", ")\\nvalues(", "ir");
+
+		if(!findBuffer("^\\bvalues\\b\\(", "air")){
 			jEdit._closeBuffer(view,(Buffer) bfTmp);
 			Macros.error(view, String.format(msgSyntaxError, new Object[] { "Sql Server Variables SP" }));
 			return "";
 		}
 
-		//separate in two lines for variables and values
-		replaceBuffer("\\)[  \\t]*values[  \\t]*\\(", ")\\nvalues(", "ir");
-
-		//identify if first character is At char (@)
-		findBuffer("values[ \\t]*\\(", "air");
-		textArea.goToNextCharacter(false);
-		textArea.goToNextCharacter(true);
-		String strAt = textArea.getSelectedText();
+		boolean hasAt = findBuffer("values(@", "ai");
 
 		//remove assigments for first line
 		textArea.goToBufferStart(false);
 		textArea.selectLine();
 		replaceSelection("=[ ]*([ ]{0,}\\w+|'')", "", "ir");
-
 		replaceBuffer(SQL_IN_VALUES, "_1 + _2 + _3.replace(\",\", \"" + COMA + "\")", "abr");
+		replaceBuffer(SQL_RESERVED, "_1.toUpperCase()", "br");
 
-		//check number assigments and values is match
-		textArea.goToBufferStart(false);
-		textArea.selectLine();
-		int numComaAsig = countOccurrences(textArea.getSelectedText(), ",", "");
-
-		textArea.goToBufferEnd(false);
-		textArea.selectLine();
-		int numComaValue = countOccurrences(textArea.getSelectedText(), ",", "");
+		String firstLine = textArea.getLineText(0).replaceAll("(^\\(|\\)$)", "") + "\n\n";
+		int numComaAsig = countOccurrences(firstLine, ",", "");
+		String secondLine = textArea.getLineText(1);
+		int numComaValue = countOccurrences(secondLine, ",", "");
 
 		if(numComaAsig!=numComaValue){
 			jEdit._closeBuffer(view,(Buffer) bfTmp);
@@ -1017,7 +983,7 @@ public class Query extends Text{
 		}
 
 		//in case the second line has at char (@), only assign variables
-		if(strAt.equals("@")){
+		if(hasAt){
 			textArea.goToBufferEnd(false);
 			textArea.goToStartOfWhiteSpace(true);
 
@@ -1029,9 +995,6 @@ public class Query extends Text{
 		}
 		//assign each values for each variable
 		else{
-			textArea.goToBufferStart(false);
-			textArea.selectLine();
-			String firstLine = textArea.getSelectedText().replaceAll("(^\\(|\\)$)", "") + "\n\n";
 			replaceSelection(SQL_ALIAS, "$1", "ir");
 			replaceSelection("[ \\t]+\\(\\w+\\)", "", "r");
 
@@ -1054,12 +1017,10 @@ public class Query extends Text{
 		//revove default variables
 		replaceBuffer("^set.*default[ ]*\\n*", "", "ir");
 
-		replaceBuffer(TRIM, "", "r");
-		replaceBuffer(SQL_RESERVED, "_1.toUpperCase()", "br");
-
 		//remove unused reserved words
 		replaceBuffer("[ ]*\\bOUTPUT\\b[ ]*", "", "ir");
 
+		replaceBuffer(TRIM_RIGHT, "", "r");
 		closeTmpBuffer(bfTmp);
 
 		return textArea.getText();
@@ -1082,12 +1043,12 @@ public class Query extends Text{
 		replaceBuffer("\\w+#\\b\\w+\\b", "\\n$0\\n", "ir");
 		replaceBuffer("(\\w+)(#)(\\b\\w+\\b)", "$1__$3", "ir");
 		replaceBuffer("#{1,2}\\b[^ 0-9\\(]+\\w+\\b", "\\n$0\\n", "ir");
-		replaceBuffer("^.*#[!\"$%&'\\(\\)*+,-./:;=>?@\\[\\\\\\]^_`{|}~].*\\n", "", "ir");
+		replaceBuffer(BLANK_LINE, "", "ir");
 		// replace all lines that doesn't begin for temp table (#temporal)
 		replaceBuffer("^[^#].*(\\n|\\z)", "", "ir");
 		// remove possibles extrange chars
 		replaceBuffer("[!\"$%&'\\(\\)*+,-./:;=>?@\\[\\\\\\]^`{|}~]", "", "r");
-		replaceBuffer("(^[ \\t]+|[ \\t]+$)", "", "r");
+		replaceBuffer(TRIM, "", "r");
 
 		textArea.selectAll();
 		textArea.toUpperCase();
@@ -1098,6 +1059,7 @@ public class Query extends Text{
 		sortLines(textArea);
 
 		replaceBuffer("\\z", "\n\n" + previousText, "r");
+		replaceBuffer(TRIM_UP, "", "r");
 		closeTmpBuffer(bfTmp);
 
 		return textArea.getText();
@@ -1140,7 +1102,7 @@ public class Query extends Text{
 		Buffer ldrBuff = jEdit.openFile(view,selectedText);
 
 		replaceBuffer("\\|\\{EOL\\}", "\\n", "r");
-		replaceBuffer("^[ \\t]+", "ren ", "r");
+		replaceBuffer(TRIM_LEFT, "ren ", "r");
 		replaceBuffer("|\"", " ", "");
 		replaceBuffer("\"", ".jpg", "");
 
