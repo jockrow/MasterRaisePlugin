@@ -1,4 +1,4 @@
-SELECT DISTINCT Prestar.dbo.autAutorizacionASP.autIDAutorizacion, commDivision_2.divNom
+SELECT DISTINCT Prestar.dbo.autAutorizacionASP.autIDAutorizacion AS AUTORIZACON, commDivision_2.divNom AS REGIONAL_IPS_ORIGEN
 	, dos, '1, 2'
 	, funcion, funcion(par1, 'par2')
 FROM dbo.commDivision AS commDivision_3

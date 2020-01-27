@@ -3,7 +3,7 @@ select distinct Prestar.dbo.autAutorizacionASP.autIDAutorizacion as AUTORIZACON,
 --comentario
 , funcion , funcion(par1, 'par2')
 from         dbo.commDivision AS commDivision_3 inner join
-	 dbo.commDivision with (nolock) on commDivision_3.divIDDivision = dbo.commDivision.divIDDivisionPadre inner join
+	 dbo.commDivision with(nolock) on commDivision_3.divIDDivision = dbo.commDivision.divIDDivisionPadre inner join
 	 dbo.redIPS AS Ips_Transcriptor on dbo.commDivision.divIDDivision = Ips_Transcriptor.ipsIDDivision inner join
 	 Prestar.dbo.autAutorizacionASP 	ON Prestar.dbo.autAutorizacionASP.autIDIPSOrigen <> Prestar.dbo.autDetalleAutorizacionASP.autIDIPS inner join
 	 Prestar.dbo.autDetalleAutorizacionASP with (nolock) on

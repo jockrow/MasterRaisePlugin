@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import masterraise.files.MrFile;
 import masterraise.tools.Query;
+import masterraise.tools.Query.BeautyQuery;
 import masterraise.tools.Query.ConvertQuery;
 /*
 	SELECT_UPDATE	SELECT_INSERT	INSERT_SELECT	INSERT_UPDATE	INSERT_CSV	UPDATE_INSERT	UPDATE_SELECT	UPDATE_CSV	CSV_INSERT	CSV_SELECT	CSV_UPDATE
@@ -46,7 +47,7 @@ SET CODIGO_SICA = '1700100378'
 , Fecha_Inactivacion = TO_DATE('31/01/2016','dd/mm/yyyy')
 , Area_Cultivo = 6,24
 WHERE CODIGO_SICA = '2529300114';
-*/
+ */
 public class QueryTest extends Tester {
 	@Test
 	public void convertSelectToUpdate() {
@@ -125,6 +126,21 @@ public class QueryTest extends Tester {
 	public void sqlServerSetVariablesSp() {
 		setVars("sqlServerSetVariablesSp");
 		actual = new Query().sqlServerSetVariablesSp();
+		assertEquals(expected.trim(), actual.trim());
+	}
+
+	@Test
+	public void beautyQuery() {
+		setVars("beautyQuery");
+		BeautyQuery bt = new Query(). new BeautyQuery("");
+		actual = bt.processText();
+		assertEquals(expected.trim(), actual.trim());
+	}
+
+	@Test
+	public void queryToLanguage() {
+		setVars("queryToLanguage");
+		actual = new Query().queryToLanguage();
 		assertEquals(expected.trim(), actual.trim());
 	}
 

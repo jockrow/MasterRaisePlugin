@@ -1,0 +1,18 @@
+private String nuToInvoice = "";
+private String cdInvoice = "";
+
+public String getNuToInvoice(){
+	return nuToInvoice;
+}
+
+public void setNuToInvoice(String nuToInvoice){
+	this.nuToInvoice = nuToInvoice;
+}
+
+public String getCdInvoice(){
+	return cdInvoice;
+}
+
+public void setCdInvoice(String cdInvoice){
+	this.cdInvoice = cdInvoice;
+}

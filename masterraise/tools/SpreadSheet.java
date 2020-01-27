@@ -103,7 +103,7 @@ public class SpreadSheet extends Text{
 	 * @param selectedText selected text in textArea
 	 * @return true if match columns in csv
 	 */
-	public boolean isMatchColumns(String selectedText){
+	private boolean isMatchColumns(String selectedText){
 		boolean match = true;
 		int numTabsPrev = 0;
 		int numTabsCurrent = 0;
@@ -176,6 +176,7 @@ public class SpreadSheet extends Text{
 			return false;
 		}
 
+		//TODO:se puede poner esto en la validación en query if(numComaAsig!=numComaValue){ 
 		if(!isMatchColumns(t)){
 			Macros.error(view, notMatchColumn);
 			return false;
