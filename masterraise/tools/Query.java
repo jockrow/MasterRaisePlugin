@@ -64,16 +64,16 @@ public class Query extends Text{
 			if(queryType.equals("")){
 				syntaxError = true;
 			}
-			else if(queryType.equals("SELECT") && countOccurrences(textArea.getText(), "\\bSELECT.*\\bFROM \\w", "ir") == 0){
+			else if(queryType.equals("SELECT") && countOccurrences(textArea.getText(), "\\bSELECT.*\\bFROM \\w", "r") == 0){
 				syntaxError = true;
 			}
-			else if(queryType.equals("INSERT") && countOccurrences(textArea.getText(), "\\bINSERT INTO \\w+ \\(.*\\) VALUES\\(.*\\)", "ir") == 0){
+			else if(queryType.equals("INSERT") && countOccurrences(textArea.getText(), "\\bINSERT INTO \\w+\\(.*\\) VALUES\\(.*\\)", "r") == 0){
 				syntaxError = true;
 			}
-			else if(queryType.equals("UPDATE") && countOccurrences(textArea.getText(), "\\bUPDATE \\w+ SET \\w+.*=\\p{Print}", "ir") == 0){
+			else if(queryType.equals("UPDATE") && countOccurrences(textArea.getText(), "\\bUPDATE \\w+ SET \\w+.*=\\p{Print}", "r") == 0){
 				syntaxError = true;
 			}
-			else if(queryType.equals("SP") && countOccurrences(textArea.getText(), "\\(.*\\) VALUES\\(.*\\)", "ir") == 0){
+			else if(queryType.equals("SP") && countOccurrences(textArea.getText(), "\\(.*\\) VALUES\\(.*\\)", "r") == 0){
 				syntaxError = true;
 			}
 			if(syntaxError){
@@ -83,13 +83,13 @@ public class Query extends Text{
 		}
 		else{
 			if(queryType.equals("CSV_SELECT JOIN")){
-				if(countOccurrences(textArea.getText(), "\\A\\w+" + TRIM_RIGHT, "ir") > 0){
+				if(countOccurrences(textArea.getText(), "\\A\\w+" + TRIM_RIGHT, "r") > 0){
 					msgSyntaxError = "Please Quit the table name, only must have data";
 					return true;
 				}
 			}
 			else{
-				if(countOccurrences(textArea.getText(), "\\A\\w+\\n", "ir") == 0){
+				if(countOccurrences(textArea.getText(), "\\A\\w+\\n", "r") == 0){
 					msgSyntaxError = String.format(msgSyntaxError, new Object[] {"CSV"}) + ", \nMust have table Name in first line";
 					return true;
 				}
@@ -115,9 +115,7 @@ public class Query extends Text{
 		replaceBuffer("#", SHARP, "");
 
 		if(!query.equals("CSV")){
-			replaceBuffer(SQL_DOUBLE_SPACES, " ", "r");
-			textArea.selectAll();
-			textArea.joinLines();
+			smartJoin();
 		}
 
 		replaceBuffer(".", DOT, "");
@@ -128,7 +126,7 @@ public class Query extends Text{
 			Macros.error(view, msgSyntaxError);
 			return;
 		}
-		replaceBuffer("(INSERT INTO \\w+ )(\\()", "$1\\n", "r");
+		replaceBuffer("(INSERT INTO \\w+)(\\()", "$1\\n", "r");
 		replaceBuffer("\\) VALUES\\(", "\\n", "r");
 		replaceBuffer("\\A\\(|\\)\\z", "", "r");
 		replaceBuffer(SQL_QUOTES_VALUES, "_1 + _2.replace(\",\", \"" + COMA + "\")", "br");
@@ -143,9 +141,10 @@ public class Query extends Text{
 	 */
 	private void endFormatQuery(){
 		replaceBuffer("^[ \\t]*\\n|" + TRIM_RIGHT, "", "r");
-		replaceBuffer(SQL_DOUBLE_SPACES, " ", "r");
+		replaceBuffer(DOUBLE_SPACES, " ", "r");
 		replaceBuffer(DOT, ".", "");
-		replaceBuffer(ROUND_BRACKET_RIGHT, ")", "");
+		replaceBuffer(ROUND_BRACKET_RIGHT + "[ ]?", ")", "r");
+		replaceBuffer("(\\))(\\w)", ") $2", "r");
 		//recovery temp tables
 		replaceBuffer(SHARP, "#", "r");
 		replaceBuffer(ROUND_BRACKET_LEFT, "(", "");
@@ -292,7 +291,7 @@ public class Query extends Text{
 			startFormatQuery(queryType);
 
 			//			//////TODO:mover a startFormatQuery {{{
-			replaceBuffer(SQL_RESERVED_LINE, "\\n$1", "ir");
+			replaceBuffer(SQL_RESERVED_LINE, "\\n$1", "r");
 			//			//TODO:Cuando el query es diferente de Select hay que convertirlo directamente
 			if(queryType.equals("SELECT")){
 				textArea.goToBufferStart(false);
@@ -378,7 +377,7 @@ public class Query extends Text{
 			String deleteRegExpToReplace = "";
 			switch(query1){
 			case "INSERT":
-				regExQuery = "\\bINSERT INTO \\w+ \\n";
+				regExQuery = "\\bINSERT INTO \\w+\\n";
 				deleteRegExpToReplace = "^\\w+ \\w+ ";
 				break;
 			case "SELECT":
@@ -573,7 +572,7 @@ public class Query extends Text{
 			startFormatQuery(query1);
 
 			if(query1.equals("SELECT") || query1.equals("UPDATE")){
-				replaceBuffer("ORDER[ \\t]BY.*(\\n.*)*", "", "ir");
+				replaceBuffer("ORDER[ \\t]BY.*(\\n.*)*", "", "r");
 
 				if(findBuffer("WHERE.*", "air")){
 					fowardQuery = textArea.getSelectedText();
@@ -722,7 +721,7 @@ public class Query extends Text{
 	 * }
 	 */
 	public String queryToLanguage(){
-		Buffer bfTmp = openTmpBuffer();
+		bfTmp = openTmpBuffer();
 
 		textArea.setText(firsUpperCase(textArea.getText(), '_'));
 		replaceBuffer("_", "", "");
@@ -757,7 +756,7 @@ public class Query extends Text{
 	 * in('one', 'two', '3')
 	 */
 	public void formatIn(){
-		Buffer bfTmp = openTmpBuffer();
+		bfTmp = openTmpBuffer();
 		deleteDuplicates(textArea);
 		boolean isNotNumber = findBuffer("[\\p{Alpha}/\\*\\-\\+,\\(\\)\\\"#\\$&]", "air");
 
@@ -833,7 +832,7 @@ public class Query extends Text{
 	 * SET @i_maxRegistros = 30
 	 */
 	public String sqlServerSetVariablesSp(){
-		Buffer bfTmp = openTmpBuffer();
+		bfTmp = openTmpBuffer();
 		queryType = "SP";
 		startFormatQuery(queryType);
 		boolean hasAt = findBuffer("VALUES(@", "a");
@@ -842,7 +841,7 @@ public class Query extends Text{
 		//remove assignments to first line
 		textArea.goToBufferStart(false);
 		textArea.selectLine();
-		replaceSelection("=[ ]*([ ]{0,}\\w+|'')", "", "ir");
+		replaceSelection("=[ ]*([ ]{0,}\\w+|'')", "", "r");
 
 		//case the second line has at char (@), only assign variables
 		if(hasAt){
@@ -888,17 +887,17 @@ public class Query extends Text{
 			return "";
 		}
 
-		Buffer bfTmp = openTmpBuffer();
+		bfTmp = openTmpBuffer();
 
 		replaceBuffer(COMMENTS, "", "ir"); 
 
 		//don't take primary keys from temp table like if this would a normal table, example: xll#SPDI
-		replaceBuffer("\\w+#\\b\\w+\\b", "\\n$0\\n", "ir");
-		replaceBuffer("(\\w+)(#)(\\b\\w+\\b)", "$1__$3", "ir");
-		replaceBuffer("#{1,2}\\b[^ 0-9\\(]+\\w+\\b", "\\n$0\\n", "ir");
-		replaceBuffer(BLANK_LINE, "", "ir");
+		replaceBuffer("\\w+#\\b\\w+\\b", "\\n$0\\n", "r");
+		replaceBuffer("(\\w+)(#)(\\b\\w+\\b)", "$1__$3", "r");
+		replaceBuffer("#{1,2}\\b[^ 0-9\\(]+\\w+\\b", "\\n$0\\n", "r");
+		replaceBuffer(BLANK_LINE, "", "r");
 		// replace all lines that doesn't begin for temp table (#temporal)
-		replaceBuffer("^[^#].*(\\n|\\z)", "", "ir");
+		replaceBuffer("^[^#].*(\\n|\\z)", "", "r");
 		// remove possibles extrange chars
 		replaceBuffer("[!\"$%&'\\(\\)*+,-./:;=>?@\\[\\\\\\]^`{|}~]", "", "r");
 		replaceBuffer(TRIM, "", "r");
@@ -907,7 +906,7 @@ public class Query extends Text{
 		textArea.toUpperCase();
 		deleteDuplicates(textArea);
 
-		replaceBuffer("^", "DROP TABLE ", "ir");
+		replaceBuffer("^", "DROP TABLE ", "r");
 		replaceBuffer("^DROP TABLE ##", "--DROP TABLE ##", "r");
 		sortLines(textArea);
 

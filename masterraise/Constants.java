@@ -30,6 +30,8 @@ public abstract class Constants {
 	public final static String ROUND_BRACKET_LEFT	= "___";
 	public final static String COMA					= "__";
 	public final static String TRIM_COMA			= "[ \\t]*,[ \\t]*";
+	public final static String DOUBLE_SPACES		= "[ \\t]{2,}";
+	public final static String TRIM_SPECIAL_CHARS	= "([ ]?)([\\(\\)\\{\\};])([ ]?)";
 	public final static String COMMENTS				= "[ \\t]*(--|//).*|/\\*([\\n\\t ]*([#\\w áéíóú]+\\n*)+[\\n\\t ]*)+\\*/";
 
 	public final static String URL						= "((https?|ftp)://)?(\\w+\\.\\w+)+(\\p{Graph})*";
@@ -42,7 +44,6 @@ public abstract class Constants {
 	public final static String SQL_FUNCTION			= "(" + SQL_OBJECT + "\\(" + SQL_VALUES + ")((," + SQL_VALUES + ")*)";
 	public final static String SQL_ALIAS			= "([a-z] )((AS ){0,1}\\w+)";
 	public final static String SQL_RESERVED			= "\\b(insert|into|values|update|set|as|not|like|in|inner|right|left|join|on|select|distinct|convert|case|when|then|else|end|sum|count|max|min|datetime|smallint|int|varchar|dateadd|isnull|null|from|where|and|or|with|nolock|union|group by|order by|having|desc|cast|concat|substr|declare|numeric|default)\\b";
-	public final static String SQL_DOUBLE_SPACES	= "[ \\t]{2,}";
 	public final static String SQL_RESERVED_LINE	= "\\b(SET|FROM|WHERE|AND|OR|ORDER|INNER|RIGHT|LEFT)\\b";
 	public final static String SQL_NUMBER			= "\\d+,\\d+";
 	public final static String CSV_PREFIX			= "Structure table: %s\nFIELD	VALUE\n";

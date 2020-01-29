@@ -37,6 +37,7 @@ public class Text extends Constants{
 	public static Buffer firstEditBuffer = null;
 	public TextArea textArea = view.getTextArea();
 	public EditPane editPane = view.getEditPane();
+	//TODO:reemplazar selectedText por textArea.getSelectedText()
 	public String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
 	public String previousText = "";
 	private Console console = (Console) view.getDockableWindowManager().getDockable("console");
@@ -258,6 +259,7 @@ public class Text extends Constants{
 		return bfTmp;
 	}
 
+	//TODO:registrar el primer método para que al final cuando el método que invoca sea igual éste lo cierre
 	public void closeTmpBuffer(Buffer bfTmp){
 //		if(!isJUnitTest()) {
 			selectedText = textArea.getText();
@@ -278,6 +280,7 @@ public class Text extends Constants{
 		if(t=="" || t==null){
 			textArea.selectAll();
 			t=textArea.getSelectedText();
+//			t=textArea.getText();
 		}
 		prevSelection = textArea.getSelection();
 		previousText = t;
@@ -387,11 +390,12 @@ public class Text extends Constants{
 	public void smartJoin(){
 		String t = iniSelectedText();
 
-		t=t.replaceAll("(?m)" + TRIM, "");
 		t=t.replaceAll("(?m)\n+", " ");
-		t=t.replaceAll("(?m)[ \t]+,[ \t]+", ", ");
-		t=t.replaceAll("(?m)(\\p{Print})([ \t]+)([\\)\\};])", "$1$3");
-		t=t.replaceAll("(?m)([\\(\\{])([ \t]+)(\\p{Print})", "$1$3");
+		t=t.replaceAll("(?m)" + DOUBLE_SPACES, " ");
+		t=t.replaceAll("(?m)" + TRIM_SPECIAL_CHARS, "$2");
+		t=t.replaceAll("(?m)" + TRIM_COMA, ", ");
+		t=t.replace(")", ") ");
+		t=t.replaceAll("(?m)" + TRIM, "");
 
 		endSelectedText(t);
 	}
