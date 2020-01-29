@@ -46,7 +46,7 @@ public class MasterRaisePlugin extends EBPlugin{
 		if (message instanceof EditPaneUpdate){
 			EditPaneUpdate epu = (EditPaneUpdate) message;
 			if (epu.getWhat().equals(EditPaneUpdate.CREATED)){
-				GUIUtilities.setIconPath("jeditresource:/MasterRaise.jar!/icons/masterRise/");
+				GUIUtilities.setIconPath("jeditresource:/MasterRaise.jar!/icons/");
 				setIcons();
 //				setDarkTheme();
 //				final SessionSwitcher switcher = new CustomSession(view, true);
