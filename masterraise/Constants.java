@@ -29,7 +29,7 @@ public abstract class Constants {
 	public final static String SHARP				= "____";
 	public final static String ROUND_BRACKET_LEFT	= "___";
 	public final static String COMA					= "__";
-	public final static String TRIM_COMA			= "[ \\t]*,[ \\t]*";
+	public final static String TRIM_COMA			= "([ ]?)(,)([ ]?)";
 	public final static String DOUBLE_SPACES		= "[ \\t]{2,}";
 	public final static String TRIM_SPECIAL_CHARS	= "([ ]?)([\\(\\)\\{\\};])([ ]?)";
 	public final static String COMMENTS				= "[ \\t]*(--|//).*|/\\*([\\n\\t ]*([#\\w áéíóú]+\\n*)+[\\n\\t ]*)+\\*/";

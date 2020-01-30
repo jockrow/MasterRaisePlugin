@@ -47,15 +47,15 @@ public class Query extends Text{
 	private String msgSyntaxError = "Syntax Error in %s Query";
 
 	public BeautyQuery getBeautyQuery(){
-		return new BeautyQuery();
+		return new BeautyQuery("");
 	}
 
 	public ConvertQuery getConvertQuery(){
-		return new ConvertQuery();
+		return new ConvertQuery("", "");
 	}
 
 	/**
-	 * Verify if query haf syntaxError
+	 * Verify if query has syntaxError
 	 * @return boolean - if true has Syntax error
 	 */
 	private boolean hasSyntaxError(){
@@ -126,9 +126,12 @@ public class Query extends Text{
 			Macros.error(view, msgSyntaxError);
 			return;
 		}
+		if(queryType.equals("INSERT") || queryType.equals("SP")) {
+			replaceBuffer("\\A\\(|\\)\\z", "", "r");
+		}
+		
 		replaceBuffer("(INSERT INTO \\w+)(\\()", "$1\\n", "r");
 		replaceBuffer("\\) VALUES\\(", "\\n", "r");
-		replaceBuffer("\\A\\(|\\)\\z", "", "r");
 		replaceBuffer(SQL_QUOTES_VALUES, "_1 + _2.replace(\",\", \"" + COMA + "\")", "br");
 		replaceBuffer(SQL_FUNCTION, "_1 + _3.replace(\",\", \"" + COMA + "\")", "br");
 		replaceBuffer(")", ROUND_BRACKET_RIGHT, "");
@@ -156,22 +159,11 @@ public class Query extends Text{
 	 * Format a query for easy read
 	 */
 	public class BeautyQuery{
-		private String opts = "";
+		private String opts = "ui";
 		private JCheckBox chkWithNolock;
 
 		public BeautyQuery(String opts){
-			this.opts = opts;
-		}
-
-		private BeautyQuery() { }
-
-		private void setResult(){
-			opts = "ui";
-			if(chkWithNolock.isSelected()) opts += "l";
-		}
-
-		public void setOpcs(String opcs) {
-			this.opts = opcs;
+			this.opts += opts;
 		}
 
 		public void showGui(){
@@ -199,7 +191,7 @@ public class Query extends Text{
 
 			btnOk.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent evt){
-					setResult();
+					if(chkWithNolock.isSelected()) opts += "l";
 
 					if(chkWithNolock.isSelected()){
 						Macros.error(view, "You have to Check at least one Option");
@@ -273,8 +265,9 @@ public class Query extends Text{
 		 *	AND Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 123
 		 *	OR Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 456
 		 */
-		//TODO:Poner directamente a processText
-		public void beautyQuery(String opts){
+		public String processText(){
+			bfTmp = openTmpBuffer();
+
 			if(textArea.getText().toUpperCase().indexOf("FROM") >= 0 && textArea.getText().toUpperCase().indexOf("INSERT") >= 0){
 				queryType = "INSERT SELECT";
 			}
@@ -317,11 +310,7 @@ public class Query extends Text{
 			//			//////TODO:mover a startFormatQuery }}}
 
 			endFormatQuery();
-		}
 
-		public String processText(){
-			bfTmp = openTmpBuffer();
-			beautyQuery(opts);
 			String convertedQuery = bfTmp.getText();
 			closeTmpBuffer(bfTmp);
 			dialog.dispose();
@@ -358,15 +347,6 @@ public class Query extends Text{
 		public ConvertQuery(String query1, String query2) {
 			this.query1 = query1;
 			this.query2 = query2;
-		}
-
-		/**
-		 * Constructor only for jEdit use 
-		 */
-		public ConvertQuery() { }
-
-		public String getResult(){
-			return convertion;
 		}
 
 		/**
@@ -563,6 +543,7 @@ public class Query extends Text{
 
 		public String processText(){
 			bfTmp = openTmpBuffer();
+			SpreadSheet sp = new SpreadSheet();
 			String fowardQuery = "";
 			int lastSemiColon = replaceBuffer(";\\z", "", "ar");
 
@@ -581,44 +562,12 @@ public class Query extends Text{
 			}
 
 			setNameTable();
-			/*
-				TODO:VERIFICAR QUE EN LA POSICION EN LA QUE SE ENCUENTRE EL CURSOR SE PUEDA SELECCIONAR SIN DAR VUELTA COMO
-				textArea.goToBufferStart(false);
-				textArea.goToEndOfWhiteSpace(false);
-				textArea.goToBufferEnd(true);
 
-				Y TOMARLO como para menos lineas textArea.goToBufferEnd(true);
-			 */
-			convertQuery(query1, query2);
-			endFormatQuery();
-
-			if(!query2.equals("CSV")) {
-				if(!query2.equals("INSERT") && fowardQuery != ""){
-					replaceBuffer("\\z", "\\n" + fowardQuery.trim(), "r");
-				}
-				if(!query2.equals("SELECT JOIN") && lastSemiColon > 0){
-					replaceBuffer("\\z", ";", "r");
-				}
-			}
-
-			String convertedQuery = bfTmp.getText();
-			closeTmpBuffer(bfTmp);
-			return convertedQuery;
-		}
-
-		/**
-		 * Convert a query to another query
-		 * @param query1 first query query to convert
-		 * @param query2 final converted query
-		 */
-		//TODO:Poner directamente a processText
-		public void convertQuery(String query1, String query2){
-			SpreadSheet sp = new SpreadSheet();
 			switch(query1){
 			case "INSERT":
 				replaceBuffer(",", "\\t", "r");
 				if(!sp.transposeMatrix()){
-					return;
+					return "";
 				}
 				break;
 			case "SELECT":
@@ -671,7 +620,7 @@ public class Query extends Text{
 				replaceBuffer("\\z", "\nFROM " + nameTable.trim(), "r");
 				break;
 			case "INSERT":
-				if(!sp.transposeMatrix()) return;
+				if(!sp.transposeMatrix()) return "";
 				replaceBuffer("\\t", ", ", "r");
 				textArea.goToBufferStart(false);
 				textArea.selectLine();
@@ -690,6 +639,21 @@ public class Query extends Text{
 				replaceBuffer("\\A", csvPrefix, "r");
 				break;
 			}
+
+			if(!query2.equals("CSV")) {
+				if(!query2.equals("INSERT") && fowardQuery != ""){
+					replaceBuffer("\\z", "\\n" + fowardQuery.trim(), "r");
+				}
+				if(!query2.equals("SELECT JOIN") && lastSemiColon > 0){
+					replaceBuffer("\\z", ";", "r");
+				}
+			}
+
+			endFormatQuery();
+
+			String convertedQuery = bfTmp.getText();
+			closeTmpBuffer(bfTmp);
+			return convertedQuery;
 		}
 	}
 
