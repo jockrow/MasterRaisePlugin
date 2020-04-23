@@ -181,9 +181,9 @@
 			new masterraise.tools.Query().queryToLanguage();
 		</CODE>
 	</ACTION>
-	<ACTION NAME="query-convert-to-sqllite">
+	<ACTION NAME="query-convert-to-sqlite">
 		<CODE>
-			new masterraise.tools.Query().convertToSqlLite();
+			new masterraise.tools.Query().convertToSqLite();
 		</CODE>
 	</ACTION>
 	<ACTION NAME="query-format-in">
@@ -206,7 +206,7 @@
 			new masterraise.tools.Query().sqlServerSetVariablesSp();
 		</CODE>
 	</ACTION>
-	
+
 	<!-- Text -->
 	<ACTION NAME="text-first-upper-case">
 		<CODE>

@@ -68,7 +68,7 @@ public class MasterRaiseMenuProvider implements DynamicMenuProvider{
 		createSubMenu("query-beauty");
 		createSubMenu("query-convert");
 		createSubMenu("query-to-language");
-		createSubMenu("query-convert-to-sqllite");
+		createSubMenu("query-convert-to-sqlite");
 		createSubMenu("query-format-in");
 		createSubMenu("query-oracle-ldr-to-bat-rename-images");
 		createSubMenu("query-sqlserver-get-temp-tables");
