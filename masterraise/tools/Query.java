@@ -143,7 +143,6 @@ public class Query extends Text{
 	 * end format query
 	 */
 	private void endFormatQuery(){
-		replaceBuffer("^[ \\t]*\\n|" + TRIM_RIGHT, "", "r");
 		replaceBuffer(DOUBLE_SPACES, " ", "r");
 		replaceBuffer(DOT, ".", "");
 		replaceBuffer(ROUND_BRACKET_RIGHT + "[ ]?", ")", "r");
@@ -152,7 +151,8 @@ public class Query extends Text{
 		replaceBuffer(SHARP, "#", "r");
 		replaceBuffer(ROUND_BRACKET_LEFT, "(", "");
 		replaceBuffer(COMA, ", ", "r");
-		replaceBuffer("\\b(AND|OR|,)\\b", "\\t$0", "r");
+		replaceBuffer("\\b(AND|OR|,)\\b", "\\n\\t$0", "r");
+		replaceBuffer("^[ \\t]*\\n|" + TRIM_RIGHT, "", "r");
 	}
 
 	/**
@@ -588,7 +588,6 @@ public class Query extends Text{
 			switch(query2){
 			case "SELECT JOIN":
 				if(!findBuffer("'", "a")) {
-					//TODO:CUANDO INGRESA NO DEBE PREGUNTAR NUEVAMENTE
 					textArea.goToBufferStart(false);
 					textArea.goToNextLine(false);
 					textArea.goToBufferEnd(true);
@@ -738,11 +737,12 @@ public class Query extends Text{
 	}
 
 	/**
-	 * Convert any Query to SqlLite
+	 * Convert any Query to SQLite
 	 */
-	public void convertToSqlLite(){
+	public void convertToSqLite(){
 		String t = iniSelectedText();
-		t=t.replaceAll("(?m)(\"| ENABLE| BYTE)", "");
+		t=t.replaceAll("(?m)\"| (ENABLE|BYTE|NOVALIDATE)\\b", "");
+		t=t.replace("(?m)NUMBER(*", "NUMBER(1");
 		t=t.replaceAll("(?m)(\\w+\\.)(\\w+)", "$2");
 		endSelectedText(t);
 	}
