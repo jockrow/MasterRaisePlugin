@@ -42,7 +42,7 @@ public class MyGeneration extends Text{
 		t=t.replaceAll("(?m)(^)(.*.)(\" />$)", prefix + "$2" + suffix);
 		endSelectedText(t);
 	}
-	
+
 	/**
 	 * format csv to My Generation columns properties
 	 *@Sample
