@@ -7,8 +7,6 @@ import java.lang.reflect.Method;
 import javax.swing.JDialog;
 import javax.swing.JMenuBar;
 
-import org.gjt.sp.jedit.Buffer;
-
 import masterraise.Text;
 
 /**
@@ -32,7 +30,7 @@ public class Java extends Text{
 	 * }
 	 */
 	public String genGetSet(){
-		Buffer bfTmp = openTmpBuffer();
+		openTmpBuffer();
 
 		replaceBuffer("[ \\t]*=.*|;", "", "r");
 		replaceBuffer("(\\p{Graph}+)([ \\t]+)(\\p{Graph}+)([ \\t]+)(\\w)(\\p{Graph}+)"
@@ -45,7 +43,7 @@ public class Java extends Text{
 						+ "\\n\""
 						, "bir");
 
-		closeTmpBuffer(bfTmp);
+		closeTmpBuffer();
 
 		return textArea.getText();
 	}
@@ -75,7 +73,7 @@ public class Java extends Text{
 	 */
 	public String fields2javaProperties(){
 		String REPLACE = "(object)(\\.set)(\\w+)(.*)(get)(\\w+)(.*)";
-		Buffer bfTmp = openTmpBuffer();
+		openTmpBuffer();
 
 		replaceBuffer("\"", "", "");
 
@@ -101,7 +99,7 @@ public class Java extends Text{
 		//declare
 		duplicate(text);
 		replaceSelection(REPLACE, "private $6 $3;", "r");
-		closeTmpBuffer(bfTmp);
+		closeTmpBuffer();
 
 		return textArea.getText();
 	}

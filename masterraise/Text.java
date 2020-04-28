@@ -37,14 +37,24 @@ public class Text extends Constants{
 	public static Buffer firstEditBuffer = null;
 	public TextArea textArea = view.getTextArea();
 	public EditPane editPane = view.getEditPane();
-	//TODO:reemplazar selectedText por textArea.getSelectedText()
 	public String selectedText = textArea.getSelectedText() == null ? "" : textArea.getSelectedText();
 	public String previousText = "";
 	private Console console = (Console) view.getDockableWindowManager().getDockable("console");
 	private Selection[] prevSelection = null;
+	private static String firstCalledMethod = "";
+	private static String lastCalledMethod = "";
+	Buffer bfTmp = null;
 
 	public Selection[] getPrevSelection() {
 		return prevSelection;
+	}
+	
+	public Buffer getBfTmp() {
+		return bfTmp;
+	}
+
+	public void setBfTmp(Buffer bfTmp) {
+		this.bfTmp = bfTmp;
 	}
 
 	/**
@@ -178,7 +188,6 @@ public class Text extends Constants{
 	 * @return Number of replaces
 	 */
 	public int replaceSelection(String search, String replace, String opts){
-		//TODO:corregir la selección para una sóla línea
 		boolean ic =  SearchAndReplace.getIgnoreCase();
 		boolean re =  SearchAndReplace.getRegexp();
 		boolean ww = SearchAndReplace.getWholeWord();
@@ -240,47 +249,53 @@ public class Text extends Constants{
 		return result;
 	}
 
-	public Buffer openTmpBuffer(){
+	public void openTmpBuffer(){
+		setFirstCalledMethod();
+		
 		//if is not selection take all textArea
 		if(selectedText.trim().equals("")){
-			selectedText = textArea.getText();
+			textArea.selectAll();
 		}
+		selectedText = textArea.getSelectedText();
 
 		if(firstEditBuffer == null) {
 			firstEditBuffer = buffer;
+			bfTmp = BufferSetManager.createUntitledBuffer();
+			bfTmp.insert(0, selectedText);
+			editPane.setBuffer(bfTmp);
 		}
-		Buffer bfTmp = BufferSetManager.createUntitledBuffer();
+		else {
+			bfTmp = buffer;
+		}
 
-		previousText = selectedText;
-		bfTmp.insert(0, selectedText);
 		editPane.setBuffer(bfTmp);
+		previousText = selectedText;
 		replaceBuffer(TRIM_BORDER, "", "r");
 		replaceBuffer(TRIM_LEFT, "", "r");
-		return bfTmp;
 	}
 
-	//TODO:registrar el primer método para que al final cuando el método que invoca sea igual éste lo cierre
-	public void closeTmpBuffer(Buffer bfTmp){
-//		if(!isJUnitTest()) {
-			selectedText = textArea.getText();
+	public void closeTmpBuffer(){
+		setLastCalledMethod();
 
-			if(!isInvokingTwoTimes()) {
-				jEdit._closeBuffer(view, bfTmp);
-				editPane.setBuffer(firstEditBuffer);
-				firstEditBuffer = null;
-				textArea.setText(selectedText);
-				Registers.setRegister('$', selectedText);
-			}
-//		}
+		selectedText = textArea.getText();
+
+		if(firstCalledMethod.equals(lastCalledMethod) && !isJUnitTest()) {
+			jEdit._closeBuffer(view, bfTmp);
+			editPane.setBuffer(firstEditBuffer);
+			textArea.setSelectedText(selectedText);
+			Registers.setRegister('$', selectedText);
+		}
+		firstEditBuffer = null;
+		firstCalledMethod = "";
 	}
 
 	public String iniSelectedText(){
 		String t = textArea.getSelectedText();
+		setFirstCalledMethod();
 
 		if(t=="" || t==null){
 			textArea.selectAll();
 			t=textArea.getSelectedText();
-//			t=textArea.getText();
 		}
 		prevSelection = textArea.getSelection();
 		previousText = t;
@@ -289,13 +304,21 @@ public class Text extends Constants{
 	}
 
 	public void endSelectedText(String t){
-		//TODO: si lo quito funciona QueryTest y no funcionan los demás, y si lo pongo pasa lo contrario
-//		if(!isJUnitTest()) {
-//		if(!isInvokingTwoTimes()) {
-			textArea.setSelection(prevSelection);
-			textArea.setSelectedText(t);
+		setLastCalledMethod();
+
+		if(isJUnitTest()) {
+			try {
+				Thread.sleep(950);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		textArea.setSelection(prevSelection);
+		textArea.setSelectedText(t);
+		if(firstCalledMethod.equals(lastCalledMethod)) {
 			Registers.setRegister('$', t);
-//		}
+		}
 	}
 
 	protected void deleteDuplicates(TextArea textArea){
@@ -466,28 +489,53 @@ public class Text extends Constants{
 		return list.indexOf(junit) >= 0;
 	}
 
-	private boolean isInvokingTwoTimes() {
-		int numInvoking = 0;
+	private void setFirstCalledMethod() {
+		if(firstCalledMethod != "") {
+			return;
+		}
+
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		List<StackTraceElement> listTrace = Arrays.asList(stackTrace);
+
+		for (StackTraceElement element : listTrace) {
+			if(element.getClassName().startsWith("masterraise.")
+					&& !element.getClassName().startsWith("test.")
+					&& !element.getClassName().startsWith("masterraise.Text")
+					) {
+				firstCalledMethod = element.getClassName() + "." + element.getMethodName();
+				break;
+			}
+		}
+	}
+
+	private void setLastCalledMethod() {
 		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 		List<StackTraceElement> listTrace = Arrays.asList(stackTrace);
 		
 		for (StackTraceElement element : listTrace) {
-			if(element.getClassName().startsWith("org.junit.")) {
-				return true;
-			}
-			
 			if(element.getClassName().startsWith("masterraise.")
+					&& !element.getClassName().startsWith("test.")
 					&& !element.getClassName().startsWith("masterraise.Text")
-					&& countOccurrences(element.getClassName(), "masterraise\\..*\\.showGui", "r") < 0
-					&& countOccurrences(element.getClassName(), "masterraise\\..*\\.actionPerformed", "r") < 0
 					) {
-				numInvoking++;
-				if(numInvoking > 1) {
-					return true;
+				lastCalledMethod = element.getClassName() + "." + element.getMethodName();
+				try {
+					Class<?> queryClass = Class.forName(element.getClassName());
+					queryClass.getMethod(element.getMethodName());
+					break;
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				} catch (NoSuchMethodException e) {
+					lastCalledMethod = "";
 				}
 			}
+			else if(element.getClassName().startsWith("masterraise.Text")
+					&& !element.getMethodName().equals("setLastCalledMethod")
+					&& !element.getMethodName().equals("endSelectedText")
+					&& !element.getMethodName().equals("closeTmpBuffer")
+					) {
+				lastCalledMethod = element.getClassName() + "." + element.getMethodName();
+				break;
+			}
 		}
-
-		return false;
 	}
 }

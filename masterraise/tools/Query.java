@@ -37,7 +37,6 @@ import masterraise.files.MrFile;
  *
  */
 public class Query extends Text{
-	private Buffer bfTmp = null;
 	private String queryType = "";
 	private JDialog dialog = new JDialog(view, "Convert Query", true);
 	private JPanel content = new JPanel(new BorderLayout());
@@ -122,7 +121,7 @@ public class Query extends Text{
 		replaceBuffer(TRIM_COMA, ",", "r");
 
 		if(hasSyntaxError()){
-			jEdit._closeBuffer(view,(Buffer) bfTmp);
+			jEdit._closeBuffer(view,(Buffer) getBfTmp());
 			Macros.error(view, msgSyntaxError);
 			return;
 		}
@@ -266,7 +265,7 @@ public class Query extends Text{
 		 *	OR Prestar.dbo.autAutorizacionASP.autIDAutorizacion = 456
 		 */
 		public String processText(){
-			bfTmp = openTmpBuffer();
+			openTmpBuffer();
 
 			if(textArea.getText().toUpperCase().indexOf("FROM") >= 0 && textArea.getText().toUpperCase().indexOf("INSERT") >= 0){
 				queryType = "INSERT SELECT";
@@ -311,8 +310,8 @@ public class Query extends Text{
 
 			endFormatQuery();
 
-			String convertedQuery = bfTmp.getText();
-			closeTmpBuffer(bfTmp);
+			String convertedQuery = getBfTmp().getText();
+			closeTmpBuffer();
 			dialog.dispose();
 
 			return convertedQuery;
@@ -542,7 +541,7 @@ public class Query extends Text{
 		}
 
 		public String processText(){
-			bfTmp = openTmpBuffer();
+			openTmpBuffer();
 			SpreadSheet sp = new SpreadSheet();
 			String fowardQuery = "";
 			int lastSemiColon = replaceBuffer(";\\z", "", "ar");
@@ -650,8 +649,8 @@ public class Query extends Text{
 
 			endFormatQuery();
 
-			String convertedQuery = bfTmp.getText();
-			closeTmpBuffer(bfTmp);
+			String convertedQuery = getBfTmp().getText();
+			closeTmpBuffer();
 			return convertedQuery;
 		}
 	}
@@ -684,7 +683,7 @@ public class Query extends Text{
 	 * }
 	 */
 	public String queryToLanguage(){
-		bfTmp = openTmpBuffer();
+		openTmpBuffer();
 
 		textArea.setText(firsUpperCase(textArea.getText(), '_'));
 		replaceBuffer("_", "", "");
@@ -692,7 +691,7 @@ public class Query extends Text{
 		String fields = textArea.getText() + "\n\n";
 		new Java().genGetSet();
 		replaceBuffer("\\A", fields, "r");
-		closeTmpBuffer(bfTmp);
+		closeTmpBuffer();
 
 		return textArea.getText();
 	}
@@ -719,7 +718,7 @@ public class Query extends Text{
 	 * in('one', 'two', '3')
 	 */
 	public void formatIn(){
-		bfTmp = openTmpBuffer();
+		openTmpBuffer();
 		deleteDuplicates(textArea);
 		boolean isNotNumber = findBuffer("[\\p{Alpha}/\\*\\-\\+,\\(\\)\\\"#\\$&]", "air");
 
@@ -733,7 +732,7 @@ public class Query extends Text{
 			replaceBuffer("'", "", "");
 		}
 
-		closeTmpBuffer(bfTmp);
+		closeTmpBuffer();
 	}
 
 	/**
@@ -796,7 +795,7 @@ public class Query extends Text{
 	 * SET @i_maxRegistros = 30
 	 */
 	public String sqlServerSetVariablesSp(){
-		bfTmp = openTmpBuffer();
+		openTmpBuffer();
 		queryType = "SP";
 		startFormatQuery(queryType);
 		boolean hasAt = findBuffer("VALUES(@", "a");
@@ -837,7 +836,7 @@ public class Query extends Text{
 		replaceBuffer("OUTPUT", "", "");
 		endFormatQuery();
 		replaceBuffer("((\'|NUMERIC)\\()(.*)", "_1 + _3.replace(\".\", \",\")", "br");
-		closeTmpBuffer(bfTmp);
+		closeTmpBuffer();
 
 		return textArea.getText();
 	}
@@ -851,7 +850,7 @@ public class Query extends Text{
 			return "";
 		}
 
-		bfTmp = openTmpBuffer();
+		openTmpBuffer();
 
 		replaceBuffer(COMMENTS, "", "ir"); 
 
@@ -876,7 +875,7 @@ public class Query extends Text{
 
 		replaceBuffer("\\z", "\n\n" + previousText, "r");
 		replaceBuffer(TRIM_UP, "", "r");
-		closeTmpBuffer(bfTmp);
+		closeTmpBuffer();
 
 		return textArea.getText();
 	}

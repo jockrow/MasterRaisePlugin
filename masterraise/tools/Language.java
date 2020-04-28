@@ -12,8 +12,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import org.gjt.sp.jedit.Buffer;
-
 import masterraise.Text;
 
 /**
@@ -101,7 +99,7 @@ public class Language extends Text{
 	}
 
 	public String processText(String type){
-		Buffer bfTmp = openTmpBuffer();
+		openTmpBuffer();
 		replaceBuffer(BLANK_LINE, "", "r");
 
 		if(!type.equals("language-code-to-string")){
@@ -215,8 +213,8 @@ public class Language extends Text{
 			break;
 		}
 
-		String result = bfTmp.getText();
-		closeTmpBuffer(bfTmp);
+		String result = getBfTmp().getText();
+		closeTmpBuffer();
 		//TODO:reemplazar result por selectedText
 		return result;
 	}

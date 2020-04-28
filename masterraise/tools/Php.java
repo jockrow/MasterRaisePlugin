@@ -1,6 +1,5 @@
 package masterraise.tools;
 
-import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.Macros;
 
 import masterraise.Text;
@@ -14,19 +13,20 @@ public class Php extends Text{
 	 * get list for all fields from html file, to transform in php variables
 	 */
 	public String getPhpVarsFromHtml(){
-		if(!findBuffer("<[ \\t]*" + HTML_FILTER_FIELDS, "air")){
+		openTmpBuffer();
+
+		if(countOccurrences(selectedText, "<[ \\t]*" + HTML_FILTER_FIELDS, "ir") == 0){
 			Macros.error(view, "Fields not found");
 			return "";
 		}
-		Buffer bfTmp = openTmpBuffer();
 
 		new Html().getFieldsList();
 		replaceBuffer("(.*)(\\b(name|id)\\b[\"= ]+)(\\w+)(.*)", "\\$$4;", "ir");
 		sortLines(textArea);
 		deleteDuplicates(textArea);
 
-		String fields = bfTmp.getText();
-		closeTmpBuffer(bfTmp);
+		String fields = getBfTmp().getText();
+		closeTmpBuffer();
 		return fields;
 	}
 }

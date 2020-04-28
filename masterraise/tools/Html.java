@@ -25,7 +25,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.Macros;
 import org.gjt.sp.jedit.Registers;
 import org.gjt.sp.jedit.Registers.Register;
@@ -228,8 +227,7 @@ public class Html extends Text{
 	 * Extract a list for all fields from html file 
 	 */
 	public String getFieldsList(){
-		//TODO:VERIFICAR QUE AL DAR DESHACER SE DEVUELVA AL TEXTO ORIGINAL
-		Buffer bfTmp = openTmpBuffer();
+		openTmpBuffer();
 
 		if(!findBuffer("<" + HTML_FILTER_FIELDS, "air")){
 			Macros.error(view, "Fields not found");
@@ -240,8 +238,8 @@ public class Html extends Text{
 		replaceBuffer("^((?!<" + HTML_FILTER_FIELDS + ").)*$", "", "ir");
 		replaceBuffer("(.*type[ \t]*=[ \t\"\']*" + HTML_NOT_FILTER_FIELDS + ".*)|" + BLANK_LINE, "", "ir");
 
-		String fields = bfTmp.getText();
-		closeTmpBuffer(bfTmp);
+		String fields = getBfTmp().getText();
+		closeTmpBuffer();
 		return fields;
 	}
 
